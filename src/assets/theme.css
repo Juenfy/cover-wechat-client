@@ -1,0 +1,34 @@
+/* 定制主题 */
+:root:root {
+  --red-color: red;
+  --main-colr: #57be6a;
+  --van-text-color: #181818;
+  --van-text-color-tint: #a5a5a5;
+  --van-tabbar-height: 4rem;
+  --van-tabbar-background: #f9f9f9;
+  --van-tabbar-item-active-background: var(--van-tabbar-background);
+  --van-tabbar-item-active-color: var(--main-colr);
+  --van-button-success-background: var(--red-colr);
+  --van-nav-bar-background: #ededed;
+  --van-nav-bar-border-color: #e3e3e3;
+  --van-search-background: var(--van-nav-bar-background);
+  --van-search-content-background: var(--van-white);
+  --van-search-action-text-color: #b2b2b2;
+  --van-nav-bar-icon-color: var(--van-text-color);
+  --van-action-bar-background: #f6f6f6;
+  --van-switch-on-background: var(--main-colr);
+  --van-checkbox-checked-icon-color: var(--main-colr);
+  --van-button-success-background: var(--main-colr);
+}
+
+.friend-list .van-cell__left-icon {
+  height: 3rem;
+  font-size: 3rem;
+  line-height: 3rem;
+  margin-right: 1rem;
+}
+
+main > .van-cell-group > .van-cell--center > .van-cell__title {
+  display: flex;
+  align-items: center;
+}
