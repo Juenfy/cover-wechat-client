@@ -20,10 +20,6 @@ const actions = [
   { text: "添加好友", value: "search-friend" },
 ];
 const showChatGroupCreate = ref(false);
-
-const hideChatGroupCreate = () => {
-  showChatGroupCreate.value = false;
-};
 </script>
 
 <template>
@@ -94,7 +90,10 @@ const hideChatGroupCreate = () => {
     </van-tabbar>
   </footer>
 
-  <chat-group-create :show="showChatGroupCreate" @hide="hideChatGroupCreate" />
+  <chat-group-create
+    :show="showChatGroupCreate"
+    @hide="showChatGroupCreate = false"
+  />
 </template>
 
 <style scoped></style>

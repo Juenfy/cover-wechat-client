@@ -4,6 +4,7 @@
   --theme-text-color: #181818;
   --theme-text-color-tint: #a5a5a5;
   --theme-blue-tint: #61668e;
+
   --van-primary-color: var(--theme-background);
   --van-text-color: var(--theme-text-color);
   --van-tabbar-height: 4rem;
@@ -17,6 +18,7 @@
   --van-search-action-text-color: #b2b2b2;
   --van-nav-bar-icon-color: var(--van-text-color);
   --van-action-bar-background: #f6f6f6;
+  --van-nav-bar-text-color: var(--theme-text-color);
 }
 
 .friend-list .van-cell__left-icon {
@@ -29,4 +31,12 @@
 main > .van-cell-group > .van-cell--center > .van-cell__title {
   display: flex;
   align-items: center;
+}
+
+/* 重写Vant Form样式*/
+.van-form .van-field {
+  background: #f7f7f7;
+  border-radius: 0.5rem;
+  font-size: 1.2rem;
+  padding: 1rem;
 }

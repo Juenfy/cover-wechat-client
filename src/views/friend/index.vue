@@ -1,7 +1,10 @@
 <script setup>
-import { onBeforeMount } from "vue";
+import FriendNew from "@/components/friend/new.vue";
+import { ref, onBeforeMount } from "vue";
 import { useAppStore } from "@/stores/app";
 const appStore = useAppStore();
+const showFriendNew = ref(false);
+
 onBeforeMount(() => {
   appStore.initHeader({ title: "通讯录", navbar: true, search: true });
 });
@@ -15,7 +18,8 @@ onBeforeMount(() => {
         icon="/public/new-friend.png"
         size="large"
         :center="true"
-        @click="() => {}"
+        clickable
+        @click="showFriendNew = true"
       />
       <van-cell
         title="仅聊天的朋友"
@@ -61,4 +65,5 @@ onBeforeMount(() => {
       />
     </van-index-bar>
   </main>
+  <friend-new :show="showFriendNew" @hide="showFriendNew = false" />
 </template>

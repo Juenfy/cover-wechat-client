@@ -6,9 +6,6 @@ const router = useRouter();
 const chatSetting = reactive({ muted: false, top: false, remind: false });
 const showClearChat = ref(false);
 const showChatSearch = ref(false);
-const hideChatSearch = () => {
-  showChatSearch.value = false;
-};
 </script>
 
 <template>
@@ -49,6 +46,7 @@ const hideChatSearch = () => {
     <van-cell-group>
       <van-cell
         title="查找聊天内容"
+        is-link
         clickable
         @click="showChatSearch = true"
         size="large"
@@ -115,7 +113,7 @@ const hideChatSearch = () => {
       </van-popup>
     </van-cell-group>
   </main>
-  <chat-search :show="showChatSearch" @hide="hideChatSearch" />
+  <chat-search :show="showChatSearch" @hide="showChatSearch = false" />
 </template>
 
 <style lang="less" scoped>

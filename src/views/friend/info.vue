@@ -1,9 +1,12 @@
 <script setup>
+import FriendRemark from "@/components/friend/remark.vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const showFriendSetting = () => {
   router.push("/friend/setting");
 };
+const showFriendRemark = ref(false);
 </script>
 <template>
   <header>
@@ -44,10 +47,13 @@ const showFriendSetting = () => {
       <van-cell
         title="备注和标签"
         is-link
-        url="https://github.com"
+        clickable
+        @click="showFriendRemark = true"
         size="large"
       />
       <van-cell title="朋友权限" is-link to="/friend/perm" size="large" />
+    </van-cell-group>
+    <van-cell-group :border="false">
       <van-cell is-link to="index" size="large" :center="true">
         <template #title>
           <span>朋友圈</span>
@@ -57,6 +63,8 @@ const showFriendSetting = () => {
           />
         </template>
       </van-cell>
+    </van-cell-group>
+    <van-cell-group :border="false">
       <van-cell title="个性签名" value="我是PHP大佬" size="large" />
       <van-cell title="来源" value="对方通过搜索手机号添加" size="large" />
     </van-cell-group>
@@ -64,15 +72,24 @@ const showFriendSetting = () => {
       size="large"
       :square="true"
       icon="chat-o"
-      style="margin-top: 0.5rem; border: none; color: var(--theme-blue-tint)"
+      style="
+        margin-top: 0.5rem;
+        border: none;
+        color: var(--theme-blue-tint);
+        font-weight: bold;
+      "
       to="/chat/detail"
       >发送消息</van-button
     >
   </main>
+  <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
 </template>
 <style scoped lang="less">
 .van-nav-bar {
   background: var(--van-white);
+}
+.van-cell-group {
+  margin-bottom: 0.5rem;
 }
 main {
   position: fixed;

@@ -3,14 +3,12 @@ import { useRouter, useRoute } from "vue-router";
 import { ref } from "vue";
 import "emoji-picker-element";
 const router = useRouter();
-const route = useRoute();
 const popupMoreBottom = ref(false);
 const popupEmojiBottom = ref(false);
 const message = ref("");
 const input = ref(null);
 const messageList = ref([]);
 
-console.log(route.query);
 const onClickRight = (e) => {
   console.log(e);
   router.push({
@@ -60,6 +58,15 @@ const sendMessage = () => {
     message.value = "";
   }
 };
+
+const onClickAvatar = (id) => {
+  router.push({
+    path: "/friend/info",
+    query: {
+      id: id,
+    },
+  });
+};
 </script>
 <template>
   <header>
@@ -85,7 +92,13 @@ const sendMessage = () => {
           {{ item.name }}
         </p>
         <article :class="item.right ? 'right' : ''">
-          <div class="avatar"><img alt="avatar" :src="item.avatar" /></div>
+          <div class="avatar">
+            <img
+              alt="avatar"
+              :src="item.avatar"
+              @click="onClickAvatar(item.id)"
+            />
+          </div>
           <div class="msg">
             <div class="tri"></div>
             <div class="msg_inner">{{ item.message }}</div>

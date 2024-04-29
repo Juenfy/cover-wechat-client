@@ -1,4 +1,5 @@
 <script setup>
+import FriendRemark from "@/components/friend/remark.vue";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
@@ -6,6 +7,7 @@ const friendSetting = reactive({
   star: false,
   blacklist: false,
 });
+const showFriendRemark = ref(false);
 const deleteFriend = () => {};
 </script>
 <template>
@@ -22,7 +24,8 @@ const deleteFriend = () => {};
       <van-cell
         title="设置备注和标签"
         is-link
-        to=""
+        clickable
+        @click="showFriendRemark = true"
         :center="true"
         size="large"
         value="PHP大佬"
@@ -67,6 +70,7 @@ const deleteFriend = () => {};
       >删除联系人</van-button
     >
   </main>
+  <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
 </template>
 
 <style lang="less" scoped>
