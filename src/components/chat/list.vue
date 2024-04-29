@@ -147,6 +147,6 @@ const handleTop = (id) => {
 
 .chat-item-center > .text,
 .chat-item-right {
-  color: var(--van-text-color-tint);
+  color: var(--theme-text-color-tint);
 }
 </style>

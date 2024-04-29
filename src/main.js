@@ -6,6 +6,7 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
 import Vant from "vant";
+import "@/assets/animation.css";
 import "@/assets/main.css";
 import "vant/lib/index.css";
 import "@/assets/theme.css";

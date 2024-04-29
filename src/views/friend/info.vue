@@ -1,10 +1,22 @@
 <script setup>
 import { useRouter } from "vue-router";
 const router = useRouter();
+const showFriendSetting = () => {
+  router.push("/friend/setting");
+};
 </script>
 <template>
   <header>
-    <van-nav-bar left-arrow @click-left="router.go(-1)" :border="false" />
+    <van-nav-bar
+      left-arrow
+      @click-left="router.go(-1)"
+      @click-right="showFriendSetting"
+      :border="false"
+    >
+      <template #right>
+        <van-icon name="ellipsis" />
+      </template>
+    </van-nav-bar>
   </header>
   <main>
     <van-cell-group :border="false">
@@ -35,7 +47,7 @@ const router = useRouter();
         url="https://github.com"
         size="large"
       />
-      <van-cell title="朋友权限" is-link to="index" size="large" />
+      <van-cell title="朋友权限" is-link to="/friend/perm" size="large" />
       <van-cell is-link to="index" size="large" :center="true">
         <template #title>
           <span>朋友圈</span>
@@ -45,12 +57,14 @@ const router = useRouter();
           />
         </template>
       </van-cell>
+      <van-cell title="个性签名" value="我是PHP大佬" size="large" />
+      <van-cell title="来源" value="对方通过搜索手机号添加" size="large" />
     </van-cell-group>
     <van-button
       size="large"
       :square="true"
       icon="chat-o"
-      style="margin-top: 0.5rem; border: none; color: #61668e"
+      style="margin-top: 0.5rem; border: none; color: var(--theme-blue-tint)"
       to="/chat/detail"
       >发送消息</van-button
     >
@@ -81,7 +95,7 @@ main {
         flex-direction: column;
         justify-content: space-evenly;
         span {
-          color: var(--van-text-color-tint);
+          color: var(--theme-text-color-tint);
         }
         .nickname {
           color: var(--van-text-color);

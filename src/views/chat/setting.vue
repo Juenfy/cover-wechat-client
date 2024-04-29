@@ -1,9 +1,14 @@
 <script setup>
+import ChatSearch from "@/components/chat/search.vue";
 import { reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const chatSetting = reactive({ muted: false, top: false, remind: false });
-const showClearChatPopup = ref(false);
+const showClearChat = ref(false);
+const showChatSearch = ref(false);
+const hideChatSearch = () => {
+  showChatSearch.value = false;
+};
 </script>
 
 <template>
@@ -42,7 +47,12 @@ const showClearChatPopup = ref(false);
       </van-grid>
     </van-cell-group>
     <van-cell-group>
-      <van-cell title="查找聊天内容" is-link to="chat" size="large" />
+      <van-cell
+        title="查找聊天内容"
+        clickable
+        @click="showChatSearch = true"
+        size="large"
+      />
     </van-cell-group>
     <van-cell-group>
       <van-cell title="消息免打扰" size="large">
@@ -69,12 +79,12 @@ const showClearChatPopup = ref(false);
         title="清除聊天记录"
         clickable
         size="large"
-        @click="showClearChatPopup = true"
+        @click="showClearChat = true"
       />
     </van-cell-group>
     <van-cell-group>
       <van-popup
-        v-model:show="showClearChatPopup"
+        v-model:show="showClearChat"
         round
         position="bottom"
         :style="{ background: '#f9f9f9' }"
@@ -92,7 +102,7 @@ const showClearChatPopup = ref(false);
           >清空聊天记录</span
         >
         <span
-          @click="showClearChatPopup = false"
+          @click="showClearChat = false"
           :style="{
             background: '#fff',
             display: 'block',
@@ -105,6 +115,7 @@ const showClearChatPopup = ref(false);
       </van-popup>
     </van-cell-group>
   </main>
+  <chat-search :show="showChatSearch" @hide="hideChatSearch" />
 </template>
 
 <style lang="less" scoped>

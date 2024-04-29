@@ -7,6 +7,8 @@ import home from "@/views/Home.vue";
 import chatDetail from "@/views/chat/detail.vue";
 import chatSetting from "@/views/chat/setting.vue";
 import friendInfo from "@/views/friend/info.vue";
+import friendSetting from "@/views/friend/setting.vue";
+import friendPerm from "@/views/friend/perm.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -51,6 +53,16 @@ const router = createRouter({
       path: "/friend/info",
       name: "friend-info",
       component: friendInfo,
+    },
+    {
+      path: "/friend/setting",
+      name: "friend-setting",
+      component: friendSetting,
+    },
+    {
+      path: "/friend/perm",
+      name: "friend-perm",
+      component: friendPerm,
     },
   ],
 });

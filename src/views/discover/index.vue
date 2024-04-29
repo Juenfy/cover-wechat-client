@@ -6,7 +6,6 @@ const appStore = useAppStore();
 const route = useRoute();
 onBeforeMount(() => {
   appStore.initHeader({ title: "发现", navbar: true, search: false });
-  console.log(route.params);
   console.log(route.query);
 });
 

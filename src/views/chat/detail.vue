@@ -131,7 +131,7 @@ const sendMessage = () => {
           popupEmojiBottom ? 'emoji-bottom emoji-bottom-popup' : 'emoji-bottom'
         "
         @emojiClick="onSelectEmoji"
-      ></emoji-picker>
+      />
     </div>
   </footer>
 </template>
@@ -202,7 +202,7 @@ const sendMessage = () => {
       display: block;
     }
     > li > p.nickname {
-      color: var(--van-text-color-tint);
+      color: var(--theme-text-color-tint);
       font-size: 12px;
       line-height: 12px;
     }

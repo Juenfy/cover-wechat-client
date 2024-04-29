@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from "vue";
 
-const props = defineProps({ showGroupCreate: Boolean });
+const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
-defineEmits(["closeGroupCreate"]);
+defineEmits(["hide"]);
 
 const onSearchFocus = () => {
   console.log("onSearchFocus");
@@ -20,7 +20,7 @@ const searchFocus = ref(false);
 </script>
 <template>
   <van-popup
-    v-model:show="props.showGroupCreate"
+    v-model:show="props.show"
     position="bottom"
     :style="{ height: '100%', width: '100%' }"
     duration="0.2"
@@ -29,11 +29,11 @@ const searchFocus = ref(false);
       <van-nav-bar
         title="选择联系人"
         left-arrow
-        @click-left="$emit('closeGroupCreate')"
-        @click-right="$emit('closeGroupCreate')"
+        @click-left="$emit('hide')"
+        @click-right="$emit('hide')"
       >
         <template #right>
-          <van-button type="success" size="small">完成</van-button>
+          <van-button type="primary" size="small">完成</van-button>
         </template>
       </van-nav-bar>
     </header>

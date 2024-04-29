@@ -1,7 +1,7 @@
 <script setup>
+import ChatList from "@/components/chat/list.vue";
 import { ref, onBeforeMount } from "vue";
 import { useAppStore } from "@/stores/app";
-import ChatList from "@/components/chat/list.vue";
 
 const appStore = useAppStore();
 const chatList = ref([

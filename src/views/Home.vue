@@ -1,8 +1,8 @@
 <script setup>
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import { reactive, ref } from "vue";
 import { useAppStore } from "@/stores/app";
-import GroupCreate from "@/components/chat/group-create.vue";
+import ChatGroupCreate from "@/components/chat/group/create.vue";
 const appStore = useAppStore();
 const route = useRoute();
 const fullPathToTabBarActive = reactive({
@@ -12,19 +12,17 @@ const fullPathToTabBarActive = reactive({
   "/discover": 2,
   "/me": 3,
 });
-console.log(fullPathToTabBarActive[route.fullPath]);
 const tabBarActive = ref(fullPathToTabBarActive[route.fullPath]);
 const showPopover = ref(false);
-const router = useRouter();
 
 const actions = [
   { text: "发起群聊", value: "create-group" },
   { text: "添加好友", value: "search-friend" },
 ];
-const showGroupCreate = ref(false);
+const showChatGroupCreate = ref(false);
 
-const closeGroupCreate = () => {
-  showGroupCreate.value = false;
+const hideChatGroupCreate = () => {
+  showChatGroupCreate.value = false;
 };
 </script>
 
@@ -41,7 +39,7 @@ const closeGroupCreate = () => {
           v-model:show="showPopover"
           theme="dark"
           :actions="actions"
-          @select="showGroupCreate = true"
+          @select="showChatGroupCreate = true"
           placement="bottom-end"
         >
           <template #reference>
@@ -96,10 +94,7 @@ const closeGroupCreate = () => {
     </van-tabbar>
   </footer>
 
-  <group-create
-    :showGroupCreate="showGroupCreate"
-    @closeGroupCreate="closeGroupCreate"
-  />
+  <chat-group-create :show="showChatGroupCreate" @hide="hideChatGroupCreate" />
 </template>
 
 <style scoped></style>
