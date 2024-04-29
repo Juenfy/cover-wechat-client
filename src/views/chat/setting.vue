@@ -1,11 +1,13 @@
 <script setup>
-import ChatSearch from "@/components/chat/search.vue";
-import { reactive, ref, watch } from "vue";
+import CommonSearch from "@/components/common/search.vue";
+import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const chatSetting = reactive({ muted: false, top: false, remind: false });
 const showClearChat = ref(false);
-const showChatSearch = ref(false);
+const showSearch = ref(false);
+const searchResult = ref([]);
+const onSearch = (value) => {};
 </script>
 
 <template>
@@ -48,7 +50,7 @@ const showChatSearch = ref(false);
         title="查找聊天内容"
         is-link
         clickable
-        @click="showChatSearch = true"
+        @click="showSearch = true"
         size="large"
       />
     </van-cell-group>
@@ -113,7 +115,15 @@ const showChatSearch = ref(false);
       </van-popup>
     </van-cell-group>
   </main>
-  <chat-search :show="showChatSearch" @hide="showChatSearch = false" />
+  <common-search
+    :show="showSearch"
+    @hide="showSearch = false"
+    action="chat"
+    placeholder="搜索"
+    background="var(--van-nav-bar-background)"
+    @search="onSearch"
+    :result="searchResult"
+  />
 </template>
 
 <style lang="less" scoped>

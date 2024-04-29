@@ -1,8 +1,10 @@
 <script setup>
+import ChatGroupCreate from "@/components/chat/group/create.vue";
+import CommonSearch from "@/components/common/search.vue";
 import { useRoute } from "vue-router";
 import { reactive, ref } from "vue";
 import { useAppStore } from "@/stores/app";
-import ChatGroupCreate from "@/components/chat/group/create.vue";
+
 const appStore = useAppStore();
 const route = useRoute();
 const fullPathToTabBarActive = reactive({
@@ -20,6 +22,9 @@ const actions = [
   { text: "添加好友", value: "search-friend" },
 ];
 const showChatGroupCreate = ref(false);
+const showSearch = ref(false);
+const searchResult = ref([]);
+const onSearch = (value) => {};
 </script>
 
 <template>
@@ -55,6 +60,7 @@ const showChatGroupCreate = ref(false);
       placeholder="搜索"
       v-if="appStore.showSearch"
       input-align="center"
+      @focus="showSearch = true"
     />
   </header>
 
@@ -93,6 +99,15 @@ const showChatGroupCreate = ref(false);
   <chat-group-create
     :show="showChatGroupCreate"
     @hide="showChatGroupCreate = false"
+  />
+  <common-search
+    :show="showSearch"
+    @hide="showSearch = false"
+    action="home"
+    placeholder="搜索"
+    background="var(--van-nav-bar-background)"
+    @search="onSearch"
+    :result="searchResult"
   />
 </template>
 

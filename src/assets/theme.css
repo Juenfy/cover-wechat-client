@@ -3,8 +3,7 @@
   --theme-background: #57be6a;
   --theme-text-color: #181818;
   --theme-text-color-tint: #a5a5a5;
-  --theme-blue-tint: #61668e;
-
+  --theme-blue-tint: #5f688a;
   --van-primary-color: var(--theme-background);
   --van-text-color: var(--theme-text-color);
   --van-tabbar-height: 4rem;
@@ -15,7 +14,7 @@
   --van-nav-bar-border-color: #e3e3e3;
   --van-search-background: var(--van-nav-bar-background);
   --van-search-content-background: var(--van-white);
-  --van-search-action-text-color: #b2b2b2;
+  --van-search-action-text-color: var(--theme-blue-tint);
   --van-nav-bar-icon-color: var(--van-text-color);
   --van-action-bar-background: #f6f6f6;
   --van-nav-bar-text-color: var(--theme-text-color);
@@ -28,15 +27,43 @@
   margin-right: 1rem;
 }
 
-main > .van-cell-group > .van-cell--center > .van-cell__title {
-  display: flex;
-  align-items: center;
-}
+main {
+  /* 重写Vant Form样式*/
+  .van-form .van-field {
+    background: #f7f7f7;
+    border-radius: 0.5rem;
+    font-size: 1.2rem;
+    padding: 1rem;
+  }
+  > .van-cell-group > .van-cell--center > .van-cell__title {
+    display: flex;
+    align-items: center;
+  }
+  .right-box {
+    height: 2.5rem;
+    span {
+      color: var(--theme-text-color-tint);
+    }
+  }
+  .left-box {
+    margin-left: 0.5rem;
+    height: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
-/* 重写Vant Form样式*/
-.van-form .van-field {
-  background: #f7f7f7;
-  border-radius: 0.5rem;
-  font-size: 1.2rem;
-  padding: 1rem;
+    > span {
+      display: block;
+      width: 15rem;
+      overflow: hidden; /* 隐藏超出部分 */
+      text-overflow: ellipsis; /* 超出部分显示为省略号 */
+    }
+
+    > span:first-child {
+      font-size: 18px;
+    }
+    > span:last-child {
+      color: var(--theme-text-color-tint);
+    }
+  }
 }

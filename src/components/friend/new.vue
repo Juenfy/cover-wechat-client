@@ -1,7 +1,15 @@
 <script setup>
+import CommonSearch from "../common/search.vue";
+import FriendAdd from "../friend/add.vue";
+import { ref } from "vue";
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
 defineEmits(["hide"]);
+
+const showFriendAdd = ref(false);
+const showSearch = ref(false);
+const searchResult = ref([]);
+const onSearch = (value) => {};
 </script>
 
 <template>
@@ -17,9 +25,13 @@ defineEmits(["hide"]);
         left-arrow
         :right-text="'添加朋友'"
         @click-left="$emit('hide')"
-        @click-right="onClickRight"
+        @click-right="showFriendAdd = true"
       />
-      <van-search placeholder="账号/手机号" input-align="center" />
+      <van-search
+        placeholder="账号/手机号"
+        input-align="center"
+        @focus="showSearch = true"
+      />
     </header>
     <main>
       <van-cell-group title="近三天">
@@ -104,35 +116,19 @@ defineEmits(["hide"]);
       </van-cell-group>
     </main>
   </van-popup>
+  <common-search
+    :show="showSearch"
+    @hide="showSearch = false"
+    action="friend"
+    placeholder="账号/手机号"
+    @search="onSearch"
+    :result="searchResult"
+  />
+
+  <friend-add
+    :show="showFriendAdd"
+    @showSearch="showSearch = true"
+    @hide="showFriendAdd = false"
+  />
 </template>
-<style scoped lang="less">
-main {
-  .right-box {
-    height: 2.5rem;
-    span {
-      color: var(--theme-text-color-tint);
-    }
-  }
-  .left-box {
-    margin-left: 0.5rem;
-    height: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    > span {
-      display: block;
-      width: 15rem;
-      overflow: hidden; /* 隐藏超出部分 */
-      text-overflow: ellipsis; /* 超出部分显示为省略号 */
-    }
-
-    > span:first-child {
-      font-size: 18px;
-    }
-    > span:last-child {
-      color: var(--theme-text-color-tint);
-    }
-  }
-}
-</style>
+<style scoped lang="less"></style>
