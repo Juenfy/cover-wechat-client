@@ -1,25 +1,37 @@
 <script setup>
 import { onBeforeMount, watch } from "vue";
-import { useAppStore } from "@/stores/app";
+import { useAppStore } from "@/stores/home";
 import { useRoute } from "vue-router";
-const appStore = useAppStore();
+const homeStore = useAppStore();
 const route = useRoute();
 onBeforeMount(() => {
-  appStore.initHeader({ title: "发现", navbar: true, search: false });
+  homeStore.initHeader({ title: "发现", navbar: true, search: false });
   console.log(route.query);
 });
-
-watch(
-  () => route.params,
-  (newVal, oldVal) => {
-    console.log(newVal);
-  }
-);
 </script>
 <template>
-  <div class="discover">
-    <h1>This is an discover page</h1>
-  </div>
+  <main class="main">
+    <van-cell-group>
+      <van-cell :center="true" is-link to="/discover/moment">
+        <template #title>
+          <van-image height="1.5rem" width="1.5rem" src="/public/moment.png" />
+          <div class="left-box" style="">
+            <span>朋友圈</span>
+            <span></span>
+          </div>
+        </template>
+      </van-cell>
+      <van-cell :center="true" is-link to="">
+        <template #title>
+          <van-image height="1.5rem" width="1.5rem" src="/public/scan-o.png" />
+          <div class="left-box" style="">
+            <span>扫一扫</span>
+            <span></span>
+          </div>
+        </template>
+      </van-cell>
+    </van-cell-group>
+  </main>
 </template>
 
 <style>

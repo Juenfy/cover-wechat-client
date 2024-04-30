@@ -9,6 +9,8 @@ import chatSetting from "@/views/chat/setting.vue";
 import friendInfo from "@/views/friend/info.vue";
 import friendSetting from "@/views/friend/setting.vue";
 import friendPerm from "@/views/friend/perm.vue";
+import discoverMoment from "@/views/discover/moment.vue";
+import QrcodeScan from "@/views/me/qrcode/scan.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -63,6 +65,16 @@ const router = createRouter({
       path: "/friend/perm",
       name: "friend-perm",
       component: friendPerm,
+    },
+    {
+      path: "/discover/moment",
+      name: "discover-moment",
+      component: discoverMoment,
+    },
+    {
+      path: "/me/qrcode/scan",
+      name: "me-qrcode-scan",
+      component: QrcodeScan,
     },
   ],
 });

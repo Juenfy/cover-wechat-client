@@ -35,84 +35,66 @@ const onSearch = (value) => {};
     </header>
     <main>
       <van-cell-group title="近三天">
-        <van-cell :center="true">
-          <template #title>
-            <van-image
-              height="2.5rem"
-              width="2.5rem"
-              radius="0.2rem"
-              src="https://img.yzcdn.cn/vant/cat.jpeg"
+        <van-swipe-cell>
+          <van-cell :center="true">
+            <template #title>
+              <van-image
+                height="2.5rem"
+                width="2.5rem"
+                radius="0.2rem"
+                src="https://img.yzcdn.cn/vant/cat.jpeg"
+              />
+              <div class="left-box" style="">
+                <span>123</span>
+                <span>11111111111assadsadadddddddddddddadsssssssss</span>
+              </div>
+            </template>
+            <template #right-icon>
+              <div class="right-box" style="">
+                <span>已添加</span>
+              </div>
+            </template>
+          </van-cell>
+          <template #right>
+            <van-button
+              square
+              type="danger"
+              text="删除"
+              style="height: inherit"
             />
-            <div class="left-box" style="">
-              <span>123</span>
-              <span>11111111111assadsadadddddddddddddadsssssssss</span>
-            </div>
           </template>
-          <template #right-icon>
-            <div class="right-box" style="">
-              <span>已添加</span>
-            </div>
-          </template>
-        </van-cell>
+        </van-swipe-cell>
       </van-cell-group>
       <van-cell-group title="三天前">
-        <van-cell :center="true">
-          <template #title>
-            <van-image
-              height="2.5rem"
-              width="2.5rem"
-              radius="0.2rem"
-              src="https://img.yzcdn.cn/vant/cat.jpeg"
+        <van-swipe-cell>
+          <van-cell :center="true">
+            <template #title>
+              <van-image
+                height="2.5rem"
+                width="2.5rem"
+                radius="0.2rem"
+                src="https://img.yzcdn.cn/vant/cat.jpeg"
+              />
+              <div class="left-box" style="">
+                <span>123</span>
+                <span>11111111111</span>
+              </div>
+            </template>
+            <template #right-icon>
+              <div class="right-box" style="">
+                <span>已添加</span>
+              </div>
+            </template>
+          </van-cell>
+          <template #right>
+            <van-button
+              square
+              type="danger"
+              text="删除"
+              style="height: inherit"
             />
-            <div class="left-box" style="">
-              <span>123</span>
-              <span>11111111111</span>
-            </div>
           </template>
-          <template #right-icon>
-            <div class="right-box" style="">
-              <span>已添加</span>
-            </div>
-          </template>
-        </van-cell>
-        <van-cell :center="true">
-          <template #title>
-            <van-image
-              height="2.5rem"
-              width="2.5rem"
-              radius="0.2rem"
-              src="https://img.yzcdn.cn/vant/cat.jpeg"
-            />
-            <div class="left-box" style="">
-              <span>123</span>
-              <span>11111111111</span>
-            </div>
-          </template>
-          <template #right-icon>
-            <div class="right-box" style="">
-              <span>已添加</span>
-            </div>
-          </template>
-        </van-cell>
-        <van-cell :center="true">
-          <template #title>
-            <van-image
-              height="2.5rem"
-              width="2.5rem"
-              radius="0.2rem"
-              src="https://img.yzcdn.cn/vant/cat.jpeg"
-            />
-            <div class="left-box" style="">
-              <span>123</span>
-              <span>11111111111</span>
-            </div>
-          </template>
-          <template #right-icon>
-            <div class="right-box" style="">
-              <span>已添加</span>
-            </div>
-          </template>
-        </van-cell>
+        </van-swipe-cell>
       </van-cell-group>
     </main>
   </van-popup>

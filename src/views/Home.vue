@@ -1,12 +1,15 @@
 <script setup>
 import ChatGroupCreate from "@/components/chat/group/create.vue";
 import CommonSearch from "@/components/common/search.vue";
-import { useRoute } from "vue-router";
-import { reactive, ref } from "vue";
-import { useAppStore } from "@/stores/app";
+import FriendAdd from "@/components/friend/add.vue";
 
-const appStore = useAppStore();
+import { useRoute, useRouter } from "vue-router";
+import { reactive, ref } from "vue";
+import { useAppStore } from "@/stores/home";
+
+const homeStore = useAppStore();
 const route = useRoute();
+const router = useRouter();
 const fullPathToTabBarActive = reactive({
   "/": 0,
   "/chat": 0,
@@ -14,14 +17,32 @@ const fullPathToTabBarActive = reactive({
   "/discover": 2,
   "/me": 3,
 });
-const tabBarActive = ref(fullPathToTabBarActive[route.fullPath]);
+const tabBarActive = ref(fullPathToTabBarActive[route.fullPath] ?? 0);
+
 const showPopover = ref(false);
+const showFriendAdd = ref(false);
+const showChatGroupCreate = ref(false);
 
 const actions = [
   { text: "发起群聊", value: "create-group" },
   { text: "添加好友", value: "search-friend" },
+  { text: "扫一扫", value: "qrcode-scan" },
 ];
-const showChatGroupCreate = ref(false);
+
+const onSelect = (action) => {
+  switch (action.value) {
+    case "create-group":
+      showChatGroupCreate.value = true;
+      break;
+    case "search-friend":
+      showFriendAdd.value = true;
+      break;
+    default:
+      router.push("/me/qrcode/scan");
+      break;
+  }
+};
+
 const showSearch = ref(false);
 const searchResult = ref([]);
 const onSearch = (value) => {};
@@ -30,8 +51,8 @@ const onSearch = (value) => {};
 <template>
   <header>
     <van-nav-bar
-      v-if="appStore.showNavbar"
-      :title="appStore.navTitle"
+      v-if="homeStore.showNavbar"
+      :title="homeStore.navTitle"
       @click-right="!showPopover"
     >
       <template #right>
@@ -40,25 +61,25 @@ const onSearch = (value) => {};
           v-model:show="showPopover"
           theme="dark"
           :actions="actions"
-          @select="showChatGroupCreate = true"
+          @select="onSelect"
           placement="bottom-end"
         >
           <template #reference>
             <van-icon name="add-o" size="20" color="#191919" />
           </template>
         </van-popover>
-        <router-link
-          to="/friend/search"
-          v-else-if="tabBarActive == 1"
-          style="color: var(--van-text-color)"
-        >
-          <van-icon name="friends-o" size="20" color="#191919" />
-        </router-link>
+        <van-icon
+          name="friends-o"
+          size="20"
+          color="#191919"
+          v-if="tabBarActive == 1"
+          @click="showFriendAdd = true"
+        />
       </template>
     </van-nav-bar>
     <van-search
       placeholder="搜索"
-      v-if="appStore.showSearch"
+      v-if="homeStore.showSearch"
       input-align="center"
       @focus="showSearch = true"
     />
@@ -108,6 +129,11 @@ const onSearch = (value) => {};
     background="var(--van-nav-bar-background)"
     @search="onSearch"
     :result="searchResult"
+  />
+  <friend-add
+    :show="showFriendAdd"
+    @showSearch="showSearch = true"
+    @hide="showFriendAdd = false"
   />
 </template>
 

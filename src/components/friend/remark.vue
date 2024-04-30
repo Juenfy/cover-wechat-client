@@ -1,7 +1,16 @@
 <script setup>
-const props = defineProps({ show: Boolean });
+import { reactive } from "vue";
+
+const props = defineProps({ show: Boolean, id: Number });
 //调用父组件关闭弹窗
 defineEmits(["hide"]);
+const formData = reactive({
+  id: props.id,
+  remark: "",
+  desc: "",
+});
+
+const onSubmit = () => {};
 </script>
 <template>
   <van-popup
@@ -27,7 +36,7 @@ defineEmits(["hide"]);
       <van-form @submit="onSubmit">
         <van-cell-group title="备注">
           <van-field
-            v-model="username"
+            v-model="formData.remark"
             name="备注名"
             placeholder="添加备注名"
           />
@@ -43,7 +52,11 @@ defineEmits(["hide"]);
           />
         </van-cell-group> -->
         <van-cell-group title="描述">
-          <van-field v-model="username" name="描述" placeholder="添加文字" />
+          <van-field
+            v-model="formData.desc"
+            name="描述"
+            placeholder="添加文字"
+          />
         </van-cell-group>
       </van-form>
     </main>
