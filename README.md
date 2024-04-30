@@ -31,6 +31,10 @@ npm run dev
 通讯录：
 <img src="./public/preview/friend.jpg" alt="wechat" style="width: 100%;">
 
+扫一扫：
+<video width="1080" height="1920" controls="controls">
+<source src="public/preview/qrcode-scan.mp4" type="video/mp4">
+</video>
 
 
 
