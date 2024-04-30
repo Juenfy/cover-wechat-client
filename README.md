@@ -23,18 +23,13 @@ npm run dev
 
 ### 项目预览
 聊天列表：
-<img src="./public/preview/chat.jpg" alt="wechat" style="width: 100%;">
+<img src="./public/preview/chat.jpg" alt="wechat" style="width: 30%;">
 
 聊天详情：
-<img src="./public/preview/chat-detail.jpg" alt="wechat" style="width: 100%;">
+<img src="./public/preview/chat-detail.jpg" alt="wechat" style="width: 30%;">
 
 通讯录：
-<img src="./public/preview/friend.jpg" alt="wechat" style="width: 100%;">
-
-扫一扫：
-<video width="1080" height="1920" controls="controls">
-<source src="public/preview/qrcode-scan.mp4" type="video/mp4">
-</video>
+<img src="./public/preview/friend.jpg" alt="wechat" style="width: 30%;">
 
 
 
