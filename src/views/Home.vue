@@ -49,7 +49,7 @@ const showSearch = ref(false);
 const searchResult = ref([]);
 const onSearch = (value) => {};
 onMounted(async () => {
-  if (userStore.isLogin) {
+  if (userStore.isLogin && route.fullPath == "/") {
     router.push("/chat");
   }
 });
