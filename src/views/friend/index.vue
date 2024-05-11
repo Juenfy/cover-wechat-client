@@ -2,12 +2,12 @@
 import FriendNew from "@/components/friend/new.vue";
 import FriendRemark from "@/components/friend/remark.vue";
 import { ref, onBeforeMount } from "vue";
-import { useAppStore } from "@/stores/home";
-const homeStore = useAppStore();
+import { useAppStore } from "@/stores/app";
+const appStore = useAppStore();
 const showFriendNew = ref(false);
 const showFriendRemark = ref(false);
 onBeforeMount(() => {
-  homeStore.initHeader({ title: "通讯录", navbar: true, search: true });
+  appStore.initHeader({ title: "通讯录", navbar: true, search: true });
 });
 </script>
 

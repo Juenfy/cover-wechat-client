@@ -1,9 +1,9 @@
 <script setup>
 import ChatList from "@/components/chat/list.vue";
 import { ref, onBeforeMount } from "vue";
-import { useAppStore } from "@/stores/home";
+import { useAppStore } from "@/stores/app";
 
-const homeStore = useAppStore();
+const appStore = useAppStore();
 const chatList = ref([
   {
     name: "张三",
@@ -52,7 +52,7 @@ defineEmits(["onSelect"]);
 
 onBeforeMount(() => {
   console.log(chatList);
-  homeStore.initHeader({ title: "微信", navbar: true, search: true });
+  appStore.initHeader({ title: "微信", navbar: true, search: true });
 });
 
 const loadMore = () => {

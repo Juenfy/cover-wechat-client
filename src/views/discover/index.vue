@@ -1,11 +1,11 @@
 <script setup>
 import { onBeforeMount, watch } from "vue";
-import { useAppStore } from "@/stores/home";
+import { useAppStore } from "@/stores/app";
 import { useRoute } from "vue-router";
-const homeStore = useAppStore();
+const appStore = useAppStore();
 const route = useRoute();
 onBeforeMount(() => {
-  homeStore.initHeader({ title: "发现", navbar: true, search: false });
+  appStore.initHeader({ title: "发现", navbar: true, search: false });
   console.log(route.query);
 });
 </script>

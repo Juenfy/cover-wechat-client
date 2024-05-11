@@ -4,10 +4,12 @@ import CommonSearch from "@/components/common/search.vue";
 import FriendAdd from "@/components/friend/add.vue";
 
 import { useRoute, useRouter } from "vue-router";
-import { reactive, ref } from "vue";
-import { useAppStore } from "@/stores/home";
+import { onMounted, reactive, ref } from "vue";
+import { useAppStore } from "@/stores/app";
+import { useUserStore } from "@/stores/user";
 
-const homeStore = useAppStore();
+const appStore = useAppStore();
+const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
 const fullPathToTabBarActive = reactive({
@@ -46,95 +48,129 @@ const onSelect = (action) => {
 const showSearch = ref(false);
 const searchResult = ref([]);
 const onSearch = (value) => {};
+onMounted(async () => {
+  if (userStore.isLogin) {
+    router.push("/chat");
+  }
+});
 </script>
 
 <template>
-  <header>
-    <van-nav-bar
-      v-if="homeStore.showNavbar"
-      :title="homeStore.navTitle"
-      @click-right="!showPopover"
-    >
-      <template #right>
-        <van-popover
-          v-if="tabBarActive == 0"
-          v-model:show="showPopover"
-          theme="dark"
-          :actions="actions"
-          @select="onSelect"
-          placement="bottom-end"
+  <div v-if="userStore.isLogin">
+    <header>
+      <van-nav-bar
+        v-if="appStore.showNavbar"
+        :title="appStore.navTitle"
+        @click-right="!showPopover"
+      >
+        <template #right>
+          <van-popover
+            v-if="tabBarActive == 0"
+            v-model:show="showPopover"
+            theme="dark"
+            :actions="actions"
+            @select="onSelect"
+            placement="bottom-end"
+          >
+            <template #reference>
+              <van-icon name="add-o" size="20" color="#191919" />
+            </template>
+          </van-popover>
+          <van-icon
+            name="friends-o"
+            size="20"
+            color="#191919"
+            v-if="tabBarActive == 1"
+            @click="showFriendAdd = true"
+          />
+        </template>
+      </van-nav-bar>
+      <van-search
+        placeholder="搜索"
+        v-if="appStore.showSearch"
+        input-align="center"
+        @focus="showSearch = true"
+      />
+    </header>
+
+    <router-view />
+
+    <footer>
+      <van-tabbar
+        v-model="tabBarActive"
+        :route="true"
+        z-index="999"
+        @change="(index) => (tabBarActive = index)"
+      >
+        <van-tabbar-item
+          :icon="tabBarActive == 0 ? 'chat' : 'chat-o'"
+          to="/chat"
+          >消息</van-tabbar-item
         >
-          <template #reference>
-            <van-icon name="add-o" size="20" color="#191919" />
-          </template>
-        </van-popover>
-        <van-icon
-          name="friends-o"
-          size="20"
-          color="#191919"
-          v-if="tabBarActive == 1"
-          @click="showFriendAdd = true"
-        />
-      </template>
-    </van-nav-bar>
-    <van-search
-      placeholder="搜索"
-      v-if="homeStore.showSearch"
-      input-align="center"
-      @focus="showSearch = true"
+        <van-tabbar-item
+          :icon="tabBarActive == 1 ? 'friends' : 'friends-o'"
+          to="/friend"
+          >通讯录</van-tabbar-item
+        >
+        <van-tabbar-item
+          :icon="tabBarActive == 2 ? 'eye' : 'eye-o'"
+          badge="5"
+          to="/discover"
+          >发现</van-tabbar-item
+        >
+        <van-tabbar-item
+          :icon="tabBarActive == 3 ? 'contact' : 'contact-o'"
+          badge="20"
+          to="/me"
+          >我</van-tabbar-item
+        >
+      </van-tabbar>
+    </footer>
+
+    <chat-group-create
+      :show="showChatGroupCreate"
+      @hide="showChatGroupCreate = false"
     />
-  </header>
-
-  <router-view />
-
-  <footer>
-    <van-tabbar
-      v-model="tabBarActive"
-      :route="true"
-      z-index="999"
-      @change="(index) => (tabBarActive = index)"
-    >
-      <van-tabbar-item :icon="tabBarActive == 0 ? 'chat' : 'chat-o'" to="/chat"
-        >消息</van-tabbar-item
+    <common-search
+      :show="showSearch"
+      @hide="showSearch = false"
+      action="home"
+      placeholder="搜索"
+      background="var(--van-nav-bar-background)"
+      @search="onSearch"
+      :result="searchResult"
+    />
+    <friend-add
+      :show="showFriendAdd"
+      @showSearch="showSearch = true"
+      @hide="showFriendAdd = false"
+    />
+  </div>
+  <div class="main index" v-else>
+    <footer>
+      <van-button type="primary" style="margin-left: 1rem" to="login"
+        >登录</van-button
       >
-      <van-tabbar-item
-        :icon="tabBarActive == 1 ? 'friends' : 'friends-o'"
-        to="/friend"
-        >通讯录</van-tabbar-item
-      >
-      <van-tabbar-item
-        :icon="tabBarActive == 2 ? 'eye' : 'eye-o'"
-        badge="5"
-        to="/discover"
-        >发现</van-tabbar-item
-      >
-      <van-tabbar-item
-        :icon="tabBarActive == 3 ? 'contact' : 'contact-o'"
-        badge="20"
-        to="/me"
-        >我</van-tabbar-item
-      >
-    </van-tabbar>
-  </footer>
-
-  <chat-group-create
-    :show="showChatGroupCreate"
-    @hide="showChatGroupCreate = false"
-  />
-  <common-search
-    :show="showSearch"
-    @hide="showSearch = false"
-    action="home"
-    placeholder="搜索"
-    background="var(--van-nav-bar-background)"
-    @search="onSearch"
-    :result="searchResult"
-  />
-  <friend-add
-    :show="showFriendAdd"
-    @showSearch="showSearch = true"
-    @hide="showFriendAdd = false"
-  />
+      <van-button style="margin-right: 1rem" to="register">注册</van-button>
+    </footer>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="less">
+.index {
+  background-image: url(./../assets/home-bg.jpeg);
+  background-position: center;
+  background-size: cover;
+}
+footer {
+  width: inherit;
+  position: fixed;
+  left: 0;
+  bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  button {
+    width: 7rem;
+  }
+}
+</style>

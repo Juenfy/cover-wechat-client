@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-export const useAppStore = defineStore("home", () => {
+export const useAppStore = defineStore("app", () => {
   const showSearch = ref(true);
   const showNavbar = ref(true);
   const navTitle = ref("");

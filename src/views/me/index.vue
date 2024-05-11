@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onBeforeMount } from "vue";
-import { useAppStore } from "@/stores/home";
-const homeStore = useAppStore();
+import { useAppStore } from "@/stores/app";
+const appStore = useAppStore();
 onBeforeMount(() => {
-  homeStore.initHeader({ title: "我", navbar: false, search: false });
+  appStore.initHeader({ title: "我", navbar: false, search: false });
 });
 </script>
 

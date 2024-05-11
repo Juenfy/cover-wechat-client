@@ -204,7 +204,8 @@ const onClickAvatar = (id) => {
   }
 }
 .main {
-  /*background-image: url(/src/assets/bg.png);*/
+  background-image: url(/src/assets/bg.png);
+  background-position: center;
   background-size: cover;
   overflow-y: scroll;
   flex-grow: 2;

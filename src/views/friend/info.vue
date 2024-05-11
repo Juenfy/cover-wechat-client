@@ -1,12 +1,17 @@
 <script setup>
 import FriendRemark from "@/components/friend/remark.vue";
-import { ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 import { useRouter } from "vue-router";
+import * as user from "@/api/user";
 const router = useRouter();
 const showFriendSetting = () => {
   router.push("/friend/setting");
 };
 const showFriendRemark = ref(false);
+
+onBeforeMount(() => {
+  user.getHomeInfo(5).then((res) => {});
+});
 </script>
 <template>
   <header>

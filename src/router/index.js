@@ -11,6 +11,8 @@ import friendSetting from "@/views/friend/setting.vue";
 import friendPerm from "@/views/friend/perm.vue";
 import discoverMoment from "@/views/discover/moment.vue";
 import QrcodeScan from "@/views/me/qrcode/scan.vue";
+import Register from "@/views/Register.vue";
+import Login from "@/views/Login.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -75,6 +77,16 @@ const router = createRouter({
       path: "/me/qrcode/scan",
       name: "me-qrcode-scan",
       component: QrcodeScan,
+    },
+    {
+      path: "/register",
+      name: "register",
+      component: Register,
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: Login,
     },
   ],
 });

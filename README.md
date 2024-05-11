@@ -6,7 +6,7 @@
 ### 项目运行
 
 ```shell
-https://github.com/Juenfy/cover-wechat-front.git
+git clone https://github.com/Juenfy/cover-wechat-front.git
 ```
 
 ```shell
