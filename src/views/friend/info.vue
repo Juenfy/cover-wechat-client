@@ -2,7 +2,7 @@
 import FriendRemark from "@/components/friend/remark.vue";
 import { ref, onBeforeMount } from "vue";
 import { useRouter } from "vue-router";
-import * as user from "@/api/user";
+import * as userApi from "@/api/user";
 const router = useRouter();
 const showFriendSetting = () => {
   router.push("/friend/setting");
@@ -10,7 +10,7 @@ const showFriendSetting = () => {
 const showFriendRemark = ref(false);
 
 onBeforeMount(() => {
-  user.getHomeInfo(5).then((res) => {});
+  userApi.getHomeInfo(5).then((res) => {});
 });
 </script>
 <template>

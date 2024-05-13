@@ -1,19 +1,34 @@
 <script setup>
 import FriendNew from "@/components/friend/new.vue";
 import FriendRemark from "@/components/friend/remark.vue";
-import { ref, onBeforeMount } from "vue";
+import { ref, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
+import * as friendApi from "@/api/friend";
+import { useFriendStore } from "@/stores/friend";
 const appStore = useAppStore();
+const friendStore = useFriendStore();
 const showFriendNew = ref(false);
 const showFriendRemark = ref(false);
-onBeforeMount(() => {
+const indexList = ref([]);
+const getFriendList = async () => {
+  if (friendStore.list.length == 0) {
+    await friendApi.getList().then((res) => {
+      friendStore.setList(res.data);
+      indexList.value = Object.keys(res.data);
+    });
+  } else {
+    indexList.value = Object.keys(friendStore.list);
+  }
+};
+onMounted(async () => {
   appStore.initHeader({ title: "通讯录", navbar: true, search: true });
+  await getFriendList();
 });
 </script>
 
 <template>
   <main class="friend-list">
-    <van-index-bar>
+    <van-index-bar :index-list="indexList">
       <van-cell
         title="新的朋友"
         icon="/public/new-friend.png"
@@ -36,43 +51,30 @@ onBeforeMount(() => {
         :center="true"
         @click="() => {}"
       />
-      <van-index-anchor index="A" />
-      <van-swipe-cell>
-        <van-cell
-          title="文本"
-          icon="https://q4.itc.cn/q_70/images03/20240405/0fe4005840664f30b76f1a63909a5489.jpeg"
-          size="large"
-          :center="true"
-          @click="() => {}"
-        />
-        <template #right>
-          <van-button
-            square
-            type="primary"
-            text="备注"
-            style="height: inherit"
-            @click="showFriendRemark = true"
+      <div v-for="(val, index) in indexList" :key="index">
+        <van-index-anchor :index="val" />
+        <van-swipe-cell
+          v-for="friend in friendStore.list[val]"
+          :key="friend.friend.id"
+        >
+          <van-cell
+            :title="friend.nickname"
+            :icon="friend.friend.avatar"
+            size="large"
+            :center="true"
+            @click="() => {}"
           />
-        </template>
-      </van-swipe-cell>
-      <van-index-anchor index="B" />
-      <van-swipe-cell>
-        <van-cell
-          title="文本"
-          icon="https://q4.itc.cn/q_70/images03/20240405/0fe4005840664f30b76f1a63909a5489.jpeg"
-          size="large"
-          :center="true"
-        />
-        <template #right>
-          <van-button
-            square
-            type="primary"
-            text="备注"
-            style="height: inherit"
-            @click="showFriendRemark = true"
-          />
-        </template>
-      </van-swipe-cell>
+          <template #right>
+            <van-button
+              square
+              type="primary"
+              text="备注"
+              style="height: inherit"
+              @click="showFriendRemark = true"
+            />
+          </template>
+        </van-swipe-cell>
+      </div>
     </van-index-bar>
   </main>
   <friend-new :show="showFriendNew" @hide="showFriendNew = false" />

@@ -1,9 +1,9 @@
 <script setup>
 import { showConfirmDialog } from "vant";
-import { ref, onBeforeMount } from "vue";
+import { onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useRouter } from "vue-router";
-import * as user from "@/api/user";
+import * as userApi from "@/api/user";
 
 const appStore = useAppStore();
 const router = useRouter();
@@ -15,7 +15,7 @@ const onLogout = () => {
   })
     .then(() => {
       // on confirm
-      user.postLogout().then((res) => {
+      userApi.postLogout().then((res) => {
         if (res.code == 200001) {
           setTimeout(() => {
             router.push("/login");
@@ -27,7 +27,7 @@ const onLogout = () => {
       // on cancel
     });
 };
-onBeforeMount(() => {
+onMounted(async () => {
   appStore.initHeader({ title: "我", navbar: false, search: false });
 });
 </script>

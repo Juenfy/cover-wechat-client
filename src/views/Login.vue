@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive } from "vue";
-import * as user from "@/api/user";
+import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
 import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
@@ -15,7 +15,7 @@ const formData = reactive({
 
 const onSubmit = () => {
   console.log(formData);
-  user.postLogin(formData).then((res) => {
+  userApi.postLogin(formData).then((res) => {
     console.log(res);
     if (res.code == 200102) {
       userStore.handleLogin(res.data);

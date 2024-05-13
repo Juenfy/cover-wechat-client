@@ -1,6 +1,6 @@
 <script setup>
 import { reactive } from "vue";
-import * as user from "@/api/user";
+import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
 const formData = reactive({
   avatar: "",
@@ -11,7 +11,7 @@ const formData = reactive({
 });
 const onSubmit = () => {
   console.log(formData);
-  user.postRegister(formData).then((res) => {
+  userApi.postRegister(formData).then((res) => {
     console.log(res);
     if (res.code === 200101) {
       userStore.handleLogin(res.data);
