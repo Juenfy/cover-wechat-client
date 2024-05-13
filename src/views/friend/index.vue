@@ -51,15 +51,15 @@ onMounted(async () => {
         :center="true"
         @click="() => {}"
       />
-      <div v-for="(val, index) in indexList" :key="index">
+      <div v-for="val in indexList" :key="val">
         <van-index-anchor :index="val" />
         <van-swipe-cell
-          v-for="friend in friendStore.list[val]"
-          :key="friend.friend.id"
+          v-for="item in friendStore.list[val]"
+          :key="item.friend.id"
         >
           <van-cell
-            :title="friend.nickname"
-            :icon="friend.friend.avatar"
+            :title="item.friend.nickname"
+            :icon="item.friend.avatar"
             size="large"
             :center="true"
             @click="() => {}"

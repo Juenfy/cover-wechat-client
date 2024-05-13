@@ -1,15 +1,44 @@
 <script setup>
 import CommonSearch from "../common/search.vue";
 import FriendAdd from "../friend/add.vue";
-import { ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
+import { useFriendStore } from "@/stores/friend";
+import * as friendApi from "@/api/friend";
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
 defineEmits(["hide"]);
 
+const friendStore = useFriendStore();
 const showFriendAdd = ref(false);
 const showSearch = ref(false);
 const searchResult = ref([]);
 const onSearch = (value) => {};
+const applyStatus = reactive({
+  check: "待验证",
+  pass: "已添加",
+  overdue: "已过期",
+});
+const getApplyList = async () => {
+  if (
+    friendStore.applyList.threeDay.length == 0 &&
+    friendStore.applyList.overThreeDay.length == 0
+  ) {
+    await friendApi.getApplyList().then((res) => {
+      friendStore.setApplyList(res.data);
+    });
+  }
+};
+
+const deleteApply = async (id, type) => {
+  await friendApi.deleteApply(id).then((res) => {
+    if (res.code == 200001) {
+      friendStore.deleteApply(id, type);
+    }
+  });
+};
+onMounted(async () => {
+  await getApplyList();
+});
 </script>
 
 <template>
@@ -34,24 +63,30 @@ const onSearch = (value) => {};
       />
     </header>
     <main>
-      <van-cell-group title="近三天">
-        <van-swipe-cell>
+      <van-cell-group
+        title="近三天"
+        v-if="friendStore.applyList.threeDay.length > 0"
+      >
+        <van-swipe-cell
+          v-for="item in friendStore.applyList.threeDay"
+          :key="item.id"
+        >
           <van-cell :center="true">
             <template #title>
               <van-image
                 height="2.5rem"
                 width="2.5rem"
                 radius="0.2rem"
-                src="https://img.yzcdn.cn/vant/cat.jpeg"
+                :src="item.friend.avatar"
               />
               <div class="left-box" style="">
-                <span>123</span>
-                <span>11111111111assadsadadddddddddddddadsssssssss</span>
+                <span>{{ item.friend.nickname }}</span>
+                <span>{{ item.remark }}</span>
               </div>
             </template>
             <template #right-icon>
               <div class="right-box" style="">
-                <span>已添加</span>
+                <span>{{ applyStatus[item.status] }}</span>
               </div>
             </template>
           </van-cell>
@@ -61,28 +96,35 @@ const onSearch = (value) => {};
               type="danger"
               text="删除"
               style="height: inherit"
+              @click="deleteApply(item.id, 'threeDay')"
             />
           </template>
         </van-swipe-cell>
       </van-cell-group>
-      <van-cell-group title="三天前">
-        <van-swipe-cell>
+      <van-cell-group
+        title="三天前"
+        v-if="friendStore.applyList.overThreeDay.length > 0"
+      >
+        <van-swipe-cell
+          v-for="item in friendStore.applyList.overThreeDay"
+          :key="item.id"
+        >
           <van-cell :center="true">
             <template #title>
               <van-image
                 height="2.5rem"
                 width="2.5rem"
                 radius="0.2rem"
-                src="https://img.yzcdn.cn/vant/cat.jpeg"
+                :src="item.friend.avatar"
               />
               <div class="left-box" style="">
-                <span>123</span>
-                <span>11111111111</span>
+                <span>{{ item.friend.nickname }}</span>
+                <span>{{ item.remark }}</span>
               </div>
             </template>
             <template #right-icon>
               <div class="right-box" style="">
-                <span>已添加</span>
+                <span>{{ applyStatus[item.status] }}</span>
               </div>
             </template>
           </van-cell>
@@ -92,6 +134,7 @@ const onSearch = (value) => {};
               type="danger"
               text="删除"
               style="height: inherit"
+              @click="deleteApply(item.id, 'overThreeDay')"
             />
           </template>
         </van-swipe-cell>

@@ -3,6 +3,14 @@ export const getList = async () => {
   return request.get("/api/friends/list");
 };
 
+export const getApplyList = async () => {
+  return request.get("/api/friends/apply-list");
+};
+
+export const deleteApply = async (id) => {
+  return request.delete(`/api/friends/delete-apply/${id}`);
+};
+
 export const getSearchList = async (keywords) => {
   return request.get(`/api/friends/search/${keywords}`);
 };
