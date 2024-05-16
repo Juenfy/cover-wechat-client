@@ -1,9 +1,17 @@
 <script setup>
-import { useRouter } from "vue-router";
-const router = useRouter();
+import { ref } from "vue";
+import CommonSearch from "@/components/common/search.vue";
+import * as friendApi from "@/api/friend";
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
-defineEmits(["hide", "showSearch"]);
+defineEmits(["hide"]);
+
+const showSearch = ref(false);
+const onSearch = (keywords, cb) => {
+  friendApi.getSearchList(keywords).then((res) => {
+    cb(res);
+  });
+};
 </script>
 
 <template>
@@ -18,7 +26,7 @@ defineEmits(["hide", "showSearch"]);
       <van-search
         placeholder="账号/手机号"
         input-align="center"
-        @focus="$emit('showSearch')"
+        @focus="showSearch = true"
       />
     </header>
     <main>
@@ -58,5 +66,12 @@ defineEmits(["hide", "showSearch"]);
       </van-cell-group>
     </main>
   </van-popup>
+  <common-search
+    :show="showSearch"
+    @hide="showSearch = false"
+    action="friend-search"
+    placeholder="账号/手机号"
+    @search="onSearch"
+  />
 </template>
 <style scoped lang="less"></style>

@@ -46,9 +46,8 @@ const onSelect = (action) => {
 };
 
 const showSearch = ref(false);
-const searchResult = ref([]);
-const onSearch = (value) => {};
-onMounted(async () => {
+const onSearch = (keywords, cb) => {};
+onMounted(() => {
   if (userStore.isLogin && route.fullPath == "/") {
     router.push("/chat");
   }
@@ -136,15 +135,9 @@ onMounted(async () => {
       @hide="showSearch = false"
       action="home"
       placeholder="搜索"
-      background="var(--van-nav-bar-background)"
       @search="onSearch"
-      :result="searchResult"
     />
-    <friend-add
-      :show="showFriendAdd"
-      @showSearch="showSearch = true"
-      @hide="showFriendAdd = false"
-    />
+    <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
   </div>
   <div class="main index" v-else>
     <footer>

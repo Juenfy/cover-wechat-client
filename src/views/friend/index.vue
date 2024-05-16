@@ -10,9 +10,9 @@ const friendStore = useFriendStore();
 const showFriendNew = ref(false);
 const showFriendRemark = ref(false);
 const indexList = ref([]);
-const getFriendList = async () => {
+const getFriendList = () => {
   if (friendStore.list.length == 0) {
-    await friendApi.getList().then((res) => {
+    friendApi.getList().then((res) => {
       friendStore.setList(res.data);
       indexList.value = Object.keys(res.data);
     });
@@ -20,9 +20,9 @@ const getFriendList = async () => {
     indexList.value = Object.keys(friendStore.list);
   }
 };
-onMounted(async () => {
+onMounted(() => {
   appStore.initHeader({ title: "通讯录", navbar: true, search: true });
-  await getFriendList();
+  getFriendList();
 });
 </script>
 

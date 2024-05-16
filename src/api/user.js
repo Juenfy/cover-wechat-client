@@ -11,6 +11,6 @@ export const postLogout = async () => {
   return request.post("/api/users/logout");
 };
 
-export const getHomeInfo = async (id) => {
-  return request.get(`/api/users/${id}/home`);
+export const getHomeInfo = async (keywords) => {
+  return request.get(`/api/users/${keywords}/home`);
 };

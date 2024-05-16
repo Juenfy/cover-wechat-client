@@ -11,33 +11,36 @@ defineEmits(["hide"]);
 const friendStore = useFriendStore();
 const showFriendAdd = ref(false);
 const showSearch = ref(false);
-const searchResult = ref([]);
-const onSearch = (value) => {};
+const onSearch = (keywords, cb) => {
+  friendApi.getSearchList(keywords).then((res) => {
+    cb(res);
+  });
+};
 const applyStatus = reactive({
   check: "待验证",
   pass: "已添加",
   overdue: "已过期",
 });
-const getApplyList = async () => {
+const getApplyList = () => {
   if (
     friendStore.applyList.threeDay.length == 0 &&
     friendStore.applyList.overThreeDay.length == 0
   ) {
-    await friendApi.getApplyList().then((res) => {
+    friendApi.getApplyList().then((res) => {
       friendStore.setApplyList(res.data);
     });
   }
 };
 
-const deleteApply = async (id, type) => {
-  await friendApi.deleteApply(id).then((res) => {
+const deleteApply = (id, type) => {
+  friendApi.deleteApply(id).then((res) => {
     if (res.code == 200001) {
       friendStore.deleteApply(id, type);
     }
   });
 };
-onMounted(async () => {
-  await getApplyList();
+onMounted(() => {
+  getApplyList();
 });
 </script>
 
@@ -144,10 +147,9 @@ onMounted(async () => {
   <common-search
     :show="showSearch"
     @hide="showSearch = false"
-    action="friend"
+    action="friend-search"
     placeholder="账号/手机号"
     @search="onSearch"
-    :result="searchResult"
   />
 
   <friend-add

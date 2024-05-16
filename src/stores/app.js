@@ -5,10 +5,10 @@ export const useAppStore = defineStore("app", () => {
   const showNavbar = ref(true);
   const navTitle = ref("");
 
-  function initHeader(header) {
+  const initHeader = (header) => {
     navTitle.value = header.title;
     showNavbar.value = header.navbar;
     showSearch.value = header.search;
-  }
+  };
   return { showNavbar, showSearch, navTitle, initHeader };
 });

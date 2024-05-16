@@ -4,7 +4,7 @@ import { useAppStore } from "@/stores/app";
 import { useRoute } from "vue-router";
 const appStore = useAppStore();
 const route = useRoute();
-onMounted(async () => {
+onMounted(() => {
   appStore.initHeader({ title: "发现", navbar: true, search: false });
   console.log(route.query);
 });

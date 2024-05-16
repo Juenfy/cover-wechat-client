@@ -27,7 +27,7 @@ const onLogout = () => {
       // on cancel
     });
 };
-onMounted(async () => {
+onMounted(() => {
   appStore.initHeader({ title: "我", navbar: false, search: false });
 });
 </script>

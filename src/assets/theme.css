@@ -1,15 +1,15 @@
 /* 定制主题 */
 :root:root {
-  --theme-background: #57be6a;
+  --theme-main-color: #57be6a;
   --theme-text-color: #181818;
   --theme-text-color-tint: #a5a5a5;
   --theme-blue-tint: #5f688a;
-  --van-primary-color: var(--theme-background);
+  --van-primary-color: var(--theme-main-color);
   --van-text-color: var(--theme-text-color);
   --van-tabbar-height: 4rem;
   --van-tabbar-background: #f9f9f9;
   --van-tabbar-item-active-background: var(--van-tabbar-background);
-  --van-tabbar-item-active-color: var(--theme-background);
+  --van-tabbar-item-active-color: var(--theme-main-color);
   --van-nav-bar-background: #ededed;
   --van-nav-bar-border-color: #e3e3e3;
   --van-search-background: var(--van-nav-bar-background);

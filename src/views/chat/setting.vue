@@ -6,8 +6,7 @@ const router = useRouter();
 const chatSetting = reactive({ muted: false, top: false, remind: false });
 const showClearChat = ref(false);
 const showSearch = ref(false);
-const searchResult = ref([]);
-const onSearch = (value) => {};
+const onSearch = (keywords, cb) => {};
 </script>
 
 <template>
@@ -120,9 +119,7 @@ const onSearch = (value) => {};
     @hide="showSearch = false"
     action="chat"
     placeholder="搜索"
-    background="var(--van-nav-bar-background)"
     @search="onSearch"
-    :result="searchResult"
   />
 </template>
 

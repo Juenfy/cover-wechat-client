@@ -2,6 +2,7 @@ import { reactive, ref } from "vue";
 import { defineStore } from "pinia";
 export const useFriendStore = defineStore("friend", () => {
   const list = ref([]);
+  const setting = reactive({});
   const applyList = reactive({
     threeDay: [],
     overThreeDay: [],
@@ -13,6 +14,9 @@ export const useFriendStore = defineStore("friend", () => {
     applyList.threeDay = data.three_day;
     applyList.overThreeDay = data.over_three_day;
   };
+  const setSetting = (data) => {
+    setting = data;
+  };
   const deleteApply = (id, type) => {
     if (type == "threeDay")
       applyList.threeDay = applyList.threeDay.filter((item) => item.id !== id);
@@ -21,5 +25,13 @@ export const useFriendStore = defineStore("friend", () => {
         (item) => item.id !== id
       );
   };
-  return { list, applyList, setList, setApplyList, deleteApply };
+  return {
+    list,
+    applyList,
+    setting,
+    setList,
+    setApplyList,
+    setSetting,
+    deleteApply,
+  };
 });

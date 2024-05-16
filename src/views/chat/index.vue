@@ -50,8 +50,7 @@ const finished = ref(false);
 
 defineEmits(["onSelect"]);
 
-onMounted(async () => {
-  console.log(chatList);
+onMounted(() => {
   appStore.initHeader({ title: "微信", navbar: true, search: true });
 });
 

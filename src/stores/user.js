@@ -5,21 +5,32 @@ export const useUserStore = defineStore(
   () => {
     const isLogin = ref(false);
     const accessToken = ref("");
-    const userInfo = ref({});
-    function handleLogin(user) {
+    const info = ref({});
+    const setting = ref({});
+    const setSetting = (data) => {
+      setting = data;
+    };
+    const handleLogin = (user) => {
       isLogin.value = true;
       accessToken.value = user.token;
-      userInfo.value = user;
+      info = user;
       localStorage.setItem("accessToken", user.token);
-    }
+    };
 
-    function handleLogout() {
+    const handleLogout = () => {
       isLogin.value = false;
       accessToken.value = "";
-      userInfo.value = {};
+      info = {};
       localStorage.removeItem("accessToken");
-    }
-    return { handleLogin, handleLogout, isLogin, accessToken, userInfo };
+    };
+    return {
+      setSetting,
+      handleLogin,
+      handleLogout,
+      isLogin,
+      accessToken,
+      info,
+    };
   },
   { persist: true }
 );

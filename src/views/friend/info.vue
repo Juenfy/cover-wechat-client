@@ -1,16 +1,19 @@
 <script setup>
 import FriendRemark from "@/components/friend/remark.vue";
-import { ref, onBeforeMount } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import * as userApi from "@/api/user";
 const router = useRouter();
-const showFriendSetting = () => {
-  router.push("/friend/setting");
-};
+const route = useRoute();
+const showFriendSetting = () => {};
+
+const homeInfo = ref({});
 const showFriendRemark = ref(false);
 
-onBeforeMount(() => {
-  userApi.getHomeInfo(5).then((res) => {});
+onMounted(() => {
+  userApi.getHomeInfo(route.query.keywords).then((res) => {
+    homeInfo.value = res.data;
+  });
 });
 </script>
 <template>
@@ -21,7 +24,7 @@ onBeforeMount(() => {
       @click-right="showFriendSetting"
       :border="false"
     >
-      <template #right>
+      <template #right v-if="homeInfo.relationship == 'friend'">
         <van-icon name="ellipsis" />
       </template>
     </van-nav-bar>
@@ -40,9 +43,9 @@ onBeforeMount(() => {
               />
               <div class="text">
                 <span class="nickname"
-                  >PHP大佬<van-icon name="user" color="#008cff"
+                  >{{ homeInfo.nickname }}<van-icon name="user" color="#008cff"
                 /></span>
-                <span class="vchat">微信号：phpdalao</span>
+                <span class="vchat">微信号：{{ homeInfo.wechat }}</span>
                 <span class="area">地区：上海</span>
               </div>
             </div>
@@ -55,8 +58,15 @@ onBeforeMount(() => {
         clickable
         @click="showFriendRemark = true"
         size="large"
+        v-if="homeInfo.relationship == 'friend'"
       />
-      <van-cell title="朋友权限" is-link to="/friend/perm" size="large" />
+      <van-cell
+        title="朋友权限"
+        is-link
+        to="/friend/perm"
+        size="large"
+        v-if="homeInfo.relationship == 'friend'"
+      />
     </van-cell-group>
     <van-cell-group :border="false">
       <van-cell is-link to="index" size="large" :center="true">
@@ -70,21 +80,49 @@ onBeforeMount(() => {
       </van-cell>
     </van-cell-group>
     <van-cell-group :border="false">
-      <van-cell title="个性签名" value="我是PHP大佬" size="large" />
-      <van-cell title="来源" value="对方通过搜索手机号添加" size="large" />
+      <van-cell
+        title="个性签名"
+        v-if="homeInfo.sign"
+        :value="homeInfo.sign"
+        size="large"
+      />
+      <van-cell
+        title="来源"
+        :value="homeInfo.source_text"
+        size="large"
+        v-if="homeInfo.relationship != 'owner'"
+      />
     </van-cell-group>
     <van-button
       size="large"
       :square="true"
       icon="chat-o"
-      style="
-        margin-top: 0.5rem;
-        border: none;
-        color: var(--theme-blue-tint);
-        font-weight: bold;
-      "
       to="/chat/detail"
+      v-if="
+        homeInfo.relationship == 'owner' || homeInfo.relationship == 'friend'
+      "
       >发送消息</van-button
+    >
+    <van-button
+      size="large"
+      :square="true"
+      to="/chat/detail"
+      v-if="homeInfo.relationship == 'apply'"
+      >添加到通讯录</van-button
+    >
+    <van-button
+      size="large"
+      :square="true"
+      to="/chat/detail"
+      v-if="homeInfo.relationship == 'go_check'"
+      >前往验证</van-button
+    >
+    <van-button
+      size="large"
+      :square="true"
+      to="/chat/detail"
+      v-if="homeInfo.relationship == 'wait_check'"
+      >等待验证</van-button
     >
   </main>
   <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
@@ -101,6 +139,12 @@ main {
   width: 100%;
   height: 100%;
   background-color: var(--van-nav-bar-background);
+  button {
+    margin-top: 0.5rem;
+    border: none;
+    color: var(--theme-blue-tint);
+    font-weight: bold;
+  }
   .card {
     width: 100%;
     background-color: var(--van-white);

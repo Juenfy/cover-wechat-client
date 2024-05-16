@@ -1,28 +1,47 @@
 <script setup>
-import { watch } from "less";
-import { ref, toRefs } from "vue";
-const props = defineProps([
-  "show",
-  "background",
-  "action",
-  "placeholder",
-  "result",
-]);
-const { show, background, action, placeholder, result } = toRefs(props);
+import { onMounted, ref, toRefs, watch } from "vue";
+import { useRouter } from "vue-router";
+const props = defineProps(["show", "action", "placeholder"]);
+const { show, action, placeholder } = toRefs(props);
 const emit = defineEmits(["hide", "search"]);
 const keywords = ref("");
 const isSearch = ref(false);
+const searchResult = ref([]);
+const background = ref("var(--van-white)");
+const router = useRouter();
+
 const handleSearch = () => {
   if (keywords.value) {
-    emit("search", keywords.value);
-    keywords.value = "";
-    isSearch.value = true;
+    emit("search", keywords.value, (res) => {
+      searchResult.value = res.data;
+      isSearch.value = true;
+      background.value = "var(--van-nav-bar-background)";
+    });
   }
 };
+
+watch(keywords, (newVal) => {
+  if (newVal.length == 0) isSearch.value = false;
+});
+
 const handleCancel = () => {
-  emit("hide");
   isSearch.value = false;
+  emit("hide");
 };
+
+const handleHomeClick = (item) => {
+  router.push({
+    path: "/friend/info",
+    query: {
+      keywords: item.source == "mobile" ? item.mobile : item.wechat,
+    },
+  });
+};
+onMounted(() => {
+  if (["chat"].indexOf(action.value) !== -1) {
+    background.value = "var(--van-nav-bar-background)";
+  }
+});
 </script>
 
 <template>
@@ -53,10 +72,50 @@ const handleCancel = () => {
       />
     </header>
     <main>
-      <template v-if="action == 'chat'">
+      <van-cell-group v-if="keywords.length > 0 && !isSearch">
+        <van-cell :center="true" size="large" @click="handleSearch">
+          <template #title>
+            <van-image
+              height="3rem"
+              width="3rem"
+              radius="0.1rem"
+              src="/public/search.png"
+              style="margin-right: 0.5rem"
+            />
+            <span style="font-weight: bold">搜索：</span
+            ><span style="color: var(--theme-main-color); font-weight: bold">{{
+              keywords
+            }}</span>
+          </template>
+        </van-cell>
+      </van-cell-group>
+      <template v-if="action == 'friend-search' && isSearch">
+        <van-cell-group title="联系人" v-if="searchResult.length > 0">
+          <van-cell
+            :center="true"
+            size="large"
+            v-for="(item, index) in searchResult"
+            :key="index"
+            @click="handleHomeClick(item)"
+          >
+            <template #title>
+              <van-image
+                height="3rem"
+                width="3rem"
+                radius="0.1rem"
+                :src="item.avatar"
+                style="margin-right: 0.5rem"
+              />
+              <span>{{ item.nickname }}</span>
+            </template>
+          </van-cell>
+        </van-cell-group>
+        <div class="no-result" v-else>用户不存在</div>
+      </template>
+      <template v-if="action == 'chat' && isSearch">
         <div v-if="isSearch">
-          <div v-if="result.length > 0"></div>
-          <div v-else>暂无搜索结果</div>
+          <div v-if="searchResult.length > 0"></div>
+          <div class="no-result" v-else>暂无搜索结果</div>
         </div>
         <div v-else>
           <p style="text-align: center; color: var(--theme-text-color-tint)">
@@ -98,7 +157,24 @@ const handleCancel = () => {
           </van-row>
         </div>
       </template>
+      <template v-if="action == 'home' && isSearch">
+        <div></div>
+      </template>
     </main>
   </van-popup>
 </template>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+main {
+  .no-result {
+    width: 100%;
+    text-align: center;
+    line-height: 4rem;
+    height: 4rem;
+    background: var(--van-white);
+    color: var(--theme-text-color-tint);
+  }
+  .van-cell-group__title {
+    padding: 16px 1px !important;
+  }
+}
+</style>

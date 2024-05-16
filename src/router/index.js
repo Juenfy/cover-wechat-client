@@ -13,6 +13,7 @@ import discoverMoment from "@/views/discover/moment.vue";
 import QrcodeScan from "@/views/me/qrcode/scan.vue";
 import Register from "@/views/Register.vue";
 import Login from "@/views/Login.vue";
+import FriendApply from "@/views/friend/apply.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -57,6 +58,11 @@ const router = createRouter({
       path: "/friend/info",
       name: "friend-info",
       component: friendInfo,
+    },
+    {
+      path: "/friend/apply",
+      name: "friend-apply",
+      component: FriendApply,
     },
     {
       path: "/friend/setting",
