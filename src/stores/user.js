@@ -6,25 +6,20 @@ export const useUserStore = defineStore(
     const isLogin = ref(false);
     const accessToken = ref("");
     const info = ref({});
-    const setting = ref({});
-    const setSetting = (data) => {
-      setting = data;
-    };
     const handleLogin = (user) => {
       isLogin.value = true;
       accessToken.value = user.token;
-      info = user;
+      info.value = user;
       localStorage.setItem("accessToken", user.token);
     };
 
     const handleLogout = () => {
       isLogin.value = false;
       accessToken.value = "";
-      info = {};
+      info.value = {};
       localStorage.removeItem("accessToken");
     };
     return {
-      setSetting,
       handleLogin,
       handleLogout,
       isLogin,

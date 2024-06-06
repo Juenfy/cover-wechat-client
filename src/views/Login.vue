@@ -3,9 +3,10 @@ import { onMounted, reactive } from "vue";
 import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
 import { useUserStore } from "@/stores/user";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
+const route = useRoute();
 const userStore = useUserStore();
 const formData = reactive({
   mobile: "",
@@ -22,15 +23,16 @@ const onSubmit = () => {
       showSuccessToast(res.msg);
       setTimeout(() => {
         router.push("/chat");
-      }, 1000);
+      }, 200);
     } else {
       return showFailToast(res.msg);
     }
   });
 };
 onMounted(() => {
-  if (!localStorage.getItem("accessToken")) {
+  if (route.query.logout) {
     userStore.handleLogout();
+    return showFailToast("账户信息已失效，请重新登录");
   }
 });
 </script>

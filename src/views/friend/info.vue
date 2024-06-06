@@ -10,6 +10,15 @@ const showFriendSetting = () => {};
 const homeInfo = ref({});
 const showFriendRemark = ref(false);
 
+const onButtonClick = () => {
+  router.push({
+    path: "/friend/apply",
+    query: {
+      keywords: homeInfo.value.keywords,
+      source: homeInfo.value.source,
+    },
+  });
+};
 onMounted(() => {
   userApi.getHomeInfo(route.query.keywords).then((res) => {
     homeInfo.value = res.data;
@@ -97,7 +106,7 @@ onMounted(() => {
       size="large"
       :square="true"
       icon="chat-o"
-      to="/chat/detail"
+      @click="onButtonClick"
       v-if="
         homeInfo.relationship == 'owner' || homeInfo.relationship == 'friend'
       "
@@ -106,23 +115,16 @@ onMounted(() => {
     <van-button
       size="large"
       :square="true"
-      to="/chat/detail"
+      @click="onButtonClick"
       v-if="homeInfo.relationship == 'apply'"
       >添加到通讯录</van-button
     >
     <van-button
       size="large"
       :square="true"
-      to="/chat/detail"
+      @click="onButtonClick"
       v-if="homeInfo.relationship == 'go_check'"
       >前往验证</van-button
-    >
-    <van-button
-      size="large"
-      :square="true"
-      to="/chat/detail"
-      v-if="homeInfo.relationship == 'wait_check'"
-      >等待验证</van-button
     >
   </main>
   <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />

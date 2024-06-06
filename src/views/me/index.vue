@@ -2,10 +2,12 @@
 import { showConfirmDialog } from "vant";
 import { onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
+import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
 import * as userApi from "@/api/user";
 
 const appStore = useAppStore();
+const userStore = useUserStore();
 const router = useRouter();
 
 const onLogout = () => {
@@ -18,8 +20,9 @@ const onLogout = () => {
       userApi.postLogout().then((res) => {
         if (res.code == 200001) {
           setTimeout(() => {
-            router.push("/login");
-          }, 1000);
+            userStore.handleLogout();
+            location.href = "/login";
+          }, 200);
         }
       });
     })

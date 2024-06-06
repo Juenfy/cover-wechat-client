@@ -15,6 +15,10 @@ export const getSearchList = async (keywords) => {
   return request.get(`/api/friends/search/${keywords}`);
 };
 
+export const showConfirm = async (data) => {
+  return request.post("/api/friends/show-confirm", data);
+};
+
 export const postApply = async (data) => {
   return request.post("/api/friends/apply", data);
 };

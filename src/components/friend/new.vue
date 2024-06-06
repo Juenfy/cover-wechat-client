@@ -17,7 +17,8 @@ const onSearch = (keywords, cb) => {
   });
 };
 const applyStatus = reactive({
-  check: "待验证",
+  wait_check: "待验证",
+  go_check: "去验证",
   pass: "已添加",
   overdue: "已过期",
 });
