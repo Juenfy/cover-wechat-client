@@ -1,12 +1,19 @@
 <script setup>
-import CommonSearch from "@/components/common/search.vue";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useAppStore } from "@/stores/app";
 const router = useRouter();
 const chatSetting = reactive({ muted: false, top: false, remind: false });
 const showClearChat = ref(false);
-const showSearch = ref(false);
-const onSearch = (keywords, cb) => {};
+const appStore = useAppStore();
+
+const onSearchChatRecordClick = () => {
+  appStore.setShowCommonSearch(true);
+  appStore.initCommonSearch({
+    action: "chat",
+    placeholder: "搜索",
+  });
+};
 </script>
 
 <template>
@@ -49,7 +56,7 @@ const onSearch = (keywords, cb) => {};
         title="查找聊天内容"
         is-link
         clickable
-        @click="showSearch = true"
+        @click="onSearchChatRecordClick"
         size="large"
       />
     </van-cell-group>
@@ -114,13 +121,6 @@ const onSearch = (keywords, cb) => {};
       </van-popup>
     </van-cell-group>
   </main>
-  <common-search
-    :show="showSearch"
-    @hide="showSearch = false"
-    action="chat"
-    placeholder="搜索"
-    @search="onSearch"
-  />
 </template>
 
 <style lang="less" scoped>

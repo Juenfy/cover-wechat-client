@@ -1,7 +1,20 @@
 <script setup>
 import { showSuccessToast, showFailToast } from "vant";
+import * as friendApi from "@/api/friend";
 import { onMounted } from "vue";
-
+import CommonSearch from "@/components/common/search.vue";
+import { useAppStore } from "@/stores/app";
+const appStore = useAppStore();
+const onSearch = (action, keywords, cb) => {
+  console.log("action", action);
+  switch (action) {
+    case "friend-search":
+      friendApi.getSearchList(keywords).then((res) => {
+        cb(res);
+      });
+      break;
+  }
+};
 onMounted(() => {
   // const websocket = new WebSocket("ws://127.0.0.1:8282");
   // websocket.onopen = (e) => {
@@ -27,4 +40,11 @@ onMounted(() => {
       </keep-alive>
     </transition>
   </router-view>
+  <common-search
+    :show="appStore.showCommonSearch"
+    @hide="appStore.setShowCommonSearch(false)"
+    :action="appStore.commonSearchAction"
+    :placeholder="appStore.commonSearchPlaceholder"
+    @search="onSearch"
+  />
 </template>

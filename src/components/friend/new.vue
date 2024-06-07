@@ -1,27 +1,32 @@
 <script setup>
-import CommonSearch from "../common/search.vue";
 import FriendAdd from "../friend/add.vue";
 import { onMounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAppStore } from "@/stores/app";
 import { useFriendStore } from "@/stores/friend";
 import * as friendApi from "@/api/friend";
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
-defineEmits(["hide"]);
-
+const emit = defineEmits(["hide"]);
+const router = useRouter();
+const appStore = useAppStore();
 const friendStore = useFriendStore();
 const showFriendAdd = ref(false);
-const showSearch = ref(false);
-const onSearch = (keywords, cb) => {
-  friendApi.getSearchList(keywords).then((res) => {
-    cb(res);
-  });
-};
 const applyStatus = reactive({
   wait_check: "待验证",
   go_check: "去验证",
   pass: "已添加",
   overdue: "已过期",
 });
+
+const onSearchFocus = () => {
+  appStore.setShowCommonSearch(true);
+  appStore.initCommonSearch({
+    action: "friend-search",
+    placeholder: "账号/手机号",
+  });
+};
+
 const getApplyList = () => {
   if (
     friendStore.applyList.threeDay.length == 0 &&
@@ -40,6 +45,17 @@ const deleteApply = (id, type) => {
     }
   });
 };
+
+const handleHomeClick = (item) => {
+  emit("hide");
+  router.push({
+    path: "/friend/info",
+    query: {
+      keywords: item.keywords,
+    },
+  });
+};
+
 onMounted(() => {
   getApplyList();
 });
@@ -63,7 +79,7 @@ onMounted(() => {
       <van-search
         placeholder="账号/手机号"
         input-align="center"
-        @focus="showSearch = true"
+        @focus="onSearchFocus"
       />
     </header>
     <main>
@@ -75,7 +91,7 @@ onMounted(() => {
           v-for="item in friendStore.applyList.threeDay"
           :key="item.id"
         >
-          <van-cell :center="true">
+          <van-cell :center="true" @click="handleHomeClick(item)">
             <template #title>
               <van-image
                 height="2.5rem"
@@ -113,7 +129,7 @@ onMounted(() => {
           v-for="item in friendStore.applyList.overThreeDay"
           :key="item.id"
         >
-          <van-cell :center="true">
+          <van-cell :center="true" @click="handleHomeClick(item)">
             <template #title>
               <van-image
                 height="2.5rem"
@@ -145,18 +161,7 @@ onMounted(() => {
       </van-cell-group>
     </main>
   </van-popup>
-  <common-search
-    :show="showSearch"
-    @hide="showSearch = false"
-    action="friend-search"
-    placeholder="账号/手机号"
-    @search="onSearch"
-  />
 
-  <friend-add
-    :show="showFriendAdd"
-    @showSearch="showSearch = true"
-    @hide="showFriendAdd = false"
-  />
+  <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
 </template>
 <style scoped lang="less"></style>

@@ -1,6 +1,5 @@
 <script setup>
 import ChatGroupCreate from "@/components/chat/group/create.vue";
-import CommonSearch from "@/components/common/search.vue";
 import FriendAdd from "@/components/friend/add.vue";
 
 import { useRoute, useRouter } from "vue-router";
@@ -31,6 +30,14 @@ const actions = [
   { text: "扫一扫", value: "qrcode-scan" },
 ];
 
+const onSearchFocus = () => {
+  appStore.setShowCommonSearch(true);
+  appStore.initCommonSearch({
+    action: "home",
+    placeholder: "搜索",
+  });
+};
+
 const onSelect = (action) => {
   switch (action.value) {
     case "create-group":
@@ -45,8 +52,6 @@ const onSelect = (action) => {
   }
 };
 
-const showSearch = ref(false);
-const onSearch = (keywords, cb) => {};
 onMounted(() => {
   if (userStore.isLogin && route.fullPath == "/") {
     router.push("/chat");
@@ -88,7 +93,7 @@ onMounted(() => {
         placeholder="搜索"
         v-if="appStore.showSearch"
         input-align="center"
-        @focus="showSearch = true"
+        @focus="onSearchFocus"
       />
     </header>
 
@@ -129,13 +134,6 @@ onMounted(() => {
     <chat-group-create
       :show="showChatGroupCreate"
       @hide="showChatGroupCreate = false"
-    />
-    <common-search
-      :show="showSearch"
-      @hide="showSearch = false"
-      action="home"
-      placeholder="搜索"
-      @search="onSearch"
     />
     <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
   </div>

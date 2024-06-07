@@ -1,15 +1,15 @@
 <script setup>
-import { ref } from "vue";
-import CommonSearch from "@/components/common/search.vue";
-import * as friendApi from "@/api/friend";
+import { useAppStore } from "@/stores/app";
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
 defineEmits(["hide"]);
 
-const showSearch = ref(false);
-const onSearch = (keywords, cb) => {
-  friendApi.getSearchList(keywords).then((res) => {
-    cb(res);
+const appStore = useAppStore();
+const onSearchFocus = () => {
+  appStore.setShowCommonSearch(true);
+  appStore.initCommonSearch({
+    action: "friend-search",
+    placeholder: "账号/手机号",
   });
 };
 </script>
@@ -26,7 +26,7 @@ const onSearch = (keywords, cb) => {
       <van-search
         placeholder="账号/手机号"
         input-align="center"
-        @focus="showSearch = true"
+        @focus="onSearchFocus"
       />
     </header>
     <main>
@@ -66,12 +66,5 @@ const onSearch = (keywords, cb) => {
       </van-cell-group>
     </main>
   </van-popup>
-  <common-search
-    :show="showSearch"
-    @hide="showSearch = false"
-    action="friend-search"
-    placeholder="账号/手机号"
-    @search="onSearch"
-  />
 </template>
 <style scoped lang="less"></style>

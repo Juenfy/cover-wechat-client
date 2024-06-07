@@ -11,8 +11,9 @@ const background = ref("var(--van-white)");
 const router = useRouter();
 
 const handleSearch = () => {
+  console.log("handleSearch", keywords.value);
   if (keywords.value) {
-    emit("search", keywords.value, (res) => {
+    emit("search", action.value, keywords.value, (res) => {
       searchResult.value = res.data;
       isSearch.value = true;
       background.value = "var(--van-nav-bar-background)";
@@ -30,6 +31,7 @@ const handleCancel = () => {
 };
 
 const handleHomeClick = (item) => {
+  handleCancel();
   router.push({
     path: "/friend/info",
     query: {
@@ -41,6 +43,7 @@ onMounted(() => {
   if (["chat"].indexOf(action.value) !== -1) {
     background.value = "var(--van-nav-bar-background)";
   }
+  console.log(action.value);
 });
 </script>
 
@@ -72,25 +75,11 @@ onMounted(() => {
       />
     </header>
     <main>
-      <van-cell-group v-if="keywords.length > 0 && !isSearch">
-        <van-cell :center="true" size="large" @click="handleSearch">
-          <template #title>
-            <van-image
-              height="3rem"
-              width="3rem"
-              radius="0.1rem"
-              src="/public/search.png"
-              style="margin-right: 0.5rem"
-            />
-            <span style="font-weight: bold">搜索：</span
-            ><span style="color: var(--theme-main-color); font-weight: bold">{{
-              keywords
-            }}</span>
-          </template>
-        </van-cell>
-      </van-cell-group>
-      <template v-if="action == 'friend-search' && isSearch">
-        <van-cell-group title="联系人" v-if="searchResult.length > 0">
+      <template v-if="action == 'friend-search'">
+        <van-cell-group
+          title="联系人"
+          v-if="isSearch && searchResult.length > 0"
+        >
           <van-cell
             :center="true"
             size="large"
@@ -110,7 +99,27 @@ onMounted(() => {
             </template>
           </van-cell>
         </van-cell-group>
-        <div class="no-result" v-else>用户不存在</div>
+        <div class="no-result" v-else-if="isSearch && searchResult.length == 0">
+          用户不存在
+        </div>
+        <van-cell-group v-else-if="keywords.length > 0">
+          <van-cell :center="true" size="large" @click="handleSearch">
+            <template #title>
+              <van-image
+                height="3rem"
+                width="3rem"
+                radius="0.1rem"
+                src="/public/search.png"
+                style="margin-right: 0.5rem"
+              />
+              <span style="font-weight: bold">搜索：</span
+              ><span
+                style="color: var(--theme-main-color); font-weight: bold"
+                >{{ keywords }}</span
+              >
+            </template>
+          </van-cell>
+        </van-cell-group>
       </template>
       <template v-if="action == 'chat' && isSearch">
         <div v-if="isSearch">

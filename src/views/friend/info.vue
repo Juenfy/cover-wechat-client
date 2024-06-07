@@ -116,7 +116,10 @@ onMounted(() => {
       size="large"
       :square="true"
       @click="onButtonClick"
-      v-if="homeInfo.relationship == 'apply'"
+      v-if="
+        homeInfo.relationship == 'apply' ||
+        homeInfo.relationship == 'wait_check'
+      "
       >添加到通讯录</van-button
     >
     <van-button
