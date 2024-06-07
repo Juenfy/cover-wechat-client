@@ -2,6 +2,7 @@
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
+import { SearchChatRecord } from "@/enums/app";
 const router = useRouter();
 const chatSetting = reactive({ muted: false, top: false, remind: false });
 const showClearChat = ref(false);
@@ -10,7 +11,7 @@ const appStore = useAppStore();
 const onSearchChatRecordClick = () => {
   appStore.setShowCommonSearch(true);
   appStore.initCommonSearch({
-    action: "chat",
+    action: SearchChatRecord,
     placeholder: "搜索",
   });
 };

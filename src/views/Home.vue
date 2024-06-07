@@ -6,6 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 import { onMounted, reactive, ref } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
+import { Home, HomeActions, CreateGroup, SearchFriend } from "@/enums/app";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -24,26 +25,20 @@ const showPopover = ref(false);
 const showFriendAdd = ref(false);
 const showChatGroupCreate = ref(false);
 
-const actions = [
-  { text: "发起群聊", value: "create-group" },
-  { text: "添加好友", value: "search-friend" },
-  { text: "扫一扫", value: "qrcode-scan" },
-];
-
 const onSearchFocus = () => {
   appStore.setShowCommonSearch(true);
   appStore.initCommonSearch({
-    action: "home",
+    action: Home,
     placeholder: "搜索",
   });
 };
 
 const onSelect = (action) => {
   switch (action.value) {
-    case "create-group":
+    case CreateGroup:
       showChatGroupCreate.value = true;
       break;
-    case "search-friend":
+    case SearchFriend:
       showFriendAdd.value = true;
       break;
     default:
@@ -72,7 +67,7 @@ onMounted(() => {
             v-if="tabBarActive == 0"
             v-model:show="showPopover"
             theme="dark"
-            :actions="actions"
+            :actions="HomeActions"
             @select="onSelect"
             placement="bottom-end"
           >

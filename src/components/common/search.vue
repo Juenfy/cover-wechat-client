@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, toRefs, watch } from "vue";
 import { useRouter } from "vue-router";
+import { SearchFriend, SearchChatRecord } from "@/enums/app";
 const props = defineProps(["show", "action", "placeholder"]);
 const { show, action, placeholder } = toRefs(props);
 const emit = defineEmits(["hide", "search"]);
@@ -40,7 +41,7 @@ const handleHomeClick = (item) => {
   });
 };
 onMounted(() => {
-  if (["chat"].indexOf(action.value) !== -1) {
+  if ([SearchChatRecord].indexOf(action.value) !== -1) {
     background.value = "var(--van-nav-bar-background)";
   }
   console.log(action.value);
@@ -75,7 +76,7 @@ onMounted(() => {
       />
     </header>
     <main>
-      <template v-if="action == 'friend-search'">
+      <template v-if="action == SearchFriend">
         <van-cell-group
           title="联系人"
           v-if="isSearch && searchResult.length > 0"

@@ -1,11 +1,12 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import { Home } from "@/enums/app";
 export const useAppStore = defineStore("app", () => {
   const showSearch = ref(true);
   const showNavbar = ref(true);
   const navTitle = ref("");
   const showCommonSearch = ref(false);
-  const commonSearchAction = ref("home");
+  const commonSearchAction = ref(Home);
   const commonSearchPlaceholder = ref("搜索");
   const initCommonSearch = (search) => {
     commonSearchAction.value = search.action;

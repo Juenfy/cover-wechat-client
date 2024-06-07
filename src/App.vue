@@ -4,11 +4,12 @@ import * as friendApi from "@/api/friend";
 import { onMounted } from "vue";
 import CommonSearch from "@/components/common/search.vue";
 import { useAppStore } from "@/stores/app";
+import { SearchFriend } from "./enums/app";
 const appStore = useAppStore();
 const onSearch = (action, keywords, cb) => {
   console.log("action", action);
   switch (action) {
-    case "friend-search":
+    case SearchFriend:
       friendApi.getSearchList(keywords).then((res) => {
         cb(res);
       });

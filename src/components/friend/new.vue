@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useFriendStore } from "@/stores/friend";
 import * as friendApi from "@/api/friend";
+import { SearchFriend } from "@/enums/app";
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);
@@ -22,7 +23,7 @@ const applyStatus = reactive({
 const onSearchFocus = () => {
   appStore.setShowCommonSearch(true);
   appStore.initCommonSearch({
-    action: "friend-search",
+    action: SearchFriend,
     placeholder: "账号/手机号",
   });
 };
