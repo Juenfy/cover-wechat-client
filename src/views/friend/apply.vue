@@ -1,9 +1,9 @@
 <script setup>
 import { onBeforeMount, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { showFailToast } from "vant";
 import * as friendApi from "@/api/friend";
-
+import { Apply } from "@/enums/friend";
+import { handleResponse } from "@/utils/common";
 const router = useRouter();
 const route = useRoute();
 
@@ -19,27 +19,28 @@ const formData = ref({
   },
   type: "apply",
 });
-const friend = ref({});
 
 const showConfirm = async () => {
   friendApi
     .showConfirm({
       source: route.query.source,
       keywords: route.query.keywords,
+      relationship: route.query.relationship,
     })
     .then((res) => {
-      if (res.code == 200001) {
-        formData.value = res.data;
-      } else {
-        showFailToast(res.msg);
-        router.go(-1);
-      }
+      handleResponse(
+        res,
+        (res) => {
+          formData.value = res.data;
+        },
+        router
+      );
     });
 };
 
 const onSubmit = () => {
   console.log(formData.value);
-  if (formData.value.type == "apply") {
+  if (formData.value.type == Apply) {
     friendApi
       .postApply({
         friend: formData.value.friend.id,
@@ -48,7 +49,19 @@ const onSubmit = () => {
         setting: formData.value.setting,
       })
       .then((res) => {
-        console.log(res);
+        handleResponse(
+          res,
+          (res) => {
+            router.push({
+              path: "/friend",
+              query: {
+                show_friend_new: 1,
+              },
+            });
+          },
+          router,
+          true
+        );
       });
   } else {
     friendApi
@@ -58,7 +71,16 @@ const onSubmit = () => {
         setting: formData.value.setting,
       })
       .then((res) => {
-        console.log(res);
+        handleResponse(
+          res,
+          (res) => {
+            router.push({
+              path: "/friend",
+            });
+          },
+          router,
+          true
+        );
       });
   }
 };
@@ -70,7 +92,7 @@ onBeforeMount(async () => {
 <template>
   <header>
     <van-nav-bar
-      title="申请添加朋友"
+      :title="formData.type == 'apply' ? '申请添加朋友' : '通过好友验证'"
       left-arrow
       @click-left="router.go(-1)"
       :border="false"
@@ -133,7 +155,7 @@ onBeforeMount(async () => {
       </van-cell-group>
       <div style="margin-top: 2rem; text-align: center">
         <van-button type="primary" native-type="submit" style="width: 12rem">
-          提交
+          {{ formData.type == "apply" ? "提交" : "完成" }}
         </van-button>
       </div>
     </van-form>

@@ -1,16 +1,44 @@
 <script setup>
-import { reactive } from "vue";
-
-const props = defineProps({ show: Boolean, id: Number });
+import { useRouter } from "vue-router";
+import { reactive, watch } from "vue";
+import { useFriendStore } from "@/stores/friend";
+import * as friendApi from "@/api/friend";
+import { handleResponse } from "@/utils/common";
+const friendStore = useFriendStore();
+const props = defineProps({ show: Boolean });
+const router = useRouter();
 //调用父组件关闭弹窗
 defineEmits(["hide"]);
 const formData = reactive({
-  id: props.id,
-  remark: "",
+  friend: 0,
+  nickname: "",
   desc: "",
 });
 
-const onSubmit = () => {};
+const onSubmit = () => {
+  friendApi.putUpdate(formData).then((res) => {
+    handleResponse(
+      res,
+      (res) => {
+        router.push({
+          path: "/friend/info",
+          query: { keywords: friendStore.info.keywords },
+        });
+      },
+      router,
+      true
+    );
+  });
+};
+
+watch(
+  () => friendStore.info,
+  (info) => {
+    formData.friend = info.id;
+    formData.nickname = info.final_nickname;
+    formData.desc = info.desc;
+  }
+);
 </script>
 <template>
   <van-popup
@@ -23,7 +51,7 @@ const onSubmit = () => {};
       <van-nav-bar
         left-text="取消"
         @click-left="$emit('hide')"
-        @click-right="$emit('hide')"
+        @click-right="onSubmit"
         :border="false"
       >
         <template #right>
@@ -33,10 +61,10 @@ const onSubmit = () => {};
     </header>
     <main>
       <h2>设置备注和标签</h2>
-      <van-form @submit="onSubmit">
+      <van-form>
         <van-cell-group title="备注">
           <van-field
-            v-model="formData.remark"
+            v-model="formData.nickname"
             name="备注名"
             placeholder="添加备注名"
           />

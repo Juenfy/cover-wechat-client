@@ -1,6 +1,6 @@
 <script setup>
 import { showConfirmDialog } from "vant";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
@@ -30,6 +30,7 @@ const onLogout = () => {
       // on cancel
     });
 };
+
 onMounted(() => {
   appStore.initHeader({ title: "我", navbar: false, search: false });
 });
@@ -46,14 +47,15 @@ onMounted(() => {
                 radius=".5rem"
                 width="4rem"
                 height="4rem"
-                src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
+                :src="userStore.info.avatar"
               />
               <div class="text">
                 <span class="nickname"
-                  >PHP大佬<van-icon name="user" color="#008cff"
+                  >{{ userStore.info.nickname
+                  }}<van-icon name="user" color="#008cff"
                 /></span>
-                <span class="vchat">微信号：phpdalao</span>
-                <span class="area">地区：上海</span>
+                <span class="vchat">微信号：{{ userStore.info.wechat }}</span>
+                <span class="area">地区：广州</span>
               </div>
             </div>
           </div>

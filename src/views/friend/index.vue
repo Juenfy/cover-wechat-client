@@ -2,27 +2,39 @@
 import FriendNew from "@/components/friend/new.vue";
 import FriendRemark from "@/components/friend/remark.vue";
 import { ref, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import * as friendApi from "@/api/friend";
-import { useFriendStore } from "@/stores/friend";
+
 const appStore = useAppStore();
-const friendStore = useFriendStore();
+const router = useRouter();
+const route = useRoute();
+const friendList = ref({});
 const showFriendNew = ref(false);
 const showFriendRemark = ref(false);
 const indexList = ref([]);
-const getFriendList = () => {
-  if (friendStore.list.length == 0) {
-    friendApi.getList().then((res) => {
-      friendStore.setList(res.data);
-      indexList.value = Object.keys(res.data);
-    });
-  } else {
-    indexList.value = Object.keys(friendStore.list);
-  }
+const getFriendList = async () => {
+  friendApi.getList().then((res) => {
+    friendList.value = res.data;
+    indexList.value = Object.keys(res.data);
+  });
 };
-onMounted(() => {
+
+const handleHomeClick = (item) => {
+  router.push({
+    path: "/friend/info",
+    query: {
+      keywords: item.keywords,
+    },
+  });
+};
+
+onMounted(async () => {
   appStore.initHeader({ title: "通讯录", navbar: true, search: true });
-  getFriendList();
+  await getFriendList();
+  if (route.query.show_friend_new == 1) {
+    showFriendNew.value = true;
+  }
 });
 </script>
 
@@ -53,16 +65,13 @@ onMounted(() => {
       />
       <div v-for="val in indexList" :key="val">
         <van-index-anchor :index="val" />
-        <van-swipe-cell
-          v-for="item in friendStore.list[val]"
-          :key="item.friend.id"
-        >
+        <van-swipe-cell v-for="item in friendList[val]" :key="item.friend.id">
           <van-cell
             :title="item.friend.nickname"
             :icon="item.friend.avatar"
             size="large"
             :center="true"
-            @click="() => {}"
+            @click="handleHomeClick(item)"
           />
           <template #right>
             <van-button

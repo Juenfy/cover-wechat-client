@@ -1,8 +1,9 @@
+<!--通用搜索组件-->
 <script setup>
 import { onMounted, ref, toRefs, watch } from "vue";
 import { useRouter } from "vue-router";
 import { SearchFriend, SearchChatRecord } from "@/enums/app";
-const props = defineProps(["show", "action", "placeholder"]);
+const props = defineProps(["show", "action", "placeholder"]); //action决定了当前是要搜索什么的意思
 const { show, action, placeholder } = toRefs(props);
 const emit = defineEmits(["hide", "search"]);
 const keywords = ref("");
@@ -14,7 +15,9 @@ const router = useRouter();
 const handleSearch = () => {
   console.log("handleSearch", keywords.value);
   if (keywords.value) {
+    //触发父组件搜索
     emit("search", action.value, keywords.value, (res) => {
+      //回调拿到搜索结果
       searchResult.value = res.data;
       isSearch.value = true;
       background.value = "var(--van-nav-bar-background)";
@@ -41,6 +44,7 @@ const handleHomeClick = (item) => {
   });
 };
 onMounted(() => {
+  //部分搜索界面样式设置
   if ([SearchChatRecord].indexOf(action.value) !== -1) {
     background.value = "var(--van-nav-bar-background)";
   }

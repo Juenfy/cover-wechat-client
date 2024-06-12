@@ -1,8 +1,10 @@
 <script setup>
-import { useRouter, useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import { ref } from "vue";
 import "emoji-picker-element";
+import { useFriendStore } from "@/stores/friend";
 const router = useRouter();
+const friendStore = useFriendStore();
 const popupMoreBottom = ref(false);
 const popupEmojiBottom = ref(false);
 const message = ref("");
@@ -71,7 +73,7 @@ const onClickAvatar = (id) => {
 <template>
   <header>
     <van-nav-bar
-      title="标题"
+      :title="friendStore.info.final_nickname"
       left-arrow
       @click-left="router.go(-1)"
       @click-right="onClickRight"
