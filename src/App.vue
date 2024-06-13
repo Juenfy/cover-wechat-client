@@ -1,11 +1,14 @@
 <script setup>
-import { showSuccessToast, showFailToast } from "vant";
 import * as friendApi from "@/api/friend";
-import { onMounted } from "vue";
+import { onMounted, watch, inject } from "vue";
 import CommonSearch from "@/components/common/search.vue";
 import { useAppStore } from "@/stores/app";
-import { SearchFriend } from "./enums/app";
+import { useUserStore } from "@/stores/user";
+import { SearchFriend } from "@/enums/app";
+const WebSocketClient = inject("WebSocketClient");
+const emitter = inject("emitter");
 const appStore = useAppStore();
+const userStore = useUserStore();
 const onSearch = (action, keywords, cb) => {
   console.log("action", action);
   switch (action) {
@@ -16,18 +19,25 @@ const onSearch = (action, keywords, cb) => {
       break;
   }
 };
+watch(
+  () => userStore.isLogin,
+  (val) => {
+    if (val) {
+      //登录成功 连接websocket
+      const data = {
+        who: "user",
+        action: "login",
+        data: userStore.info,
+      };
+      WebSocketClient.send(data);
+    } else {
+      //推出登录 关闭websocket
+      WebSocketClient.stop();
+    }
+  }
+);
 onMounted(() => {
-  // const websocket = new WebSocket("ws://127.0.0.1:8282");
-  // websocket.onopen = (e) => {
-  //   showSuccessToast("连接成功");
-  // };
-  // websocket.onmessage = (e) => {};
-  // websocket.onclose = (e) => {
-  //   showFailToast("连接关闭");
-  // };
-  // websocket.onerror = (e) => {
-  //   showFailToast("连接错误");
-  // };
+  console.log(emitter, WebSocketClient);
 });
 </script>
 

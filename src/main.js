@@ -2,13 +2,13 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 //1.引入piniaPersistedstate持久化插件
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
-// import { websocket } from "@/utils/websocket";
 import App from "./App.vue";
 import router from "./router";
 import Vant from "vant";
-
+import mitt from "mitt";
+import { WebSocketClient } from "@/utils/websocket";
 import VConsole from "vconsole";
-const vconsole = new VConsole();
+// const vconsole = new VConsole();
 
 import "@/assets/animation.css";
 import "@/assets/main.less";
@@ -19,7 +19,18 @@ const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
 const app = createApp(App);
-// app.provide("websocket", websocket);
+
+//全局事件总线
+const emitter = mitt();
+app.provide("emitter", emitter);
+
+//连接websocket
+const url = "ws://127.0.0.1:2346";
+const ws = new WebSocketClient(url, emitter);
+ws.start();
+
+app.provide("WebSocketClient", ws);
+
 app.use(pinia);
 app.use(router);
 app.use(Vant);

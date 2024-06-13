@@ -6,15 +6,15 @@ export const useUserStore = defineStore(
     const isLogin = ref(false);
     const info = ref({});
     const handleLogin = (user) => {
-      isLogin.value = true;
       info.value = user;
       localStorage.setItem("accessToken", user.token);
+      isLogin.value = true;
     };
 
     const handleLogout = () => {
-      isLogin.value = false;
       info.value = {};
       localStorage.removeItem("accessToken");
+      isLogin.value = false;
     };
     return {
       handleLogin,
