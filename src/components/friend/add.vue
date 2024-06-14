@@ -50,7 +50,7 @@ const onSearchFocus = () => {
             </div>
           </template>
         </van-cell>
-        <van-cell is-link to="" :center="true" size="large">
+        <van-cell is-link to="/me/qrcode/scan" :center="true" size="large">
           <template #title>
             <van-image
               height="2rem"

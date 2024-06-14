@@ -3,7 +3,7 @@ import { onBeforeMount, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import * as friendApi from "@/api/friend";
 import { Apply } from "@/enums/friend";
-import { handleResponse } from "@/utils/common";
+import { handleResponse } from "@/utils/helper";
 const router = useRouter();
 const route = useRoute();
 

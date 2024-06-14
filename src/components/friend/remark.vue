@@ -3,7 +3,7 @@ import { useRouter } from "vue-router";
 import { reactive, watch } from "vue";
 import { useFriendStore } from "@/stores/friend";
 import * as friendApi from "@/api/friend";
-import { handleResponse } from "@/utils/common";
+import { handleResponse } from "@/utils/helper";
 const friendStore = useFriendStore();
 const props = defineProps({ show: Boolean });
 const router = useRouter();
@@ -35,7 +35,7 @@ watch(
   () => friendStore.info,
   (info) => {
     formData.friend = info.id;
-    formData.nickname = info.final_nickname;
+    formData.nickname = info.display_nickname;
     formData.desc = info.desc;
   }
 );

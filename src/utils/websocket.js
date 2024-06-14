@@ -5,7 +5,7 @@ export class WebSocketClient {
     this.websocket = null;
   }
 
-  start() {
+  start(cb) {
     console.log(this.emitter);
     if ("WebSocket" in window) {
       console.log("当前浏览器支持 WebSocket");
@@ -17,19 +17,15 @@ export class WebSocketClient {
       alert("当前浏览器不支持 WebSocket");
     }
     if (this.websocket) {
-      this.websocket.onopen = (e) => {
-        console.log("连接成功", e);
-      };
-
+      this.websocket.onopen = cb;
       this.websocket.onmessage = (e) => {
-        console.log("收到消息", e);
+        console.log("收到消息", e.data);
       };
 
       this.websocket.onclose = (e) => {
         console.log("连接关闭", e);
       };
     }
-    return this.websocket;
   }
 
   stop() {

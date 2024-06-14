@@ -1,49 +1,11 @@
 <script setup>
 import ChatList from "@/components/chat/list.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useAppStore } from "@/stores/app";
-
+import { useChatStore } from "@/stores/chat";
+import { sortChatList } from "@/utils/helper";
 const appStore = useAppStore();
-const chatList = ref([
-  {
-    name: "张三",
-    avatars: [
-      "https://img.yzcdn.cn/vant/cat.jpeg",
-      "https://img.yzcdn.cn/vant/cat.jpeg",
-      "https://img.yzcdn.cn/vant/cat.jpeg",
-    ],
-    message: "今天天气不错",
-    time: "1712915431",
-    badge: 10,
-    id: 1,
-    type: "group",
-    muted: true,
-  },
-  {
-    name: "张三",
-    avatars: [
-      "https://img.yzcdn.cn/vant/cat.jpeg",
-      "https://img.yzcdn.cn/vant/cat.jpeg",
-      "https://img.yzcdn.cn/vant/cat.jpeg",
-    ],
-    message: "今天天气不错",
-    time: "1712915431",
-    badge: 0,
-    id: 2,
-    type: "group",
-    muted: true,
-  },
-  {
-    name: "张三",
-    avatars: ["https://img.yzcdn.cn/vant/cat.jpeg"],
-    message: "今天天气不错",
-    time: "1712915431",
-    badge: 100,
-    id: 3,
-    type: "private",
-    muted: false,
-  },
-]);
+const chatStore = useChatStore();
 
 const loading = ref(false);
 const finished = ref(false);
@@ -64,14 +26,18 @@ const loadMore = () => {
   // }, 1000)
 };
 
-const handleItemClick = (item) => {
-  console.log(item);
-};
+watch(
+  () => chatStore.list,
+  (list) => {
+    console.log("list", list);
+  }
+);
+
 const thumb = ref(["https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"]);
 </script>
 <template>
   <van-list v-model="loading" :finished="finished" @load="loadMore">
-    <chat-list :list="chatList" />
+    <chat-list :list="chatStore.list" />
   </van-list>
 </template>
 

@@ -4,7 +4,7 @@ import friendIndex from "@/views/friend/index.vue";
 import discoverIndex from "@/views/discover/index.vue";
 import meIndex from "@/views/me/index.vue";
 import home from "@/views/Home.vue";
-import chatDetail from "@/views/chat/detail.vue";
+import chatMessage from "@/views/chat/message.vue";
 import chatSetting from "@/views/chat/setting.vue";
 import friendInfo from "@/views/friend/info.vue";
 import friendSetting from "@/views/friend/setting.vue";
@@ -45,9 +45,9 @@ const router = createRouter({
       ],
     },
     {
-      path: "/chat/detail",
-      name: "chat-detail",
-      component: chatDetail,
+      path: "/chat/message",
+      name: "chat-message",
+      component: chatMessage,
     },
     {
       path: "/chat/setting",

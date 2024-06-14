@@ -29,12 +29,7 @@ const onSubmit = () => {
     }
   });
 };
-onMounted(() => {
-  if (route.query.logout) {
-    userStore.handleLogout();
-    return showFailToast("账户信息已失效，请重新登录");
-  }
-});
+onMounted(() => {});
 </script>
 
 <template>

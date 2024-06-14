@@ -10,6 +10,6 @@ export const Home = "home";
 
 export const HomeActions = [
   { text: "发起群聊", value: CreateGroup },
-  { text: "添加好友", value: SearchFriend },
+  { text: "添加朋友", value: SearchFriend },
   { text: "扫一扫", value: QrcodeScan },
 ];

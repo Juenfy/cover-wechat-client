@@ -1,11 +1,15 @@
 <script setup>
 import * as friendApi from "@/api/friend";
 import { onMounted, watch, inject } from "vue";
+import { useRoute } from "vue-router";
 import CommonSearch from "@/components/common/search.vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend } from "@/enums/app";
+import { showFailToast } from "vant";
+import { startWebSocket } from "@/utils/helper";
 const WebSocketClient = inject("WebSocketClient");
+const route = useRoute();
 const emitter = inject("emitter");
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -24,20 +28,22 @@ watch(
   (val) => {
     if (val) {
       //登录成功 连接websocket
-      const data = {
-        who: "user",
-        action: "login",
-        data: userStore.info,
-      };
-      WebSocketClient.send(data);
-    } else {
-      //推出登录 关闭websocket
-      WebSocketClient.stop();
+      startWebSocket(WebSocketClient, userStore.info.id);
     }
   }
 );
 onMounted(() => {
   console.log(emitter, WebSocketClient);
+
+  if (route.query.logout) {
+    userStore.handleLogout();
+    return showFailToast("账户信息已失效，请重新登录");
+  }
+
+  //页面刷新 重新连接websocket
+  if (userStore.isLogin) {
+    startWebSocket(WebSocketClient, userStore.info.id);
+  }
 });
 </script>
 

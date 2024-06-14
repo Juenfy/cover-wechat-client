@@ -27,8 +27,6 @@ app.provide("emitter", emitter);
 //连接websocket
 const url = "ws://127.0.0.1:2346";
 const ws = new WebSocketClient(url, emitter);
-ws.start();
-
 app.provide("WebSocketClient", ws);
 
 app.use(pinia);

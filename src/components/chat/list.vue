@@ -1,4 +1,5 @@
 <script setup>
+import { timestampFormat } from "@/utils/helper";
 const props = defineProps(["list"]);
 const handleDelete = (id) => {
   console.log(id);
@@ -11,8 +12,8 @@ const handleTop = (id) => {
   <van-cell-group :border="false">
     <van-swipe-cell v-for="item in props.list" :key="item.id">
       <router-link
-        :to="{ name: 'chat-detail', query: { id: item.id } }"
-        class="to-chat-detail"
+        :to="{ name: 'chat-message', query: { id: item.id } }"
+        class="to-chat-message"
       >
         <div class="chat-item-left">
           <van-badge
@@ -25,20 +26,20 @@ const handleTop = (id) => {
             <div class="avatar-box">
               <img
                 alt="avatar"
-                v-for="avatar in item.avatars"
+                v-for="avatar in item.to.avatars"
                 :key="avatar"
                 :src="avatar"
-                :class="item.avatars.length > 1 ? 'avatar-group' : ''"
+                :class="item.to.avatars.length > 1 ? 'avatar-group' : ''"
               />
             </div>
           </van-badge>
         </div>
         <div class="chat-item-center">
-          <span class="username">{{ item.name }}</span>
+          <span class="username">{{ item.to.display_nickname }}</span>
           <span class="text">{{ item.message }}</span>
         </div>
         <div class="chat-item-right">
-          <span class="time">{{ item.time }}</span>
+          <span class="time">{{ timestampFormat(item.time) }}</span>
           <van-icon name="volume-o" v-show="item.muted" />
         </div>
       </router-link>
@@ -64,7 +65,7 @@ const handleTop = (id) => {
 
 <style scope lang="less">
 .van-swipe-cell__wrapper,
-.to-chat-detail {
+.to-chat-message {
   display: flex;
   width: 100%;
   color: var(--van-text-color);

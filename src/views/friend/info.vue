@@ -3,8 +3,12 @@ import FriendRemark from "@/components/friend/remark.vue";
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import * as userApi from "@/api/user";
+import { useUserStore } from "@/stores/user";
+import { useChatStore } from "@/stores/chat";
 import { useFriendStore } from "@/stores/friend";
 import { RelationShip } from "@/enums/friend";
+const userStore = useUserStore();
+const chatStore = useChatStore();
 const friendStore = useFriendStore();
 const router = useRouter();
 const route = useRoute();
@@ -13,18 +17,34 @@ const showFriendSetting = () => {};
 const homeInfo = ref({});
 const showFriendRemark = ref(false);
 
+//头像处理成数组
+const to = friendStore.info;
+to.avatars = [to.avatar];
+delete to.avatar;
+
+const chatItem = ref({
+  form: userStore.info,
+  to: to,
+  is_group: 0,
+  top: 0,
+  message: "",
+  badge: 0,
+  time: parseInt(Date.now() / 1000),
+  muted: true,
+});
+
 const onButtonClick = () => {
   if (
     [RelationShip.Owner, RelationShip.Friend].indexOf(
       homeInfo.value.relationship
     ) != -1
   ) {
+    chatStore.pushListItem(chatItem.value);
     router.push({
-      path: "/chat/detail",
+      path: "/chat/message",
       query: {
-        keywords: homeInfo.value.keywords,
-        source: homeInfo.value.source,
-        relationship: homeInfo.value.relationship,
+        to_user: homeInfo.value.id,
+        is_group: 0,
       },
     });
   } else {
@@ -77,12 +97,12 @@ onMounted(() => {
               />
               <div class="text">
                 <span class="nickname"
-                  >{{ homeInfo.final_nickname
+                  >{{ homeInfo.display_nickname
                   }}<van-icon name="user" color="#008cff"
                 /></span>
                 <span
                   class="n"
-                  v-if="homeInfo.final_nickname != homeInfo.nickname"
+                  v-if="homeInfo.display_nickname != homeInfo.nickname"
                   >昵称：{{ homeInfo.nickname }}</span
                 >
                 <span class="vchat">微信号：{{ homeInfo.wechat }}</span>

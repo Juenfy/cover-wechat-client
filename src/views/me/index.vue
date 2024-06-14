@@ -1,27 +1,26 @@
 <script setup>
 import { showConfirmDialog } from "vant";
-import { onMounted, ref } from "vue";
+import { onMounted, inject } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
-import { useRouter } from "vue-router";
 import * as userApi from "@/api/user";
-
 const appStore = useAppStore();
 const userStore = useUserStore();
-const router = useRouter();
+const WebSocketClient = inject("WebSocketClient");
 
 const onLogout = () => {
   showConfirmDialog({
     title: "提示",
     message: "确定退出登录吗？",
   })
-    .then(() => {
+    .then(async () => {
       // on confirm
       userApi.postLogout().then((res) => {
         if (res.code == 200001) {
+          WebSocketClient.stop();
+          userStore.handleLogout();
           setTimeout(() => {
-            userStore.handleLogout();
-            location.href = "/login";
+            location.href = "/";
           }, 200);
         }
       });
@@ -39,7 +38,7 @@ onMounted(() => {
 <template>
   <main>
     <van-cell-group :border="false">
-      <van-cell>
+      <van-cell is-link="" to="" :center="true">
         <template #title>
           <div class="card">
             <div class="info">
@@ -59,6 +58,10 @@ onMounted(() => {
               </div>
             </div>
           </div>
+        </template>
+        <template #right-icon>
+          <van-icon name="qr" />
+          <van-icon name="arrow" />
         </template>
       </van-cell>
     </van-cell-group>

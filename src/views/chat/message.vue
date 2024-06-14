@@ -1,13 +1,15 @@
 <script setup>
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { ref } from "vue";
 import "emoji-picker-element";
 import { useFriendStore } from "@/stores/friend";
+import * as messageApi from "@/api/message";
 const router = useRouter();
+const route = useRoute();
 const friendStore = useFriendStore();
 const popupMoreBottom = ref(false);
 const popupEmojiBottom = ref(false);
-const message = ref("");
+const content = ref("");
 const input = ref(null);
 const messageList = ref([]);
 
@@ -42,22 +44,32 @@ const handleEmojiClick = (e) => {
 };
 const onSelectEmoji = (emoji) => {
   console.log(emoji);
-  message.value += emoji.detail.unicode;
+  content.value += emoji.detail.unicode;
   input.value.focus();
   console.log(input);
 };
 
 const sendMessage = () => {
-  if (message.value) {
-    console.log(message.value);
-    messageList.value.push({
-      id: Math.random(9999),
-      avatar: "https://img.yzcdn.cn/vant/cat.jpeg",
-      name: "Vant",
-      message: message.value,
-      right: Math.random(1) > 0.5 ? true : false,
+  if (content.value) {
+    const data = {
+      to_user: route.query.to_user,
+      content: content.value,
+      type: "text",
+      is_group: route.query.is_group,
+    };
+    // console.log(content.value);
+    // messageList.value.push({
+    //   id: Math.random(9999),
+    //   avatar: "https://img.yzcdn.cn/vant/cat.jpeg",
+    //   name: "Vant",
+    //   message: message.value,
+    //   right: Math.random(1) > 0.5 ? true : false,
+    // });
+    messageApi.send(data).then((res) => {
+      console.log(res);
     });
-    message.value = "";
+
+    content.value = "";
   }
 };
 
@@ -73,7 +85,7 @@ const onClickAvatar = (id) => {
 <template>
   <header>
     <van-nav-bar
-      :title="friendStore.info.final_nickname"
+      :title="friendStore.info.display_nickname"
       left-arrow
       @click-left="router.go(-1)"
       @click-right="onClickRight"
@@ -117,7 +129,7 @@ const onClickAvatar = (id) => {
         </div>
         <input
           type="text"
-          v-model="message"
+          v-model="content"
           @keyup.enter="sendMessage"
           ref="input"
         />
