@@ -1,9 +1,10 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref, inject } from "vue";
 import "emoji-picker-element";
 import { useFriendStore } from "@/stores/friend";
 import * as messageApi from "@/api/message";
+const emitter = inject("emitter");
 const router = useRouter();
 const route = useRoute();
 const friendStore = useFriendStore();
@@ -49,30 +50,6 @@ const onSelectEmoji = (emoji) => {
   console.log(input);
 };
 
-const sendMessage = () => {
-  if (content.value) {
-    const data = {
-      to_user: route.query.to_user,
-      content: content.value,
-      type: "text",
-      is_group: route.query.is_group,
-    };
-    // console.log(content.value);
-    // messageList.value.push({
-    //   id: Math.random(9999),
-    //   avatar: "https://img.yzcdn.cn/vant/cat.jpeg",
-    //   name: "Vant",
-    //   message: message.value,
-    //   right: Math.random(1) > 0.5 ? true : false,
-    // });
-    messageApi.send(data).then((res) => {
-      console.log(res);
-    });
-
-    content.value = "";
-  }
-};
-
 const onClickAvatar = (id) => {
   router.push({
     path: "/friend/info",
@@ -81,6 +58,59 @@ const onClickAvatar = (id) => {
     },
   });
 };
+
+const sendMessage = () => {
+  if (content.value) {
+    const data = {
+      to_user: route.query.to_user,
+      content: content.value,
+      type: "text",
+      is_group: route.query.is_group,
+    };
+    messageApi.send(data).then((res) => {
+      console.log("sendMessage", res);
+      if (res.code == 200001) {
+        messageList.value.push(res.data);
+      }
+    });
+
+    content.value = "";
+  }
+};
+
+const readMessage = () => {
+  const data = {
+    to_user: route.query.to_user,
+  };
+  messageApi.read(data).then((res) => {
+    console.log("readMessage", res);
+  });
+};
+
+const getMessageList = () => {
+  messageApi.getList(route.query.to_user, route.query.is_group).then((res) => {
+    console.log("getMessageList", res);
+    if (res.code == 200001) {
+      messageList.value = res.data;
+    }
+  });
+};
+
+const onMessage = (data) => {
+  readMessage();
+  console.log("onMessage", JSON.stringify(data));
+  messageList.value.push(data);
+};
+
+onMounted(() => {
+  readMessage();
+  getMessageList();
+  emitter.on("onChatMessage", onMessage);
+});
+
+onUnmounted(() => {
+  emitter.off("offChatMessage", onMessage);
+});
 </script>
 <template>
   <header>
@@ -103,19 +133,19 @@ const onClickAvatar = (id) => {
     <ul class="message-list">
       <li v-for="item in messageList" :key="item.id">
         <p :class="item.right ? 'nickname right' : 'nickname'">
-          {{ item.name }}
+          {{ item.from.nickname }}
         </p>
         <article :class="item.right ? 'right' : ''">
           <div class="avatar">
             <img
               alt="avatar"
-              :src="item.avatar"
+              :src="item.from.avatar"
               @click="onClickAvatar(item.id)"
             />
           </div>
           <div class="msg">
             <div class="tri"></div>
-            <div class="msg_inner">{{ item.message }}</div>
+            <div class="msg_inner">{{ item.content }}</div>
           </div>
         </article>
       </li>
@@ -226,6 +256,7 @@ const onClickAvatar = (id) => {
   padding: 0;
   .message-list {
     padding: 0 1rem;
+    margin-bottom: 3rem;
     > li {
       display: block;
     }

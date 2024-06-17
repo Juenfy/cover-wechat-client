@@ -19,7 +19,13 @@ export class WebSocketClient {
     if (this.websocket) {
       this.websocket.onopen = cb;
       this.websocket.onmessage = (e) => {
-        console.log("收到消息", e.data);
+        const data = JSON.parse(e.data);
+        console.log("收到消息", data);
+        switch (data.action) {
+          case "send":
+            this.emitter.emit("onChatMessage", data.data);
+            break;
+        }
       };
 
       this.websocket.onclose = (e) => {

@@ -12,31 +12,34 @@ const handleTop = (id) => {
   <van-cell-group :border="false">
     <van-swipe-cell v-for="item in props.list" :key="item.id">
       <router-link
-        :to="{ name: 'chat-message', query: { id: item.id } }"
+        :to="{
+          name: 'chat-message',
+          query: { to_user: item.friend, is_group: item.is_group },
+        }"
         class="to-chat-message"
       >
         <div class="chat-item-left">
           <van-badge
-            :content="item.badge"
+            :content="item.unread"
             max="99"
             :show-zero="false"
-            :dot="item.badge > 0 && item.muted"
+            :dot="item.unread > 0 && item.muted"
             position="top-right"
           >
             <div class="avatar-box">
               <img
                 alt="avatar"
-                v-for="avatar in item.to.avatars"
+                v-for="avatar in item.avatars"
                 :key="avatar"
                 :src="avatar"
-                :class="item.to.avatars.length > 1 ? 'avatar-group' : ''"
+                :class="item.avatars.length > 1 ? 'avatar-group' : ''"
               />
             </div>
           </van-badge>
         </div>
         <div class="chat-item-center">
-          <span class="username">{{ item.to.display_nickname }}</span>
-          <span class="text">{{ item.message }}</span>
+          <span class="username">{{ item.nickname }}</span>
+          <span class="text">{{ item.content }}</span>
         </div>
         <div class="chat-item-right">
           <span class="time">{{ timestampFormat(item.time) }}</span>

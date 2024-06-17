@@ -2,18 +2,20 @@
 import ChatList from "@/components/chat/list.vue";
 import { ref, onMounted, watch } from "vue";
 import { useAppStore } from "@/stores/app";
-import { useChatStore } from "@/stores/chat";
+// import { useChatStore } from "@/stores/chat";
 import { sortChatList } from "@/utils/helper";
+import * as chatApi from "@/api/chat";
 const appStore = useAppStore();
-const chatStore = useChatStore();
-
+// const chatStore = useChatStore();
+const chatList = ref([]);
 const loading = ref(false);
 const finished = ref(false);
 
 defineEmits(["onSelect"]);
 
-onMounted(() => {
+onMounted(async () => {
   appStore.initHeader({ title: "微信", navbar: true, search: true });
+  await getChatList();
 });
 
 const loadMore = () => {
@@ -26,18 +28,18 @@ const loadMore = () => {
   // }, 1000)
 };
 
-watch(
-  () => chatStore.list,
-  (list) => {
-    console.log("list", list);
-  }
-);
+const getChatList = async () => {
+  chatApi.getList().then((res) => {
+    console.log(res);
+    chatList.value = res.data;
+  });
+};
 
 const thumb = ref(["https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"]);
 </script>
 <template>
   <van-list v-model="loading" :finished="finished" @load="loadMore">
-    <chat-list :list="chatStore.list" />
+    <chat-list :list="chatList" />
   </van-list>
 </template>
 

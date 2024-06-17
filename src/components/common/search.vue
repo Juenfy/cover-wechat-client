@@ -126,7 +126,7 @@ onMounted(() => {
           </van-cell>
         </van-cell-group>
       </template>
-      <template v-if="action == 'chat' && isSearch">
+      <template v-if="action == SearchChatRecord && isSearch">
         <div v-if="isSearch">
           <div v-if="searchResult.length > 0"></div>
           <div class="no-result" v-else>暂无搜索结果</div>
