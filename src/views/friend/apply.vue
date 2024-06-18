@@ -43,7 +43,7 @@ const onSubmit = () => {
   if (formData.value.type == Apply) {
     friendApi
       .postApply({
-        friend: formData.value.friend.id,
+        keywords: route.query.keywords,
         nickname: formData.value.nickname,
         remark: formData.value.remark,
         setting: formData.value.setting,

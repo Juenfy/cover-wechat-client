@@ -39,7 +39,7 @@ const handleHomeClick = (item) => {
   router.push({
     path: "/friend/info",
     query: {
-      keywords: item.source == "mobile" ? item.mobile : item.wechat,
+      keywords: item.keywords,
     },
   });
 };
