@@ -1,22 +1,16 @@
 <script setup>
 import ChatList from "@/components/chat/list.vue";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, inject } from "vue";
 import { useAppStore } from "@/stores/app";
-// import { useChatStore } from "@/stores/chat";
 import { sortChatList } from "@/utils/helper";
 import * as chatApi from "@/api/chat";
 const appStore = useAppStore();
-// const chatStore = useChatStore();
 const chatList = ref([]);
 const loading = ref(false);
 const finished = ref(false);
+const emitter = inject("emitter");
 
 defineEmits(["onSelect"]);
-
-onMounted(async () => {
-  appStore.initHeader({ title: "微信", navbar: true, search: true });
-  await getChatList();
-});
 
 const loadMore = () => {
   // setTimeout(() => {
@@ -28,13 +22,27 @@ const loadMore = () => {
   // }, 1000)
 };
 
-const getChatList = async () => {
+const getChatList = () => {
   chatApi.getList().then((res) => {
-    console.log(res);
-    chatList.value = res.data;
+    console.log("getChatList", res);
+    chatList.value = sortChatList(res.data);
   });
 };
 
+const onMessage = (data) => {
+  console.log("index:onMessage", data);
+  getChatList();
+};
+
+onMounted(() => {
+  appStore.initHeader({ title: "微信", navbar: true, search: true });
+  emitter.on("onChatMessage", onMessage);
+  getChatList();
+});
+
+onUnmounted(() => {
+  emitter.off("onChatMessage", onMessage);
+});
 const thumb = ref(["https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"]);
 </script>
 <template>

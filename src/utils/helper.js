@@ -59,12 +59,11 @@ export const timestampFormat = (timestamp) => {
 };
 
 export const sortChatList = (list) => {
-  console.log(list);
   list.sort((a, b) => {
-    if (a.top == b.top) {
-      return a.top - b.top;
+    if (a.top != b.top) {
+      return b.top - a.top;
     }
-    return a.time - b.time;
+    return b.time - a.time;
   });
   return list;
 };

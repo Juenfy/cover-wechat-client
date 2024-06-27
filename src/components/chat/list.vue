@@ -14,7 +14,7 @@ const handleTop = (id) => {
       <router-link
         :to="{
           name: 'chat-message',
-          query: { to_user: item.friend, is_group: item.is_group },
+          params: { to_user: item.to_user, is_group: item.is_group },
         }"
         class="to-chat-message"
       >
@@ -29,10 +29,10 @@ const handleTop = (id) => {
             <div class="avatar-box">
               <img
                 alt="avatar"
-                v-for="avatar in item.avatars"
+                v-for="avatar in item.from.avatars"
                 :key="avatar"
                 :src="avatar"
-                :class="item.avatars.length > 1 ? 'avatar-group' : ''"
+                :class="item.from.avatars.length > 1 ? 'avatar-group' : ''"
               />
             </div>
           </van-badge>

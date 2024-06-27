@@ -1,6 +1,6 @@
 <script setup>
 import * as friendApi from "@/api/friend";
-import { onMounted, watch, inject } from "vue";
+import { onMounted, watch, inject, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import CommonSearch from "@/components/common/search.vue";
 import { useAppStore } from "@/stores/app";
@@ -32,6 +32,10 @@ watch(
     }
   }
 );
+const onMessage = (data) => {
+  console.log("App:onChatMessage", data);
+};
+
 onMounted(() => {
   console.log(emitter, WebSocketClient);
 
@@ -44,6 +48,12 @@ onMounted(() => {
   if (userStore.isLogin) {
     startWebSocket(WebSocketClient, userStore.info.id);
   }
+
+  emitter.on("onChatMessage", onMessage);
+});
+
+onUnmounted(() => {
+  emitter.off("onChatMessage", onMessage);
 });
 </script>
 

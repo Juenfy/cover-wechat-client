@@ -1,22 +1,88 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch, inject } from "vue";
+import * as friendApi from "@/api/friend";
+import * as groupApi from "@/api/group";
+import { showFailToast, showSuccessToast } from "vant";
+import router from "@/router";
 
+const WebSocketClient = inject("WebSocketClient");
+const checkedList = ref([]);
+const choseText = ref("多选");
+const friendList = ref({});
+const searchFriendList = ref([]);
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
-defineEmits(["hide"]);
+const emit = defineEmits(["hide"]);
 
-const onSearchFocus = () => {
-  console.log("onSearchFocus");
-};
-
-const onSearchBlur = () => {
-  console.log("onSearchBlur");
-};
-
-const indexList = ref(["A", "B"]);
-
-const checked = ref(false);
+const indexList = ref([]);
 const searchFocus = ref(false);
+const keywords = ref("");
+
+const getFriendList = () => {
+  friendApi.getList().then((res) => {
+    friendList.value = res.data;
+    indexList.value = Object.keys(res.data).reverse();
+  });
+};
+
+const searchResult = () => {
+  searchFriendList.value = [];
+  choseText.value == "多选";
+  if (keywords.value.length <= 0) return;
+  indexList.value.forEach((element) => {
+    friendList.value[element].forEach((item) => {
+      if (item.nickname.includes(keywords.value)) {
+        searchFriendList.value.push(item);
+      }
+    });
+  });
+};
+const onClickChoseText = () => {
+  if (choseText.value == "多选") {
+    choseText.value = "结束多选";
+  } else {
+    keywords.value = "";
+    searchFocus.value = false;
+  }
+};
+const onSubmit = () => {
+  checkedList.value = [];
+  indexList.value.forEach((element) => {
+    friendList.value[element].forEach((item) => {
+      if (item.checked) {
+        checkedList.value.push(item.friend);
+      }
+    });
+  });
+
+  if (checkedList.value.length == 0) {
+    return showFailToast("请选择好友");
+  }
+
+  groupApi.postCreate({ group_users: checkedList.value }).then((res) => {
+    if (res.code == 200001) {
+      showSuccessToast(res.msg);
+      setTimeout(() => {
+        emit("hide");
+        router.push({
+          name: "chat-message",
+          params: { to_user: res.data.group_id, is_group: 1 },
+        });
+      }, 2000);
+    } else {
+      showFailToast(res.msg);
+    }
+  });
+};
+
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal) {
+      getFriendList();
+    }
+  }
+);
 </script>
 <template>
   <van-popup
@@ -28,10 +94,12 @@ const searchFocus = ref(false);
     <header>
       <van-nav-bar
         title="选择联系人"
-        left-arrow
         @click-left="$emit('hide')"
-        @click-right="$emit('hide')"
+        @click-right="onSubmit"
       >
+        <template #left>
+          <span>取消</span>
+        </template>
         <template #right>
           <van-button type="primary" size="small">完成</van-button>
         </template>
@@ -39,57 +107,59 @@ const searchFocus = ref(false);
     </header>
     <main class="friend-list">
       <van-search
-        v-model="value"
+        v-model="keywords"
         placeholder="搜索"
         @focus="searchFocus = true"
-        @blur="searchFocus = false"
+        @blur="searchFocus = keywords.length > 0"
+        @update:model-value="searchResult"
       />
-      <van-index-bar v-if="!searchFocus">
+      <van-index-bar v-if="!searchFocus" :index-list="indexList">
         <van-cell title="选择一个群" size="large" is-link to="" />
         <van-cell title="新面对面群" size="large" is-link to="" />
-        <van-index-anchor index="A" />
-        <van-cell title="文本" size="large" :center="true">
-          <template #icon>
-            <van-checkbox
-              v-model="checked"
-              @change="(checked) => {}"
-            ></van-checkbox>
-            <van-image
-              width="3rem"
-              height="3rem"
-              src="https://q4.itc.cn/q_70/images03/20240405/0fe4005840664f30b76f1a63909a5489.jpeg"
-            />
-          </template>
-        </van-cell>
-
-        <van-index-anchor index="B" />
-        <van-cell title="文本" size="large" :center="true">
-          <template #icon>
-            <van-checkbox v-model="checked"></van-checkbox>
-            <van-image
-              width="3rem"
-              height="3rem"
-              src="https://q4.itc.cn/q_70/images03/20240405/0fe4005840664f30b76f1a63909a5489.jpeg"
-            />
-          </template>
-        </van-cell>
+        <div v-for="val in indexList" :key="val">
+          <van-index-anchor :index="val" />
+          <van-cell
+            :title="item.nickname"
+            size="large"
+            :center="true"
+            v-for="(item, index) in friendList[val]"
+            :key="item.friend"
+          >
+            <template #icon>
+              <van-checkbox
+                v-model="friendList[val][index].checked"
+                @change="
+                  (checked) => {
+                    friendList[val][index].checked = checked;
+                  }
+                "
+              ></van-checkbox>
+              <van-image width="3rem" height="3rem" :src="item.avatar" />
+            </template>
+          </van-cell>
+        </div>
       </van-index-bar>
-      <div class="search-result" v-else>
+      <div class="search-result" v-else-if="keywords.length > 0 && searchFocus">
         <van-nav-bar
-          left-text="联系人"
-          right-text="多选"
+          left-text="搜索结果"
+          :right-text="choseText"
           left-disabled
-          @click-right="$emit('closeGroupCreate')"
+          @click-right="onClickChoseText"
         />
         <van-cell-group title="联系人" :border="false">
-          <van-cell title="文本" size="large" :center="true">
+          <van-cell
+            :title="item.nickname"
+            size="large"
+            :center="true"
+            v-for="(item, index) in searchFriendList"
+            :key="item.friend"
+          >
             <template #icon>
-              <van-checkbox v-model="checked"></van-checkbox>
-              <van-image
-                width="3rem"
-                height="3rem"
-                src="https://q4.itc.cn/q_70/images03/20240405/0fe4005840664f30b76f1a63909a5489.jpeg"
-              />
+              <van-checkbox
+                v-model="searchFriendList[index].checked"
+                v-if="choseText != '多选'"
+              ></van-checkbox>
+              <van-image width="3rem" height="3rem" :src="item.avatar" />
             </template>
           </van-cell>
         </van-cell-group>

@@ -16,7 +16,7 @@ const indexList = ref([]);
 const getFriendList = async () => {
   friendApi.getList().then((res) => {
     friendList.value = res.data;
-    indexList.value = Object.keys(res.data);
+    indexList.value = Object.keys(res.data).reverse();
   });
 };
 
@@ -65,10 +65,10 @@ onMounted(async () => {
       />
       <div v-for="val in indexList" :key="val">
         <van-index-anchor :index="val" />
-        <van-swipe-cell v-for="item in friendList[val]" :key="item.friend.id">
+        <van-swipe-cell v-for="item in friendList[val]" :key="item.friend">
           <van-cell
-            :title="item.friend.nickname"
-            :icon="item.friend.avatar"
+            :title="item.nickname"
+            :icon="item.avatar"
             size="large"
             :center="true"
             @click="handleHomeClick(item)"

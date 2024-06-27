@@ -1,21 +1,24 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { onMounted, onUnmounted, ref, inject } from "vue";
+import { onMounted, onUnmounted, ref, inject, reactive } from "vue";
 import "emoji-picker-element";
-import { useFriendStore } from "@/stores/friend";
 import * as messageApi from "@/api/message";
+import * as chatApi from "@/api/chat";
 const emitter = inject("emitter");
 const router = useRouter();
 const route = useRoute();
-const friendStore = useFriendStore();
 const popupMoreBottom = ref(false);
 const popupEmojiBottom = ref(false);
 const content = ref("");
 const input = ref(null);
 const messageList = ref([]);
+const chatInfo = ref({});
+const queryData = reactive({
+  to_user: route.params.to_user,
+  is_group: route.params.is_group,
+});
 
-const onClickRight = (e) => {
-  console.log(e);
+const onClickRight = () => {
   router.push({
     path: "/chat/setting",
     query: {
@@ -23,6 +26,7 @@ const onClickRight = (e) => {
     },
   });
 };
+
 const handleMoreClick = (e) => {
   if (popupEmojiBottom.value) {
     popupEmojiBottom.value = false;
@@ -33,6 +37,7 @@ const handleMoreClick = (e) => {
     popupMoreBottom.value = !popupMoreBottom.value;
   }
 };
+
 const handleEmojiClick = (e) => {
   if (popupMoreBottom.value) {
     popupMoreBottom.value = false;
@@ -44,10 +49,8 @@ const handleEmojiClick = (e) => {
   }
 };
 const onSelectEmoji = (emoji) => {
-  console.log(emoji);
   content.value += emoji.detail.unicode;
   input.value.focus();
-  console.log(input);
 };
 
 const onClickAvatar = (id) => {
@@ -61,13 +64,9 @@ const onClickAvatar = (id) => {
 
 const sendMessage = () => {
   if (content.value) {
-    const data = {
-      to_user: route.query.to_user,
-      content: content.value,
-      type: "text",
-      is_group: route.query.is_group,
-    };
-    messageApi.send(data).then((res) => {
+    queryData.content = content.value;
+    queryData.type = "text";
+    messageApi.send(queryData).then((res) => {
       console.log("sendMessage", res);
       if (res.code == 200001) {
         messageList.value.push(res.data);
@@ -78,17 +77,16 @@ const sendMessage = () => {
   }
 };
 
-const readMessage = () => {
-  const data = {
-    to_user: route.query.to_user,
-  };
-  messageApi.read(data).then((res) => {
-    console.log("readMessage", res);
-  });
+const readMessage = async () => {
+  if (queryData.to_user) {
+    messageApi.read(queryData).then((res) => {
+      console.log("readMessage", res);
+    });
+  }
 };
 
-const getMessageList = () => {
-  messageApi.getList(route.query.to_user, route.query.is_group).then((res) => {
+const getMessageList = async () => {
+  messageApi.getList(queryData.to_user, queryData.is_group).then((res) => {
     console.log("getMessageList", res);
     if (res.code == 200001) {
       messageList.value = res.data;
@@ -96,26 +94,35 @@ const getMessageList = () => {
   });
 };
 
+const getChatInfo = async () => {
+  chatApi.getInfo(queryData.to_user, queryData.is_group).then((res) => {
+    console.log("getChatInfo", res);
+    if (res.code == 200001) {
+      chatInfo.value = res.data;
+    }
+  });
+};
+
 const onMessage = (data) => {
-  readMessage();
-  console.log("onMessage", JSON.stringify(data));
+  console.log("message:onMessage", data);
   messageList.value.push(data);
 };
 
-onMounted(() => {
-  readMessage();
-  getMessageList();
+onMounted(async () => {
   emitter.on("onChatMessage", onMessage);
+  await getChatInfo();
+  await getMessageList();
 });
 
-onUnmounted(() => {
+onUnmounted(async () => {
   emitter.off("offChatMessage", onMessage);
+  await readMessage();
 });
 </script>
 <template>
   <header>
     <van-nav-bar
-      :title="friendStore.info.display_nickname"
+      :title="chatInfo.nickname"
       left-arrow
       @click-left="router.go(-1)"
       @click-right="onClickRight"

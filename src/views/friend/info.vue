@@ -3,12 +3,8 @@ import FriendRemark from "@/components/friend/remark.vue";
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import * as userApi from "@/api/user";
-import { useUserStore } from "@/stores/user";
-import { useChatStore } from "@/stores/chat";
 import { useFriendStore } from "@/stores/friend";
 import { RelationShip } from "@/enums/friend";
-const userStore = useUserStore();
-const chatStore = useChatStore();
 const friendStore = useFriendStore();
 const router = useRouter();
 const route = useRoute();
@@ -17,32 +13,15 @@ const showFriendSetting = () => {};
 const homeInfo = ref({});
 const showFriendRemark = ref(false);
 
-//头像处理成数组
-const to = friendStore.info;
-to.avatars = [to.avatar];
-delete to.avatar;
-
-const chatItem = ref({
-  form: userStore.info,
-  to: to,
-  is_group: 0,
-  top: 0,
-  message: "",
-  badge: 0,
-  time: parseInt(Date.now() / 1000),
-  muted: true,
-});
-
 const onButtonClick = () => {
   if (
     [RelationShip.Owner, RelationShip.Friend].indexOf(
       homeInfo.value.relationship
     ) != -1
   ) {
-    chatStore.pushListItem(chatItem.value);
     router.push({
-      path: "/chat/message",
-      query: {
+      name: "chat-message",
+      params: {
         to_user: homeInfo.value.id,
         is_group: 0,
       },

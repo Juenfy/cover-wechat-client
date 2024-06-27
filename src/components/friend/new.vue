@@ -1,6 +1,6 @@
 <script setup>
 import FriendAdd from "../friend/add.vue";
-import { onMounted, ref } from "vue";
+import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import * as friendApi from "@/api/friend";
@@ -48,10 +48,14 @@ const handleHomeClick = (item) => {
     },
   });
 };
-
-onMounted(() => {
-  getApplyList();
-});
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal) {
+      getApplyList();
+    }
+  }
+);
 </script>
 
 <template>
