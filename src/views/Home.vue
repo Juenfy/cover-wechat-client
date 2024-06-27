@@ -104,22 +104,32 @@ onMounted(() => {
         <van-tabbar-item
           :icon="tabBarActive == 0 ? 'chat' : 'chat-o'"
           to="/chat"
+          :badge-props="{
+            content: appStore.unreadChat > 0 ? appStore.unreadChat : '',
+            max: 99,
+          }"
           >消息</van-tabbar-item
         >
         <van-tabbar-item
           :icon="tabBarActive == 1 ? 'friends' : 'friends-o'"
+          :badge-props="{
+            content: appStore.unreadFriend > 0 ? appStore.unreadFriend : '',
+            max: 99,
+          }"
           to="/friend"
           >通讯录</van-tabbar-item
         >
         <van-tabbar-item
           :icon="tabBarActive == 2 ? 'eye' : 'eye-o'"
-          badge="5"
+          :badge-props="{
+            content: appStore.unreadDiscover > 0 ? appStore.unreadDiscover : '',
+            max: 99,
+          }"
           to="/discover"
           >发现</van-tabbar-item
         >
         <van-tabbar-item
           :icon="tabBarActive == 3 ? 'contact' : 'contact-o'"
-          badge="20"
           to="/me"
           >我</van-tabbar-item
         >

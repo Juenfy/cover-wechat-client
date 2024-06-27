@@ -28,6 +28,9 @@ app.provide("emitter", emitter);
 const url = "ws://127.0.0.1:2346";
 const ws = new WebSocketClient(url, emitter);
 app.provide("WebSocketClient", ws);
+const noticeAudio = new Audio("/audio/notification/default.mp3");
+console.log(noticeAudio);
+app.provide("NoticeAudio", noticeAudio);
 
 app.use(pinia);
 app.use(router);

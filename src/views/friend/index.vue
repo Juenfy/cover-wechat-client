@@ -48,7 +48,13 @@ onMounted(async () => {
         :center="true"
         clickable
         @click="showFriendNew = true"
-      />
+      >
+        <template #right-icon>
+          <div>
+            <van-badge :content="20" max="99" />
+          </div>
+        </template>
+      </van-cell>
       <van-cell
         title="仅聊天的朋友"
         icon="/public/friend-only-chat.png"

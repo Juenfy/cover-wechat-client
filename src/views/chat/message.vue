@@ -1,17 +1,18 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { onMounted, onUnmounted, ref, inject, reactive } from "vue";
+import { onMounted, onUnmounted, ref, reactive } from "vue";
 import "emoji-picker-element";
 import * as messageApi from "@/api/message";
 import * as chatApi from "@/api/chat";
-const emitter = inject("emitter");
+import { useAppStore } from "@/stores/app";
+import { messageList } from "@/utils/websocket";
 const router = useRouter();
 const route = useRoute();
+const appStore = useAppStore();
 const popupMoreBottom = ref(false);
 const popupEmojiBottom = ref(false);
 const content = ref("");
 const input = ref(null);
-const messageList = ref([]);
 const chatInfo = ref({});
 const queryData = reactive({
   to_user: route.params.to_user,
@@ -81,6 +82,9 @@ const readMessage = async () => {
   if (queryData.to_user) {
     messageApi.read(queryData).then((res) => {
       console.log("readMessage", res);
+      if (res.code == 200001) {
+        appStore.unreadDecrBy(1, route.params.unread);
+      }
     });
   }
 };
@@ -103,19 +107,12 @@ const getChatInfo = async () => {
   });
 };
 
-const onMessage = (data) => {
-  console.log("message:onMessage", data);
-  messageList.value.push(data);
-};
-
 onMounted(async () => {
-  emitter.on("onChatMessage", onMessage);
   await getChatInfo();
   await getMessageList();
 });
 
 onUnmounted(async () => {
-  emitter.off("offChatMessage", onMessage);
   await readMessage();
 });
 </script>

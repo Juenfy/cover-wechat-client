@@ -48,3 +48,38 @@ export class WebSocketClient {
     }
   }
 }
+
+export const startWebSocket = async (WebSocketClient, uid) => {
+  WebSocketClient.start((e) => {
+    console.log("连接成功", e);
+    //登录成功 连接websocket
+    const data = {
+      who: "user",
+      action: "login",
+      data: { uid: uid },
+    };
+    WebSocketClient.send(data);
+  });
+};
+
+import { ref } from "vue";
+import * as chatApi from "@/api/chat";
+export const chatList = ref([]);
+export const messageList = ref([]);
+
+export const getChatList = () => {
+  chatApi.getList().then((res) => {
+    console.log("getChatList", res);
+    chatList.value = sortChatList(res.data);
+  });
+};
+
+const sortChatList = (list) => {
+  list.sort((a, b) => {
+    if (a.top != b.top) {
+      return b.top - a.top;
+    }
+    return b.time - a.time;
+  });
+  return list;
+};

@@ -45,7 +45,7 @@ const router = createRouter({
       ],
     },
     {
-      path: "/chat/message/:to_user/:is_group",
+      path: "/chat/message/:to_user/:is_group/:unread",
       name: "chat-message",
       component: chatMessage,
     },

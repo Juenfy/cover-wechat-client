@@ -7,12 +7,13 @@ import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend } from "@/enums/app";
 import { showFailToast } from "vant";
-import { startWebSocket } from "@/utils/helper";
+import { startWebSocket, getChatList, messageList } from "@/utils/websocket";
 const WebSocketClient = inject("WebSocketClient");
 const route = useRoute();
 const emitter = inject("emitter");
 const appStore = useAppStore();
 const userStore = useUserStore();
+const noticeAudio = inject("NoticeAudio");
 const onSearch = (action, keywords, cb) => {
   console.log("action", action);
   switch (action) {
@@ -32,8 +33,18 @@ watch(
     }
   }
 );
-const onMessage = (data) => {
+const onChatMessage = (data) => {
   console.log("App:onChatMessage", data);
+  console.log(route.fullPath);
+  if (route.fullPath.indexOf("chat/message") == -1) {
+    noticeAudio.play();
+    appStore.unreadIncr();
+  } else {
+    messageList.value.push(data);
+  }
+  if (route.fullPath.indexOf("/chat") != -1) {
+    getChatList();
+  }
 };
 
 onMounted(() => {
@@ -49,11 +60,11 @@ onMounted(() => {
     startWebSocket(WebSocketClient, userStore.info.id);
   }
 
-  emitter.on("onChatMessage", onMessage);
+  emitter.on("onChatMessage", onChatMessage);
 });
 
 onUnmounted(() => {
-  emitter.off("onChatMessage", onMessage);
+  emitter.off("onChatMessage", onChatMessage);
 });
 </script>
 
