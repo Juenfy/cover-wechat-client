@@ -21,7 +21,7 @@ http.interceptors.response.use(
   (response) => {
     const res = response.data;
     if ([401200, 400006].indexOf(res.code) != -1) {
-      location.href = "/logout=1";
+      location.href = "/login?logout=1";
     }
     return res;
   },

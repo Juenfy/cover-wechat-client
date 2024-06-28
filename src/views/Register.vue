@@ -72,6 +72,9 @@ const afterRead = (file) => {
         <van-button block type="primary" native-type="submit">
           注册
         </van-button>
+        <van-button block type="primary" to="/login" style="margin-top: 1rem">
+          已有账号？登录
+        </van-button>
       </div>
     </van-form>
   </div>

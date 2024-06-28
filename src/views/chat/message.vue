@@ -83,7 +83,7 @@ const readMessage = async () => {
     messageApi.read(queryData).then((res) => {
       console.log("readMessage", res);
       if (res.code == 200001) {
-        appStore.unreadDecrBy(1, route.params.unread);
+        appStore.unreadDecrBy(1, chatInfo.value.unread);
       }
     });
   }

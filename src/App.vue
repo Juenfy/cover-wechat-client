@@ -1,12 +1,12 @@
 <script setup>
 import * as friendApi from "@/api/friend";
-import { onMounted, watch, inject, onUnmounted } from "vue";
+import { onMounted, watch, inject, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import CommonSearch from "@/components/common/search.vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend } from "@/enums/app";
-import { showFailToast } from "vant";
+import { showDialog } from "vant";
 import { startWebSocket, getChatList, messageList } from "@/utils/websocket";
 const WebSocketClient = inject("WebSocketClient");
 const route = useRoute();
@@ -33,38 +33,51 @@ watch(
     }
   }
 );
-const onChatMessage = (data) => {
-  console.log("App:onChatMessage", data);
-  console.log(route.fullPath);
-  if (route.fullPath.indexOf("chat/message") == -1) {
-    noticeAudio.play();
-    appStore.unreadIncr();
-  } else {
-    messageList.value.push(data);
-  }
-  if (route.fullPath.indexOf("/chat") != -1) {
-    getChatList();
+
+const onMessage = (data) => {
+  console.log("App:onMessage", data);
+  switch (data.action) {
+    case "send":
+      console.log(route.fullPath);
+      if (
+        route.fullPath.indexOf(
+          "chat/message/" + data.data.to_user + "/" + data.data.is_group
+        ) == -1
+      ) {
+        appStore.unreadIncr();
+        noticeAudio.play();
+      } else {
+        messageList.value.push(data.data);
+      }
+      if (route.fullPath == "/chat") {
+        getChatList();
+      }
+      break;
+    case "logout":
+      showDialog({
+        title: "强制下线通知",
+        message:
+          "您的账号于" +
+          data.time +
+          "在其他地方登录，您已被强制下线，请重新登录。如果不是本人操作，请重新修改密码。",
+      }).then(() => {
+        location.href = "/login?logout=1";
+      });
+      break;
   }
 };
 
 onMounted(() => {
   console.log(emitter, WebSocketClient);
-
-  if (route.query.logout) {
-    userStore.handleLogout();
-    return showFailToast("账户信息已失效，请重新登录");
-  }
-
   //页面刷新 重新连接websocket
   if (userStore.isLogin) {
     startWebSocket(WebSocketClient, userStore.info.id);
   }
-
-  emitter.on("onChatMessage", onChatMessage);
+  emitter.on("onMessage", onMessage);
 });
 
 onUnmounted(() => {
-  emitter.off("onChatMessage", onChatMessage);
+  emitter.off("onMessage", onMessage);
 });
 </script>
 

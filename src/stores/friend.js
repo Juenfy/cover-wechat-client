@@ -8,9 +8,15 @@ export const useFriendStore = defineStore(
     const setInfo = (data) => {
       info.value = data;
     };
+
+    const clear = () => {
+      info.value = {};
+    };
+
     return {
       info,
       setInfo,
+      clear,
     };
   },
   { persist: true }

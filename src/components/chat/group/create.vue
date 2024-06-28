@@ -13,7 +13,11 @@ const searchFriendList = ref([]);
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);
-
+const sendData = ref({
+  who: "group",
+  action: "create",
+  data: {},
+});
 const indexList = ref([]);
 const searchFocus = ref(false);
 const keywords = ref("");
@@ -62,11 +66,13 @@ const onSubmit = () => {
   groupApi.postCreate({ group_users: checkedList.value }).then((res) => {
     if (res.code == 200001) {
       showSuccessToast(res.msg);
+      sendData.value.data = res.data;
+      WebSocketClient.send(sendData.value);
       setTimeout(() => {
         emit("hide");
         router.push({
           name: "chat-message",
-          params: { to_user: res.data.group_id, is_group: 1 },
+          params: { to_user: res.data.group_id, is_group: 1, unread: 0 },
         });
       }, 2000);
     } else {

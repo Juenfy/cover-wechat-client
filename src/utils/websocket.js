@@ -21,11 +21,7 @@ export class WebSocketClient {
       this.websocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
         console.log("收到消息", data);
-        switch (data.action) {
-          case "send":
-            this.emitter.emit("onChatMessage", data.data);
-            break;
-        }
+        this.emitter.emit("onMessage", data);
       };
 
       this.websocket.onclose = (e) => {
