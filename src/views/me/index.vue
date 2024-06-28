@@ -22,6 +22,7 @@ const onLogout = () => {
           WebSocketClient.stop();
           userStore.handleLogout();
           friendStore.clear();
+          appStore.clear();
           setTimeout(() => {
             location.href = "/";
           }, 200);

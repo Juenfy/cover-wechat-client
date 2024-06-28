@@ -50,8 +50,8 @@ onMounted(async () => {
         @click="showFriendNew = true"
       >
         <template #right-icon>
-          <div>
-            <van-badge :content="20" max="99" />
+          <div v-if="appStore.unread.apply > 0">
+            <van-badge :content="appStore.unread.apply" max="99" />
           </div>
         </template>
       </van-cell>

@@ -17,7 +17,6 @@ const handleTop = (id) => {
           params: {
             to_user: item.to_user,
             is_group: item.is_group,
-            unread: item.unread,
           },
         }"
         class="to-chat-message"

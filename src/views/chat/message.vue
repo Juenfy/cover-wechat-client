@@ -178,13 +178,7 @@ onUnmounted(async () => {
         "
       >
         <van-grid :column-num="4" style="width: inherit" gutter="1rem">
-          <van-grid-item
-            v-for="value in 6"
-            :key="value"
-            icon="photo-o"
-            text="文字"
-            style="border-radius: 2rem"
-          />
+          <van-grid-item key="1" icon="photo" text="图片" />
         </van-grid>
       </div>
       <emoji-picker

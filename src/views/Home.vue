@@ -105,7 +105,7 @@ onMounted(() => {
           :icon="tabBarActive == 0 ? 'chat' : 'chat-o'"
           to="/chat"
           :badge-props="{
-            content: appStore.unreadChat > 0 ? appStore.unreadChat : '',
+            content: appStore.unread.chat > 0 ? appStore.unread.chat : '',
             max: 99,
           }"
           >消息</van-tabbar-item
@@ -113,7 +113,7 @@ onMounted(() => {
         <van-tabbar-item
           :icon="tabBarActive == 1 ? 'friends' : 'friends-o'"
           :badge-props="{
-            content: appStore.unreadFriend > 0 ? appStore.unreadFriend : '',
+            content: appStore.unread.friend > 0 ? appStore.unread.friend : '',
             max: 99,
           }"
           to="/friend"
@@ -122,7 +122,8 @@ onMounted(() => {
         <van-tabbar-item
           :icon="tabBarActive == 2 ? 'eye' : 'eye-o'"
           :badge-props="{
-            content: appStore.unreadDiscover > 0 ? appStore.unreadDiscover : '',
+            content:
+              appStore.unread.discover > 0 ? appStore.unread.discover : '',
             max: 99,
           }"
           to="/discover"

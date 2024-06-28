@@ -1,4 +1,5 @@
 <script setup>
+import * as messageApi from "@/api/message";
 import * as friendApi from "@/api/friend";
 import { onMounted, watch, inject, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -30,6 +31,11 @@ watch(
     if (val) {
       //登录成功 连接websocket
       startWebSocket(WebSocketClient, userStore.info.id);
+      messageApi.getUnread().then((res) => {
+        if (res.code == 200001) {
+          appStore.setUnread(res.data);
+        }
+      });
     }
   }
 );
@@ -44,7 +50,7 @@ const onMessage = (data) => {
           "chat/message/" + data.data.to_user + "/" + data.data.is_group
         ) == -1
       ) {
-        appStore.unreadIncr();
+        appStore.unreadIncrBy(1);
         noticeAudio.play();
       } else {
         messageList.value.push(data.data);
@@ -63,6 +69,10 @@ const onMessage = (data) => {
       }).then(() => {
         location.href = "/login?logout=1";
       });
+      break;
+    case "apply":
+      appStore.unreadIncrBy(4);
+      appStore.unreadIncrBy(2);
       break;
   }
 };

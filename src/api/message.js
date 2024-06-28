@@ -12,3 +12,7 @@ export const send = async (data) => {
 export const read = async (data) => {
   return request.put("/api/message/read", data);
 };
+
+export const getUnread = async () => {
+  return request.get("/api/message/unread");
+};
