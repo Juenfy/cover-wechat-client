@@ -11,6 +11,7 @@
   "dependencies": {
     "@vitejs/plugin-basic-ssl": "^1.1.0",
     "axios": "^1.6.8",
+    "crypto-js": "^4.2.0",
     "emoji-picker-element": "^1.21.3",
     "mitt": "^3.0.1",
     "pinia": "^2.1.7",

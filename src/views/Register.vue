@@ -1,15 +1,22 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
+import { Verify } from "@/components/Verifition";
 const formData = reactive({
   avatar: "",
   nickname: "",
   mobile: "",
   wechat: "",
   password: "",
+  captchaVerification: "",
 });
-const onSubmit = () => {
+const captchaEnable = ref(true);
+const verify = ref();
+const captchaType = ref("blockPuzzle"); // blockPuzzle 滑块 clickWord 点击文字
+
+const onSubmit = (data) => {
+  formData.captchaVerification = data.captchaVerification || "";
   console.log(formData);
   userApi.postRegister(formData).then((res) => {
     console.log(res);
@@ -17,12 +24,23 @@ const onSubmit = () => {
       userStore.handleLogin(res.data);
       showSuccessToast("登录成功");
       setTimeout(() => {
-        router.push("/chat");
+        location.href = "/chat";
       }, 1000);
     } else {
       return showFailToast(res.msg);
     }
   });
+};
+
+const getCode = async () => {
+  // 情况一，未开启：则直接登录
+  if (!captchaEnable.value) {
+    onSubmit({});
+  } else {
+    // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
+    // 弹出验证码
+    verify.value.show();
+  }
 };
 
 const afterRead = (file) => {
@@ -40,7 +58,7 @@ const afterRead = (file) => {
       style="margin: 2rem 0"
       :preview-image="false"
     />
-    <van-form @submit="onSubmit">
+    <van-form @submit="getCode">
       <van-cell-group inset>
         <van-field
           v-model="formData.nickname"
@@ -77,6 +95,13 @@ const afterRead = (file) => {
         </van-button>
       </div>
     </van-form>
+    <Verify
+      ref="verify"
+      :captchaType="captchaType"
+      :imgSize="{ width: '400px', height: '200px' }"
+      mode="pop"
+      @success="onSubmit"
+    />
   </div>
 </template>
 <style scoped lang="less">

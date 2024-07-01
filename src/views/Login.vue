@@ -1,11 +1,12 @@
 <script setup>
-import { onMounted, reactive, inject } from "vue";
+import { onMounted, reactive, inject, ref } from "vue";
 import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
 import { useUserStore } from "@/stores/user";
 import { useFriendStore } from "@/stores/friend";
 import { useAppStore } from "@/stores/app";
 import { useRouter, useRoute } from "vue-router";
+import { Verify } from "@/components/Verifition";
 
 const router = useRouter();
 const route = useRoute();
@@ -17,9 +18,14 @@ const formData = reactive({
   mobile: "",
   password: "",
   code: "1234",
+  captchaVerification: "",
 });
+const captchaEnable = ref(true);
+const verify = ref();
+const captchaType = ref("blockPuzzle"); // blockPuzzle 滑块 clickWord 点击文字
 
-const onSubmit = () => {
+const onSubmit = (data) => {
+  formData.captchaVerification = data.captchaVerification || "";
   console.log(formData);
   userApi.postLogin(formData).then((res) => {
     console.log(res);
@@ -34,6 +40,18 @@ const onSubmit = () => {
     }
   });
 };
+
+const getCode = async () => {
+  // 情况一，未开启：则直接登录
+  if (!captchaEnable.value) {
+    onSubmit({});
+  } else {
+    // 情况二，已开启：则展示验证码；只有完成验证码的情况，才进行登录
+    // 弹出验证码
+    verify.value.show();
+  }
+};
+
 onMounted(() => {
   console.log(route.query);
   if (route.query.logout) {
@@ -49,7 +67,7 @@ onMounted(() => {
 <template>
   <div class="main">
     <h3>手机号登录</h3>
-    <van-form @submit="onSubmit">
+    <van-form @submit="getCode">
       <van-cell-group inset>
         <van-field
           v-model="formData.mobile"
@@ -79,6 +97,13 @@ onMounted(() => {
         </van-button>
       </div>
     </van-form>
+    <Verify
+      ref="verify"
+      :captchaType="captchaType"
+      :imgSize="{ width: '400px', height: '200px' }"
+      mode="pop"
+      @success="onSubmit"
+    />
   </div>
 </template>
 <style scoped lang="less">
