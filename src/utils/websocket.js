@@ -70,7 +70,7 @@ export const getChatList = () => {
   });
 };
 
-const sortChatList = (list) => {
+export const sortChatList = (list) => {
   list.sort((a, b) => {
     if (a.top != b.top) {
       return b.top - a.top;

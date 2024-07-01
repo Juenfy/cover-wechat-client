@@ -7,3 +7,15 @@ export const getList = async () => {
 export const getInfo = async (toUser, isGroup) => {
   return request.get(`/api/chat/info?to_user=${toUser}&is_group=${isGroup}`);
 };
+
+export const putHide = async (data) => {
+  return request.put("/api/chat/hide", data);
+};
+
+export const putTop = async (data) => {
+  return request.put("/api/chat/top", data);
+};
+
+export const putDelete = async (data) => {
+  return request.put("/api/chat/delete", data);
+};

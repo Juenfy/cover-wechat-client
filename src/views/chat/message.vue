@@ -177,8 +177,15 @@ onUnmounted(async () => {
           popupMoreBottom ? 'more-bottom more-bottom-popup' : 'more-bottom'
         "
       >
-        <van-grid :column-num="4" style="width: inherit" gutter="1rem">
-          <van-grid-item key="1" icon="photo" text="图片" />
+        <van-grid
+          :column-num="4"
+          style="width: inherit"
+          gutter="1rem"
+          square
+          center
+          :border="false"
+        >
+          <van-grid-item icon="photo" text="图片" />
         </van-grid>
       </div>
       <emoji-picker

@@ -1,16 +1,49 @@
 <script setup>
 import { timestampFormat } from "@/utils/helper";
+import * as chatApi from "@/api/chat";
 const props = defineProps(["list"]);
-const handleDelete = (id) => {
-  console.log(id);
+const emit = defineEmits(["action"]);
+
+const makeData = (item) => {
+  return {
+    is_group: item.is_group,
+    to_user: item.to_user,
+  };
 };
-const handleTop = (id) => {
-  console.log(id);
+
+const handleDelete = (item) => {
+  chatApi.putDelete(makeData(item)).then((res) => {
+    if (res.code == 200001) {
+      emit("action", "delete", res.data);
+    }
+  });
+};
+
+const handleHide = (item) => {
+  chatApi.putHide(makeData(item)).then((res) => {
+    if (res.code == 200001) {
+      emit("action", "hide", res.data);
+    }
+  });
+};
+
+const handleTop = (item, isTop) => {
+  let data = makeData(item);
+  data.is_top = isTop;
+  chatApi.putTop(data).then((res) => {
+    if (res.code == 200001) {
+      emit("action", "top", res.data);
+    }
+  });
 };
 </script>
 <template>
   <van-cell-group :border="false">
-    <van-swipe-cell v-for="item in props.list" :key="item.id">
+    <van-swipe-cell
+      v-for="item in props.list"
+      :key="item.id"
+      :class="item.top > 0 ? 'top-active' : ''"
+    >
       <router-link
         :to="{
           name: 'chat-message',
@@ -32,10 +65,10 @@ const handleTop = (id) => {
             <div class="avatar-box">
               <img
                 alt="avatar"
-                v-for="avatar in item.from.avatars"
+                v-for="avatar in item.to.avatars"
                 :key="avatar"
                 :src="avatar"
-                :class="item.from.avatars.length > 1 ? 'avatar-group' : ''"
+                :class="item.to.avatars.length > 1 ? 'avatar-group' : ''"
               />
             </div>
           </van-badge>
@@ -55,14 +88,21 @@ const handleTop = (id) => {
           type="danger"
           text="删除"
           style="height: inherit"
-          @click="handleDelete(item.id)"
+          @click="handleDelete(item)"
+        />
+        <van-button
+          square
+          type="warning"
+          text="不显示"
+          style="height: inherit"
+          @click="handleHide(item)"
         />
         <van-button
           square
           type="primary"
-          text="置顶"
+          :text="item.top > 0 ? '取消置顶' : '置顶'"
           style="height: inherit"
-          @click="handleTop(item.id)"
+          @click="handleTop(item, item.top > 0 ? 0 : 1)"
         />
       </template>
     </van-swipe-cell>
@@ -70,6 +110,10 @@ const handleTop = (id) => {
 </template>
 
 <style scope lang="less">
+.top-active {
+  background: var(--van-nav-bar-background);
+}
+
 .van-swipe-cell__wrapper,
 .to-chat-message {
   display: flex;
