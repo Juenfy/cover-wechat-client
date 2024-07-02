@@ -137,23 +137,32 @@ onUnmounted(async () => {
   </header>
   <main class="main">
     <ul class="message-list">
-      <li v-for="item in messageList" :key="item.id">
-        <p :class="item.right ? 'nickname right' : 'nickname'">
-          {{ item.from.nickname }}
-        </p>
-        <article :class="item.right ? 'right' : ''">
-          <div class="avatar">
-            <img
-              alt="avatar"
-              :src="item.from.avatar"
-              @click="onClickAvatar(item.id)"
-            />
-          </div>
-          <div class="msg">
-            <div class="tri"></div>
-            <div class="msg_inner">{{ item.content }}</div>
-          </div>
-        </article>
+      <li
+        v-for="item in messageList"
+        :key="item.id"
+        :class="item.is_tips == 1 ? 'li-tips-message' : ''"
+      >
+        <div v-if="item.is_tips == 0" class="normal-message">
+          <!-- <p :class="item.right ? 'nickname right' : 'nickname'">
+            {{ item.from.nickname }}
+          </p> -->
+          <article :class="item.right ? 'right' : ''">
+            <div class="avatar">
+              <img
+                alt="avatar"
+                :src="item.from.avatar"
+                @click="onClickAvatar(item.id)"
+              />
+            </div>
+            <div class="msg">
+              <div class="tri"></div>
+              <div class="msg_inner">{{ item.content }}</div>
+            </div>
+          </article>
+        </div>
+        <div v-else class="tips-message">
+          {{ item.content }}
+        </div>
       </li>
     </ul>
   </main>
@@ -255,7 +264,7 @@ onUnmounted(async () => {
   }
 }
 .main {
-  background-image: url(/src/assets/bg.png);
+  // background-image: url(/src/assets/bg.png);
   background-position: center;
   background-size: cover;
   overflow-y: scroll;
@@ -267,23 +276,23 @@ onUnmounted(async () => {
     > li {
       display: block;
     }
-    > li > p.nickname {
-      color: var(--theme-text-color-tint);
+    > li > .normal-message > p.nickname {
+      color: var(--theme-text-color);
       font-size: 12px;
       line-height: 12px;
     }
-    > li > p.right {
+    > li > .normal-message > p.right {
       text-align: right;
     }
-    > li > article {
+    > li > .normal-message > article {
       display: flex;
       justify-content: flex-start;
       margin-bottom: 0.5rem;
       > .avatar {
         margin-right: 0.7rem;
         > img {
-          width: 3rem;
-          height: 3rem;
+          width: 3.5rem;
+          height: 3.5rem;
           border-radius: 0.2rem;
         }
       }
@@ -308,7 +317,7 @@ onUnmounted(async () => {
       }
     }
 
-    > li > article.right {
+    > li > .normal-message > article.right {
       flex-direction: row-reverse;
       > .avatar {
         margin-right: 0px;
@@ -332,7 +341,7 @@ onUnmounted(async () => {
       }
     }
 
-    > li > article.center {
+    > li > .normal-message > article.center {
       display: flex;
       justify-content: center;
       > .tips {
@@ -347,6 +356,13 @@ onUnmounted(async () => {
         text-overflow: ellipsis;
         overflow: hidden;
       }
+    }
+
+    > li > .tips-message {
+      width: inherit;
+      text-align: center;
+      line-height: 4rem;
+      color: var(--theme-text-color);
     }
   }
 }

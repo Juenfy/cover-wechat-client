@@ -17,7 +17,7 @@ const formData = ref({
     },
     SettingFriendPerm: "ALLOW_ALL",
   },
-  type: "apply",
+  type: Apply,
 });
 
 const showConfirm = async () => {
@@ -155,7 +155,7 @@ onBeforeMount(async () => {
       </van-cell-group>
       <div style="margin-top: 2rem; text-align: center">
         <van-button type="primary" native-type="submit" style="width: 12rem">
-          {{ formData.type == "apply" ? "提交" : "完成" }}
+          {{ formData.type == Apply ? "提交" : "完成" }}
         </van-button>
       </div>
     </van-form>

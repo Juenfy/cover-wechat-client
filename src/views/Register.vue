@@ -20,7 +20,7 @@ const onSubmit = (data) => {
   console.log(formData);
   userApi.postRegister(formData).then((res) => {
     console.log(res);
-    if (res.code === 200101) {
+    if (res.code == 200101) {
       userStore.handleLogin(res.data);
       showSuccessToast("登录成功");
       setTimeout(() => {

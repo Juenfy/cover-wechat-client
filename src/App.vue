@@ -13,6 +13,8 @@ import {
   UnreadFriend,
   UnreadApply,
 } from "@/enums/app";
+import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
+
 import { showDialog } from "vant";
 import { startWebSocket, getChatList, messageList } from "@/utils/websocket";
 const WebSocketClient = inject("WebSocketClient");
@@ -23,6 +25,7 @@ const userStore = useUserStore();
 const noticeAudio = inject("NoticeAudio");
 const showMessagePopup = ref(false);
 const message = ref({});
+const messageAction = ref("");
 const onSearch = (action, keywords, cb) => {
   console.log("action", action);
   switch (action) {
@@ -48,10 +51,11 @@ watch(
   }
 );
 
+//全局消息监听
 const onMessage = (data) => {
   console.log("App:onMessage", data);
   switch (data.action) {
-    case "send":
+    case ActionSend:
       let currentPath =
         "/chat/message/" + data.data.from.id + "/" + data.data.is_group;
       console.log(route.fullPath, currentPath);
@@ -71,13 +75,14 @@ const onMessage = (data) => {
       ) {
         message.value = data.data;
         showMessagePopup.value = true;
+        messageAction.value = ActionSend;
       }
       //消息未读数加1
       appStore.unreadIncrBy(UnreadChat);
       //播放消息通知音
       noticeAudio.play();
       break;
-    case "logout":
+    case ActionLogout:
       showDialog({
         title: "强制下线通知",
         message:
@@ -88,9 +93,12 @@ const onMessage = (data) => {
         location.href = "/login?logout=1";
       });
       break;
-    case "apply":
+    case ActionApply:
       appStore.unreadIncrBy(UnreadApply);
       appStore.unreadIncrBy(UnreadFriend);
+      message.value = data.data;
+      messageAction.value = ActionApply;
+      showMessagePopup.value = true;
       break;
   }
 };
@@ -130,5 +138,6 @@ onUnmounted(() => {
     :show="showMessagePopup"
     @hide="showMessagePopup = false"
     :message="message"
+    :action="messageAction"
   />
 </template>
