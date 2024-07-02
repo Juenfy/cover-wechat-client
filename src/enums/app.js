@@ -6,6 +6,8 @@ export const QrcodeScan = "qrcode-scan";
 
 export const SearchChatRecord = "search-chat-record";
 
+export const SearchGroup = "search-group";
+
 export const Home = "home";
 
 export const HomeActions = [
@@ -13,3 +15,8 @@ export const HomeActions = [
   { text: "添加朋友", value: SearchFriend },
   { text: "扫一扫", value: QrcodeScan },
 ];
+
+export const UnreadChat = "unread-chat";
+export const UnreadFriend = "unread-friend";
+export const UnreadDiscover = "unread-dicover";
+export const UnreadApply = "unread-apply";

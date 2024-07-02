@@ -4,3 +4,7 @@ import request from "@/utils/request";
 export const postCreate = async (data) => {
   return request.post("/api/group/create", data);
 };
+
+export const getList = async () => {
+  return request.get("/api/group/list");
+};

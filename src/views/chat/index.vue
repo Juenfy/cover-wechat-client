@@ -1,3 +1,4 @@
+<!--消息列表页面-->
 <script setup>
 import ChatList from "@/components/chat/list.vue";
 import { ref, onMounted } from "vue";

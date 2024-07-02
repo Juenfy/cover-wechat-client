@@ -1,3 +1,4 @@
+<!--添加朋友组件-->
 <script setup>
 import { useAppStore } from "@/stores/app";
 import { SearchFriend } from "@/enums/app";

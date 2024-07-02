@@ -1,3 +1,4 @@
+<!--聊天窗口页面-->
 <script setup>
 import { useRouter, useRoute } from "vue-router";
 import { onMounted, onUnmounted, ref, reactive } from "vue";
@@ -6,6 +7,7 @@ import * as messageApi from "@/api/message";
 import * as chatApi from "@/api/chat";
 import { useAppStore } from "@/stores/app";
 import { messageList } from "@/utils/websocket";
+import { UnreadChat } from "@/enums/app";
 const router = useRouter();
 const route = useRoute();
 const appStore = useAppStore();
@@ -83,7 +85,7 @@ const readMessage = async () => {
     messageApi.read(queryData).then((res) => {
       console.log("readMessage", res);
       if (res.code == 200001) {
-        appStore.unreadDecrBy(1, chatInfo.value.unread);
+        appStore.unreadDecrBy(UnreadChat, chatInfo.value.unread);
       }
     });
   }

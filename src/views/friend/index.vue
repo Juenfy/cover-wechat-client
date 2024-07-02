@@ -1,6 +1,7 @@
 <script setup>
 import FriendNew from "@/components/friend/new.vue";
 import FriendRemark from "@/components/friend/remark.vue";
+import GroupList from "@/components/chat/group/list.vue";
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAppStore } from "@/stores/app";
@@ -12,6 +13,7 @@ const route = useRoute();
 const friendList = ref({});
 const showFriendNew = ref(false);
 const showFriendRemark = ref(false);
+const showGroupList = ref(false);
 const indexList = ref([]);
 const getFriendList = async () => {
   friendApi.getList().then((res) => {
@@ -67,7 +69,7 @@ onMounted(async () => {
         icon="/public/group-chat.png"
         size="large"
         :center="true"
-        @click="() => {}"
+        @click="showGroupList = true"
       />
       <div v-for="val in indexList" :key="val">
         <van-index-anchor :index="val" />
@@ -94,4 +96,5 @@ onMounted(async () => {
   </main>
   <friend-new :show="showFriendNew" @hide="showFriendNew = false" />
   <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
+  <group-list :show="showGroupList" @hide="showGroupList = false" />
 </template>

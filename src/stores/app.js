@@ -1,6 +1,12 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { Home } from "@/enums/app";
+import {
+  UnreadDiscover,
+  UnreadChat,
+  UnreadFriend,
+  UnreadApply,
+} from "@/enums/app";
 export const useAppStore = defineStore(
   "app",
   () => {
@@ -35,36 +41,36 @@ export const useAppStore = defineStore(
 
     const unreadIncrBy = (unreadType = 1, incr = 1) => {
       switch (unreadType) {
-        case 1:
+        case UnreadChat:
           unread.value.chat += incr;
           break;
-        case 2:
+        case UnreadFriend:
           unread.value.friend += incr;
           break;
-        case 3:
+        case UnreadDiscover:
           unread.value.discover += incr;
           break;
-        default:
+        case UnreadApply:
           unread.value.apply += incr;
           break;
       }
     };
 
-    const unreadDecrBy = (unreadType = 1, decr = 1) => {
+    const unreadDecrBy = (unreadType, decr = 1) => {
       switch (unreadType) {
-        case 1:
+        case UnreadChat:
           unread.value.chat -= decr;
           if (unread.value.chat < 0) unread.value.chat = 0;
           break;
-        case 2:
+        case UnreadFriend:
           unread.value.friend -= decr;
           if (unread.value.friend < 0) unread.value.friend = 0;
           break;
-        case 3:
+        case UnreadDiscover:
           unread.value.discover -= decr;
           if (unread.value.discover < 0) unread.value.discover = 0;
           break;
-        default:
+        case UnreadApply:
           unread.value.apply -= decr;
           if (unread.value.apply < 0) unread.value.apply = 0;
           break;

@@ -4,9 +4,15 @@ import * as friendApi from "@/api/friend";
 import { onMounted, watch, inject, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import CommonSearch from "@/components/common/search.vue";
+import MessagePopup from "@/components/message/popup.vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
-import { SearchFriend } from "@/enums/app";
+import {
+  SearchFriend,
+  UnreadChat,
+  UnreadFriend,
+  UnreadApply,
+} from "@/enums/app";
 import { showDialog } from "vant";
 import { startWebSocket, getChatList, messageList } from "@/utils/websocket";
 const WebSocketClient = inject("WebSocketClient");
@@ -15,6 +21,8 @@ const emitter = inject("emitter");
 const appStore = useAppStore();
 const userStore = useUserStore();
 const noticeAudio = inject("NoticeAudio");
+const showMessagePopup = ref(false);
+const message = ref({});
 const onSearch = (action, keywords, cb) => {
   console.log("action", action);
   switch (action) {
@@ -44,20 +52,30 @@ const onMessage = (data) => {
   console.log("App:onMessage", data);
   switch (data.action) {
     case "send":
-      console.log(route.fullPath);
-      if (
-        route.fullPath.indexOf(
-          "chat/message/" + data.data.to_user + "/" + data.data.is_group
-        ) == -1
-      ) {
-        appStore.unreadIncrBy(1);
-        noticeAudio.play();
-      } else {
+      let currentPath =
+        "/chat/message/" + data.data.from.id + "/" + data.data.is_group;
+      console.log(route.fullPath, currentPath);
+      // 当前聊天窗口，推进消息
+      if (route.fullPath == currentPath) {
         messageList.value.push(data.data);
       }
+
       if (route.fullPath == "/chat") {
         getChatList();
       }
+
+      //不在聊天窗口或者消息列表页面就弹出消息气泡
+      if (
+        route.fullPath != "/chat" &&
+        route.fullPath.indexOf("/chat/message") == -1
+      ) {
+        message.value = data.data;
+        showMessagePopup.value = true;
+      }
+      //消息未读数加1
+      appStore.unreadIncrBy(UnreadChat);
+      //播放消息通知音
+      noticeAudio.play();
       break;
     case "logout":
       showDialog({
@@ -71,8 +89,8 @@ const onMessage = (data) => {
       });
       break;
     case "apply":
-      appStore.unreadIncrBy(4);
-      appStore.unreadIncrBy(2);
+      appStore.unreadIncrBy(UnreadApply);
+      appStore.unreadIncrBy(UnreadFriend);
       break;
   }
 };
@@ -107,5 +125,10 @@ onUnmounted(() => {
     :action="appStore.commonSearchAction"
     :placeholder="appStore.commonSearchPlaceholder"
     @search="onSearch"
+  />
+  <message-popup
+    :show="showMessagePopup"
+    @hide="showMessagePopup = false"
+    :message="message"
   />
 </template>

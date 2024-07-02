@@ -1,3 +1,4 @@
+<!--创建群聊组件-->
 <script setup>
 import { ref, watch, inject } from "vue";
 import * as friendApi from "@/api/friend";

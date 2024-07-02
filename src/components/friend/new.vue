@@ -1,3 +1,4 @@
+<!--新的朋友组件-->
 <script setup>
 import FriendAdd from "../friend/add.vue";
 import { ref, watch } from "vue";
