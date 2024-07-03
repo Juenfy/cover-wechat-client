@@ -37,7 +37,7 @@ const handleCancel = () => {
 const handleHomeClick = (item) => {
   handleCancel();
   router.push({
-    path: "/friend/info",
+    name: "friend-info",
     query: {
       keywords: item.keywords,
     },

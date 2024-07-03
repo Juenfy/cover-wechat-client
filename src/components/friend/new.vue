@@ -5,9 +5,9 @@ import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import * as friendApi from "@/api/friend";
-import { SearchFriend } from "@/enums/app";
+import { SearchFriend, UnreadFriend, UnreadApply } from "@/enums/app";
 import { ApplyStatus } from "@/enums/friend";
-const props = defineProps({ show: Boolean });
+const props = defineProps({ show: Boolean, unread: Number });
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);
 const router = useRouter();
@@ -43,7 +43,7 @@ const deleteApply = (id) => {
 const handleHomeClick = (item) => {
   emit("hide");
   router.push({
-    path: "/friend/info",
+    name: "friend-info",
     query: {
       keywords: item.keywords,
     },
@@ -54,6 +54,8 @@ watch(
   (newVal) => {
     if (newVal) {
       getApplyList();
+      appStore.unreadDecrBy(UnreadApply, props.unread);
+      appStore.unreadDecrBy(UnreadFriend, props.unread);
     }
   }
 );

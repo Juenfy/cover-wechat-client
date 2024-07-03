@@ -24,7 +24,7 @@ const getFriendList = async () => {
 
 const handleHomeClick = (item) => {
   router.push({
-    path: "/friend/info",
+    name: "friend-info",
     query: {
       keywords: item.keywords,
     },
@@ -94,7 +94,11 @@ onMounted(async () => {
       </div>
     </van-index-bar>
   </main>
-  <friend-new :show="showFriendNew" @hide="showFriendNew = false" />
+  <friend-new
+    :show="showFriendNew"
+    @hide="showFriendNew = false"
+    @unread="appStore.unread.apply"
+  />
   <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
   <group-list :show="showGroupList" @hide="showGroupList = false" />
 </template>

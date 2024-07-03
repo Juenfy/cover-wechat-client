@@ -73,7 +73,7 @@ const onSubmit = () => {
         emit("hide");
         router.push({
           name: "chat-message",
-          params: { to_user: res.data.group_id, is_group: 1, unread: 0 },
+          params: { to_user: res.data.group_id, is_group: 1 },
         });
       }, 2000);
     } else {

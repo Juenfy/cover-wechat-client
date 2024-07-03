@@ -39,7 +39,6 @@ const showConfirm = async () => {
 };
 
 const onSubmit = () => {
-  console.log(formData.value);
   if (formData.value.type == Apply) {
     friendApi
       .postApply({
@@ -53,7 +52,7 @@ const onSubmit = () => {
           res,
           (res) => {
             router.push({
-              path: "/friend",
+              name: "friend",
               query: {
                 show_friend_new: 1,
               },
@@ -66,7 +65,7 @@ const onSubmit = () => {
   } else {
     friendApi
       .postVerify({
-        friend: formData.value.friend.id,
+        friend: formData.value.friend,
         nickname: formData.value.nickname,
         setting: formData.value.setting,
       })
@@ -74,9 +73,7 @@ const onSubmit = () => {
         handleResponse(
           res,
           (res) => {
-            router.push({
-              path: "/friend",
-            });
+            router.push("/chat");
           },
           router,
           true

@@ -23,7 +23,7 @@ const queryData = reactive({
 
 const onClickRight = () => {
   router.push({
-    path: "/chat/setting",
+    name: "chat-setting",
     query: {
       id: 1,
     },
@@ -58,7 +58,7 @@ const onSelectEmoji = (emoji) => {
 
 const onClickAvatar = (id) => {
   router.push({
-    path: "/friend/info",
+    name: "friend-info",
     query: {
       id: id,
     },
@@ -281,9 +281,6 @@ onUnmounted(async () => {
       font-size: 12px;
       line-height: 12px;
     }
-    > li > .normal-message > p.right {
-      text-align: right;
-    }
     > li > .normal-message > article {
       display: flex;
       justify-content: flex-start;
@@ -335,7 +332,6 @@ onUnmounted(async () => {
 
         > .msg_inner {
           border-radius: 0.2rem 0 0.2rem 0.2rem;
-          text-align: right;
           background-color: #98e865;
         }
       }

@@ -28,7 +28,7 @@ const onButtonClick = () => {
     });
   } else {
     router.push({
-      path: "/friend/apply",
+      name: "friend-apply",
       query: {
         keywords: homeInfo.value.keywords,
         source: homeInfo.value.source,

@@ -22,7 +22,7 @@ const onSubmit = () => {
       res,
       (res) => {
         router.push({
-          path: "/friend/info",
+          name: "friend-info",
           query: { keywords: friendStore.info.keywords },
         });
       },

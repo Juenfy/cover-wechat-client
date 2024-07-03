@@ -162,12 +162,14 @@ const handleTop = (item, isTop) => {
 .chat-item-center > .username,
 .chat-item-center > .text,
 .chat-item-right > .time {
+  display: block;
+}
+.chat-item-center > .text {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   word-break: break-all;
-  width: inherit;
-  display: block;
+  width: 10rem;
 }
 
 .chat-item-center > .username {
