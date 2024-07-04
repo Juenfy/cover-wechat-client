@@ -3,6 +3,10 @@ import { reactive, ref } from "vue";
 import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
 import { Verify } from "@/components/Verifition";
+import { useUserStore } from "@/stores/user";
+import { useRouter } from "vue-router";
+const userStore = useUserStore();
+const router = useRouter();
 const formData = reactive({
   avatar: "",
   nickname: "",
@@ -24,7 +28,7 @@ const onSubmit = (data) => {
       userStore.handleLogin(res.data);
       showSuccessToast("登录成功");
       setTimeout(() => {
-        location.href = "/chat";
+        router.push("/chat");
       }, 1000);
     } else {
       return showFailToast(res.msg);

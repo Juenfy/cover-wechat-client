@@ -45,7 +45,7 @@ onMounted(async () => {
     <van-index-bar :index-list="indexList">
       <van-cell
         title="新的朋友"
-        icon="/public/new-friend.png"
+        icon="/new-friend.png"
         size="large"
         :center="true"
         clickable
@@ -59,14 +59,14 @@ onMounted(async () => {
       </van-cell>
       <van-cell
         title="仅聊天的朋友"
-        icon="/public/friend-only-chat.png"
+        icon="/friend-only-chat.png"
         size="large"
         :center="true"
         @click="() => {}"
       />
       <van-cell
         title="群聊"
-        icon="/public/group-chat.png"
+        icon="/group-chat.png"
         size="large"
         :center="true"
         @click="showGroupList = true"

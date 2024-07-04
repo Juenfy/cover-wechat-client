@@ -71,7 +71,7 @@ const content = computed(() => {
         icon-size="2rem"
       >
         <van-grid-item
-          icon="/public/wechat.png"
+          icon="/wechat.png"
           :text="content"
           class="message-popup"
         />

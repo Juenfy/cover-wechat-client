@@ -43,7 +43,7 @@ const onSearchFocus = () => {
               height="2rem"
               width="2rem"
               radius="0.1rem"
-              src="/public/group-create.png"
+              src="/group-create.png"
             />
             <div class="left-box">
               <span>面对面建群</span>
@@ -57,7 +57,7 @@ const onSearchFocus = () => {
               height="2rem"
               width="2rem"
               radius="0.1rem"
-              src="/public/scan.png"
+              src="/scan.png"
             />
             <div class="left-box">
               <span>扫一扫</span>

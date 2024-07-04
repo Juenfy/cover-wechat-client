@@ -14,7 +14,7 @@ onMounted(() => {
     <van-cell-group>
       <van-cell :center="true" is-link to="/discover/moment">
         <template #title>
-          <van-image height="1.5rem" width="1.5rem" src="/public/moment.png" />
+          <van-image height="1.5rem" width="1.5rem" src="/moment.png" />
           <div class="left-box" style="">
             <span>朋友圈</span>
             <span></span>
@@ -23,7 +23,7 @@ onMounted(() => {
       </van-cell>
       <van-cell :center="true" is-link to="">
         <template #title>
-          <van-image height="1.5rem" width="1.5rem" src="/public/scan-o.png" />
+          <van-image height="1.5rem" width="1.5rem" src="/scan-o.png" />
           <div class="left-box" style="">
             <span>扫一扫</span>
             <span></span>

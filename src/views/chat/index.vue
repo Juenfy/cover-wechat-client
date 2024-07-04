@@ -38,7 +38,6 @@ onMounted(() => {
   appStore.initHeader({ title: "微信", navbar: true, search: true });
   getChatList();
 });
-const thumb = ref(["https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"]);
 </script>
 <template>
   <van-list v-model="loading" :finished="finished">

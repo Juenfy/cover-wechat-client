@@ -81,11 +81,7 @@ onMounted(() => {
       style="background: transparent"
     >
       <template #left>
-        <van-image
-          src="/public/back.png"
-          width="2rem"
-          height="2rem"
-        ></van-image>
+        <van-image src="/back.png" width="2rem" height="2rem"></van-image>
       </template>
       <template #right v-if="!torchNotSupported"
         ><van-image :src="icon" width="2rem" height="2rem"></van-image

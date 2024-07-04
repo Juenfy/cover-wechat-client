@@ -80,7 +80,7 @@ onMounted(() => {
     <van-cell-group :border="false">
       <van-cell :center="true" is-link to="/me/setting">
         <template #title>
-          <van-image height="1.5rem" width="1.5rem" src="/public/setting.png" />
+          <van-image height="1.5rem" width="1.5rem" src="/setting.png" />
           <div class="left-box" style="">
             <span>设置</span>
             <span></span>

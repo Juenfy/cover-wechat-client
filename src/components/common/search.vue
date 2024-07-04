@@ -114,7 +114,7 @@ onMounted(() => {
                 height="3rem"
                 width="3rem"
                 radius="0.1rem"
-                src="/public/search.png"
+                src="/search.png"
                 style="margin-right: 0.5rem"
               />
               <span style="font-weight: bold">搜索：</span
