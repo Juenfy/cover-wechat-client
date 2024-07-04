@@ -2,14 +2,12 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { reactive, watch } from "vue";
-import { useFriendStore } from "@/stores/friend";
 import * as friendApi from "@/api/friend";
 import { handleResponse } from "@/utils/helper";
-const friendStore = useFriendStore();
-const props = defineProps({ show: Boolean });
+const props = defineProps({ show: Boolean, info: Object });
 const router = useRouter();
 //调用父组件关闭弹窗
-defineEmits(["hide"]);
+const emit = defineEmits(["hide", "updateCb"]);
 const formData = reactive({
   friend: 0,
   nickname: "",
@@ -20,11 +18,9 @@ const onSubmit = () => {
   friendApi.putUpdate(formData).then((res) => {
     handleResponse(
       res,
-      (res) => {
-        router.push({
-          name: "friend-info",
-          query: { keywords: friendStore.info.keywords },
-        });
+      async (res) => {
+        await emit("updateCb");
+        emit("hide");
       },
       router,
       true
@@ -33,7 +29,7 @@ const onSubmit = () => {
 };
 
 watch(
-  () => friendStore.info,
+  () => props.info,
   (info) => {
     formData.friend = info.id;
     formData.nickname = info.display_nickname;

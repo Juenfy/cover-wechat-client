@@ -3,11 +3,9 @@ import { showConfirmDialog } from "vant";
 import { onMounted, inject } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
-import { useFriendStore } from "@/stores/friend";
 import * as userApi from "@/api/user";
 const appStore = useAppStore();
 const userStore = useUserStore();
-const friendStore = useFriendStore();
 const WebSocketClient = inject("WebSocketClient");
 
 const onLogout = () => {
@@ -21,7 +19,6 @@ const onLogout = () => {
         if (res.code == 200001) {
           WebSocketClient.stop();
           userStore.handleLogout();
-          friendStore.clear();
           appStore.clear();
           setTimeout(() => {
             location.href = "/";

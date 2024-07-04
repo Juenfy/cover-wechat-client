@@ -7,8 +7,6 @@ import home from "@/views/Home.vue";
 import chatMessage from "@/views/chat/message.vue";
 import chatSetting from "@/views/chat/setting.vue";
 import friendInfo from "@/views/friend/info.vue";
-import friendSetting from "@/views/friend/setting.vue";
-import friendPerm from "@/views/friend/perm.vue";
 import discoverMoment from "@/views/discover/moment.vue";
 import QrcodeScan from "@/views/me/qrcode/scan.vue";
 import Register from "@/views/Register.vue";
@@ -63,16 +61,6 @@ const router = createRouter({
       path: "/friend/apply",
       name: "friend-apply",
       component: FriendApply,
-    },
-    {
-      path: "/friend/setting",
-      name: "friend-setting",
-      component: friendSetting,
-    },
-    {
-      path: "/friend/perm",
-      name: "friend-perm",
-      component: friendPerm,
     },
     {
       path: "/discover/moment",

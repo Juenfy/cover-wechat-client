@@ -14,3 +14,10 @@ export const RelationShip = {
   WaitCheck: "wait_check",
   Apply: "apply",
 };
+
+export const Setting = {
+  FriendPerm: {
+    MomentAndStatus: { DontSeeHim: 0, DontLetHimSeeIt: 0 },
+    SettingFriendPerm: "ALLOW_ALL",
+  },
+};

@@ -1,17 +1,17 @@
 <script setup>
 import FriendRemark from "@/components/friend/remark.vue";
+import FriendPerm from "@/components/friend/perm.vue";
+import FriendSetting from "@/components/friend/setting.vue";
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import * as userApi from "@/api/user";
-import { useFriendStore } from "@/stores/friend";
 import { RelationShip } from "@/enums/friend";
-const friendStore = useFriendStore();
 const router = useRouter();
 const route = useRoute();
-const showFriendSetting = () => {};
-
 const homeInfo = ref({});
 const showFriendRemark = ref(false);
+const showFriendPerm = ref(false);
+const showFriendSetting = ref(false);
 
 const onButtonClick = () => {
   if (
@@ -41,8 +41,11 @@ const onButtonClick = () => {
 const getHomeInfo = () => {
   userApi.getHomeInfo(route.query.keywords).then((res) => {
     homeInfo.value = res.data;
-    friendStore.setInfo(res.data);
   });
+};
+
+const updateCb = async () => {
+  getHomeInfo();
 };
 
 onMounted(() => {
@@ -54,7 +57,7 @@ onMounted(() => {
     <van-nav-bar
       left-arrow
       @click-left="router.go(-1)"
-      @click-right="showFriendSetting"
+      @click-right="showFriendSetting = true"
       :border="false"
     >
       <template #right v-if="homeInfo.relationship == RelationShip.Friend">
@@ -105,7 +108,8 @@ onMounted(() => {
       <van-cell
         title="朋友权限"
         is-link
-        to="/friend/perm"
+        clickable
+        @click="showFriendPerm = true"
         size="large"
         v-if="homeInfo.relationship == RelationShip.Friend"
       />
@@ -164,7 +168,24 @@ onMounted(() => {
       >前往验证</van-button
     >
   </main>
-  <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
+  <friend-remark
+    :show="showFriendRemark"
+    @hide="showFriendRemark = false"
+    :info="homeInfo"
+    @updateCb="updateCb"
+  />
+  <friend-perm
+    :show="showFriendPerm"
+    @hide="showFriendPerm = false"
+    :info="homeInfo"
+  />
+  <friend-setting
+    :show="showFriendSetting"
+    @hide="showFriendSetting = false"
+    @showFP="showFriendPerm = true"
+    @showFR="showFriendRemark = true"
+    :info="homeInfo"
+  />
 </template>
 <style scoped lang="less">
 .van-nav-bar {

@@ -3,7 +3,6 @@ import { onMounted, reactive, inject, ref } from "vue";
 import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
 import { useUserStore } from "@/stores/user";
-import { useFriendStore } from "@/stores/friend";
 import { useAppStore } from "@/stores/app";
 import { useRouter, useRoute } from "vue-router";
 import { Verify } from "@/components/Verifition";
@@ -12,7 +11,6 @@ const router = useRouter();
 const route = useRoute();
 const WebSocketClient = inject("WebSocketClient");
 const userStore = useUserStore();
-const friendStore = useFriendStore();
 const appStore = useAppStore();
 const formData = reactive({
   mobile: "",
@@ -57,7 +55,6 @@ onMounted(() => {
   if (route.query.logout) {
     WebSocketClient.stop();
     userStore.handleLogout();
-    friendStore.clear();
     appStore.clear();
     return showFailToast("账户信息已失效，请重新登录");
   }

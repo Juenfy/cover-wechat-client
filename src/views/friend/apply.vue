@@ -11,11 +11,13 @@ const formData = ref({
   remark: "",
   nickname: "",
   setting: {
-    MomentAndStatus: {
-      DontSeeHim: false,
-      DontLetHimSeeIt: false,
+    FriendPerm: {
+      MomentAndStatus: {
+        DontSeeHim: false,
+        DontLetHimSeeIt: false,
+      },
+      SettingFriendPerm: "ALLOW_ALL",
     },
-    SettingFriendPerm: "ALLOW_ALL",
   },
   type: Apply,
 });
@@ -112,13 +114,13 @@ onBeforeMount(async () => {
           placeholder="添加备注"
         />
       </van-cell-group>
-      <van-radio-group v-model="formData.setting.SettingFriendPerm">
+      <van-radio-group v-model="formData.setting.FriendPerm.SettingFriendPerm">
         <van-cell-group :border="false" title="设置朋友权限">
           <van-cell
             title="聊天、朋友圈、微信运动等"
             size="large"
             clickable
-            @click="formData.setting.SettingFriendPerm = 'ALLOW_ALL'"
+            @click="formData.setting.FriendPerm.SettingFriendPerm = 'ALLOW_ALL'"
           >
             <template #right-icon>
               <van-radio name="ALLOW_ALL" />
@@ -128,7 +130,7 @@ onBeforeMount(async () => {
             title="仅聊天"
             size="large"
             clickable
-            @click="formData.setting.SettingFriendPerm = 'ONLY_CHAT'"
+            @click="formData.setting.FriendPerm.SettingFriendPerm = 'ONLY_CHAT'"
           >
             <template #right-icon>
               <van-radio name="ONLY_CHAT" />
@@ -140,13 +142,17 @@ onBeforeMount(async () => {
         <van-cell title="不让他看" size="large">
           <template #right-icon>
             <van-switch
-              v-model="formData.setting.MomentAndStatus.DontLetHimSeeIt"
+              v-model="
+                formData.setting.FriendPerm.MomentAndStatus.DontLetHimSeeIt
+              "
             />
           </template>
         </van-cell>
         <van-cell title="不看他" size="large">
           <template #right-icon>
-            <van-switch v-model="formData.setting.MomentAndStatus.DontSeeHim" />
+            <van-switch
+              v-model="formData.setting.FriendPerm.MomentAndStatus.DontSeeHim"
+            />
           </template>
         </van-cell>
       </van-cell-group>
