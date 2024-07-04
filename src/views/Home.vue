@@ -1,7 +1,6 @@
 <script setup>
 import ChatGroupCreate from "@/components/chat/group/create.vue";
 import FriendAdd from "@/components/friend/add.vue";
-
 import { useRoute, useRouter } from "vue-router";
 import { onMounted, reactive, ref } from "vue";
 import { useAppStore } from "@/stores/app";

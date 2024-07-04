@@ -14,9 +14,9 @@ import {
   UnreadApply,
 } from "@/enums/app";
 import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
-
 import { showDialog } from "vant";
 import { startWebSocket, getChatList, messageList } from "@/utils/websocket";
+
 const WebSocketClient = inject("WebSocketClient");
 const route = useRoute();
 const emitter = inject("emitter");
