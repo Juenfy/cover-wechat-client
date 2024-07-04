@@ -1,9 +1,11 @@
 <script setup>
 import { showConfirmDialog } from "vant";
 import { onMounted, inject } from "vue";
+import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import * as userApi from "@/api/user";
+const router = useRouter();
 const appStore = useAppStore();
 const userStore = useUserStore();
 const WebSocketClient = inject("WebSocketClient");
@@ -21,7 +23,7 @@ const onLogout = () => {
           userStore.handleLogout();
           appStore.clear();
           setTimeout(() => {
-            location.href = "/";
+            router.push("/");
           }, 200);
         }
       });

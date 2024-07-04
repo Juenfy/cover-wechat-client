@@ -2,7 +2,7 @@
 import * as messageApi from "@/api/message";
 import * as friendApi from "@/api/friend";
 import { onMounted, watch, inject, onUnmounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import CommonSearch from "@/components/common/search.vue";
 import MessagePopup from "@/components/message/popup.vue";
 import { useAppStore } from "@/stores/app";
@@ -19,6 +19,7 @@ import { startWebSocket, getChatList, messageList } from "@/utils/websocket";
 
 const WebSocketClient = inject("WebSocketClient");
 const route = useRoute();
+const router = useRouter();
 const emitter = inject("emitter");
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -90,7 +91,7 @@ const onMessage = (data) => {
           data.time +
           "在其他地方登录，您已被强制下线，请重新登录。如果不是本人操作，请重新修改密码。",
       }).then(() => {
-        location.href = "/login?logout=1";
+        router.push({ name: "login", query: { logout: 1 } });
       });
       break;
     case ActionApply:
