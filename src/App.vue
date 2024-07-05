@@ -88,7 +88,7 @@ const onMessage = (data) => {
         title: "强制下线通知",
         message:
           "您的账号于" +
-          data.time +
+          data.data.time +
           "在其他地方登录，您已被强制下线，请重新登录。如果不是本人操作，请重新修改密码。",
       }).then(() => {
         router.push({ name: "login", query: { logout: 1 } });
