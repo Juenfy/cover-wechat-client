@@ -3,13 +3,13 @@
 import ChatList from "@/components/chat/list.vue";
 import { ref, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
+import { useRoute } from "vue-router";
 import { chatList, getChatList, sortChatList } from "@/utils/websocket";
+import { UnreadChat, UnreadFriend, UnreadApply } from "@/enums/app";
 const appStore = useAppStore();
+const route = useRoute();
 const loading = ref(false);
 const finished = ref(false);
-defineEmits(["onSelect"]);
-
-const loadMore = () => {};
 
 const handleAction = (type, data) => {
   let uk = data.is_group + ":" + data.from_user + "-" + data.to_user;
@@ -34,9 +34,19 @@ const handleAction = (type, data) => {
   chatList.value = sortChatList(chatList.value);
 };
 
+const computeUnread = () => {
+  //通过好友验证消息未读数计算
+  if (route.query.verify) {
+    appStore.unreadIncrBy(UnreadChat);
+    appStore.unreadDecrBy(UnreadFriend, appStore.unread.apply);
+    appStore.unreadDecrBy(UnreadApply, appStore.unread.apply);
+  }
+};
+
 onMounted(() => {
   appStore.initHeader({ title: "微信", navbar: true, search: true });
   getChatList();
+  computeUnread();
 });
 </script>
 <template>

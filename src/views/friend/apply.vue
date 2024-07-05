@@ -75,7 +75,7 @@ const onSubmit = () => {
         handleResponse(
           res,
           (res) => {
-            router.push("/chat");
+            router.push({ name: "chat", query: { verify: 1 } });
           },
           router,
           true
