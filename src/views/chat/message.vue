@@ -57,11 +57,11 @@ const onSelectEmoji = (emoji) => {
   input.value.focus();
 };
 
-const onClickAvatar = (id) => {
+const onClickAvatar = (item) => {
   router.push({
     name: "friend-info",
     query: {
-      id: id,
+      keywords: item.from.wechat,
     },
   });
 };
@@ -160,7 +160,7 @@ onUnmounted(async () => {
                 <img
                   alt="avatar"
                   :src="item.from.avatar"
-                  @click="onClickAvatar(item.id)"
+                  @click="onClickAvatar(item)"
                 />
               </div>
               <div class="msg">
