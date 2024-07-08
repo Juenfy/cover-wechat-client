@@ -12,7 +12,7 @@ const deleteFriend = () => {};
 <template>
   <van-popup
     v-model:show="props.show"
-    position="bottom"
+    position="right"
     :style="{ height: '100%', width: '100%' }"
     duration="0.2"
   >

@@ -20,7 +20,7 @@ const showPostMomentMenu = ref(false);
   <main></main>
   <van-popup
     v-model:show="showPostMomentMenu"
-    position="bottom"
+    position="right"
     style="height: "
   >
     <van-cell-group>

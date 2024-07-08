@@ -59,7 +59,7 @@ onMounted(() => {});
 <template>
   <van-popup
     v-model:show="props.show"
-    position="bottom"
+    position="right"
     :style="{ height: '100%', width: '100%' }"
     duration="0.2"
   >
@@ -179,7 +179,7 @@ onMounted(() => {});
         <van-popup
           v-model:show="showClearChat"
           round
-          position="bottom"
+          position="right"
           :style="{ background: '#f9f9f9' }"
         >
           <span
