@@ -245,15 +245,6 @@ onUnmounted(async () => {
       > li {
         display: block;
       }
-      > li > .normal-message > .content > span {
-        color: var(--theme-text-color-tint);
-        font-size: 8px;
-        line-height: 8px;
-        display: block;
-      }
-      > li > .normal-message > .content > .right {
-        text-align: right;
-      }
       > li > .normal-message > article {
         display: flex;
         justify-content: flex-start;
@@ -265,6 +256,15 @@ onUnmounted(async () => {
             height: 3.5rem;
             border-radius: 0.2rem;
           }
+        }
+        > .content > span {
+          color: var(--theme-text-color-tint);
+          font-size: 14px;
+          line-height: 18px;
+          display: block;
+        }
+        > .content > .right {
+          text-align: right;
         }
         > .content > .msg {
           display: flex;
