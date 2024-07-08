@@ -5,7 +5,6 @@ import discoverIndex from "@/views/discover/index.vue";
 import meIndex from "@/views/me/index.vue";
 import home from "@/views/Home.vue";
 import chatMessage from "@/views/chat/message.vue";
-import chatSetting from "@/views/chat/setting.vue";
 import friendInfo from "@/views/friend/info.vue";
 import discoverMoment from "@/views/discover/moment.vue";
 import QrcodeScan from "@/views/me/qrcode/scan.vue";
@@ -46,11 +45,6 @@ const router = createRouter({
       path: "/chat/message/:to_user/:is_group",
       name: "chat-message",
       component: chatMessage,
-    },
-    {
-      path: "/chat/setting",
-      name: "chat-setting",
-      component: chatSetting,
     },
     {
       path: "/friend/info",

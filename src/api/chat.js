@@ -16,6 +16,10 @@ export const putTop = async (data) => {
   return request.put("/api/chat/top", data);
 };
 
+export const putUpdate = async (data) => {
+  return request.put("/api/chat/update", data);
+};
+
 export const putDelete = async (data) => {
   return request.put("/api/chat/delete", data);
 };

@@ -15,6 +15,7 @@ import * as chatApi from "@/api/chat";
 import { useAppStore } from "@/stores/app";
 import { messageList } from "@/utils/websocket";
 import { UnreadChat } from "@/enums/app";
+import ChatInfo from "@/components/chat/info.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -29,15 +30,7 @@ const queryData = reactive({
   to_user: route.params.to_user,
   is_group: route.params.is_group,
 });
-
-const onClickRight = () => {
-  router.push({
-    name: "chat-setting",
-    query: {
-      id: 1,
-    },
-  });
-};
+const showChatInfo = ref(false);
 
 const handleMoreClick = (e) => {
   popupEmojiBottom.value = false;
@@ -133,7 +126,7 @@ onUnmounted(async () => {
         :title="chatInfo.nickname"
         left-arrow
         @click-left="router.go(-1)"
-        @click-right="onClickRight"
+        @click-right="showChatInfo = true"
         style="
           box-sizing: border-box;
           border-bottom: 0.1rem solid var(--van-nav-bar-border-color);
@@ -215,6 +208,11 @@ onUnmounted(async () => {
       />
     </footer>
   </div>
+  <chat-info
+    :show="showChatInfo"
+    @hide="showChatInfo = false"
+    :info="chatInfo"
+  />
 </template>
 <style scoped lang="less">
 .container {
