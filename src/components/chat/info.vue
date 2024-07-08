@@ -28,7 +28,20 @@ watch(
   }
 );
 
-const updateChatInfo = (key, value) => {
+const updateTop = (value) => {
+  updateChatInfo(value, "top");
+};
+
+const updateMuted = (value) => {
+  updateChatInfo(value, "muted");
+};
+
+const updateDisplayNickname = (value) => {
+  updateChatInfo(value, "display_nickname");
+};
+
+const updateChatInfo = (value, key) => {
+  console.log(value, key);
   const data = {
     is_group: chatInfo.value.is_group,
     to_user: chatInfo.value.to_user,
@@ -116,7 +129,7 @@ onMounted(() => {});
           <template #right-icon>
             <van-switch
               v-model="chatInfo.muted"
-              @click="updateChatInfo('muted', chatInfo.muted)"
+              @update:model-value="updateMuted"
             />
           </template>
         </van-cell>
@@ -124,13 +137,13 @@ onMounted(() => {});
           <template #right-icon>
             <van-switch
               v-model="chatInfo.top"
-              @click="updateChatInfo('top', chatInfo.muted)"
+              @update:model-value="updateTop"
             />
           </template>
         </van-cell>
         <!-- <van-cell title="提醒" size="large">
           <template #right-icon>
-            <van-switch v-model="chatSetting.remind" />
+            <van-switch v-model="chatInfo.remind" @update:model-value="updateRemind"/>
           </template>
         </van-cell> -->
       </van-cell-group>
@@ -146,7 +159,7 @@ onMounted(() => {});
           <template #right-icon>
             <van-switch
               v-model="chatInfo.display_nickname"
-              @click="updateChatInfo('display_nickname', chatInfo.muted)"
+              @update:model-value="updateDisplayNickname"
             />
           </template>
         </van-cell>

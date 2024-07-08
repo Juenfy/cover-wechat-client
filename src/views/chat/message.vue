@@ -145,9 +145,6 @@ onUnmounted(async () => {
           :class="item.is_tips == 1 ? 'li-tips-message' : ''"
         >
           <div v-if="item.is_tips == 0" class="normal-message">
-            <!-- <p :class="item.right ? 'nickname right' : 'nickname'">
-            {{ item.from.nickname }}
-          </p> -->
             <article :class="item.right ? 'right' : ''">
               <div class="avatar">
                 <img
@@ -156,9 +153,17 @@ onUnmounted(async () => {
                   @click="onClickAvatar(item)"
                 />
               </div>
-              <div class="msg">
-                <div class="tri"></div>
-                <div class="msg_inner">{{ item.content }}</div>
+              <div class="content">
+                <span
+                  :class="item.right ? 'nickname right' : 'nickname'"
+                  v-if="chatInfo.display_nickname"
+                >
+                  {{ item.from.nickname }}
+                </span>
+                <div class="msg">
+                  <div class="tri"></div>
+                  <div class="msg_inner">{{ item.content }}</div>
+                </div>
               </div>
             </article>
           </div>
@@ -240,10 +245,14 @@ onUnmounted(async () => {
       > li {
         display: block;
       }
-      > li > .normal-message > p.nickname {
-        color: var(--theme-text-color);
-        font-size: 12px;
-        line-height: 12px;
+      > li > .normal-message > .content > span {
+        color: var(--theme-text-color-tint);
+        font-size: 8px;
+        line-height: 8px;
+        display: block;
+      }
+      > li > .normal-message > .content > .right {
+        text-align: right;
       }
       > li > .normal-message > article {
         display: flex;
@@ -257,7 +266,7 @@ onUnmounted(async () => {
             border-radius: 0.2rem;
           }
         }
-        > .msg {
+        > .content > .msg {
           display: flex;
           justify-content: space-between;
           > .tri {
@@ -284,7 +293,7 @@ onUnmounted(async () => {
           margin-right: 0px;
           margin-left: 0.7rem;
         }
-        > .msg {
+        > .content > .msg {
           flex-direction: row-reverse;
           > .tri {
             width: 0;
@@ -298,23 +307,6 @@ onUnmounted(async () => {
             border-radius: 0.2rem 0 0.2rem 0.2rem;
             background-color: #98e865;
           }
-        }
-      }
-
-      > li > .normal-message > article.center {
-        display: flex;
-        justify-content: center;
-        > .tips {
-          background: #ccc;
-          opacity: 0.5;
-          color: #222;
-          font-size: 10px;
-          padding: 3px 8px;
-          max-width: 80%;
-          word-wrap: break-word;
-          word-break: break-all;
-          text-overflow: ellipsis;
-          overflow: hidden;
         }
       }
 
