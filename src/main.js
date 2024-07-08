@@ -25,7 +25,7 @@ const emitter = mitt();
 app.provide("emitter", emitter);
 
 //连接websocket
-const url = "ws://7.94.250.51:2346";
+const url = "ws://47.94.250.51:2346";
 const ws = new WebSocketClient(url, emitter);
 app.provide("WebSocketClient", ws);
 const noticeAudio = new Audio("/audio/notification/default.mp3");
