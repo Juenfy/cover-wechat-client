@@ -179,7 +179,7 @@ onMounted(() => {});
         <van-popup
           v-model:show="showClearChat"
           round
-          position="right"
+          position="bottom"
           :style="{ background: '#f9f9f9' }"
         >
           <span
