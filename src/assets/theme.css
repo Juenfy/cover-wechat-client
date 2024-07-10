@@ -4,6 +4,7 @@
   --theme-text-color: #181818;
   --theme-text-color-tint: #a5a5a5;
   --theme-blue-tint: #5f688a;
+  --theme-black: #000;
   --van-primary-color: var(--theme-main-color);
   --van-text-color: var(--theme-text-color);
   --van-tabbar-height: 4rem;

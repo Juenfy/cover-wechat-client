@@ -1,6 +1,7 @@
 <script setup>
+import MeInfo from "@/components/me/info.vue";
 import { showConfirmDialog } from "vant";
-import { onMounted, inject } from "vue";
+import { onMounted, inject, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
@@ -9,6 +10,7 @@ const router = useRouter();
 const appStore = useAppStore();
 const userStore = useUserStore();
 const WebSocketClient = inject("WebSocketClient");
+const showMeInfo = ref(false);
 
 const onLogout = () => {
   showConfirmDialog({
@@ -41,7 +43,7 @@ onMounted(() => {
 <template>
   <main>
     <van-cell-group :border="false">
-      <van-cell is-link="" to="" :center="true">
+      <van-cell is-link clickable @click="showMeInfo = true" :center="true">
         <template #title>
           <div class="card">
             <div class="info">
@@ -99,6 +101,7 @@ onMounted(() => {
       >退出登录</van-button
     >
   </main>
+  <me-info :show="showMeInfo" @hide="showMeInfo = false" />
 </template>
 
 <style scoped lang="less">

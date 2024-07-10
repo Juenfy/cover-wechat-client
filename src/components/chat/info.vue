@@ -180,31 +180,11 @@ onMounted(() => {});
           v-model:show="showClearChat"
           round
           position="bottom"
-          :style="{ background: '#f9f9f9' }"
+          style="background: var(--van-tabbar-background)"
+          class="clear-chat-menu"
         >
-          <span
-            :style="{
-              background: '#fff',
-              display: 'block',
-              textAlign: 'center',
-              color: 'red',
-              fontSize: 'var(--van-cell-large-title-font-size)',
-              lineHeight: '4rem',
-              marginBottom: '0.4rem',
-            }"
-            >清空聊天记录</span
-          >
-          <span
-            @click="showClearChat = false"
-            :style="{
-              background: '#fff',
-              display: 'block',
-              textAlign: 'center',
-              fontSize: 'var(--van-cell-large-title-font-size)',
-              lineHeight: '4rem',
-            }"
-            >取消</span
-          >
+          <span class="clear-chat">清空聊天记录</span>
+          <span @click="showClearChat = false">取消</span>
         </van-popup>
       </van-cell-group>
     </main>
@@ -214,5 +194,19 @@ onMounted(() => {});
 <style lang="less" scoped>
 .van-cell-group {
   margin-bottom: 0.5rem;
+}
+.clear-chat-menu {
+  background: var(--van-nav-bar-background);
+  span {
+    background: var(--van-white);
+    display: block;
+    text-align: center;
+    font-size: var(--van-cell-large-title-font-size);
+    line-height: 4rem;
+  }
+  .clear-chat {
+    margin-bottom: 0.5rem;
+    color: var(--van-red);
+  }
 }
 </style>
