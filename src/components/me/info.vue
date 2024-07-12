@@ -1,7 +1,13 @@
 <script setup>
 import { useUserStore } from "@/stores/user";
 import { ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import CommonCamera from "@/components/common/camera.vue";
+import * as fileApi from "@/api/file";
+import * as userApi from "@/api/user";
+import { handleResponse } from "@/utils/helper";
+
+const router = useRouter();
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);
@@ -34,6 +40,25 @@ watch(
     avatar.value = val;
   }
 );
+
+const afterRead = (file) => {
+  const data = new FormData();
+  data.append("file", file.file);
+  data.append("avatar", true);
+  fileApi.upload(data).then((res) => {
+    handleResponse(
+      res,
+      () => {
+        userApi.putUpdate({ avatar: res.data.path }).then(() => {
+          userStore.updateInfo("avatar", res.data.url);
+          showUpdateAvatar.value = false;
+        });
+      },
+      router,
+      true
+    );
+  });
+};
 </script>
 <template>
   <van-popup
@@ -200,7 +225,14 @@ watch(
       class="update-avatar-menu"
     >
       <span @click="openCamera">拍照</span>
-      <span><van-uploader>从手机相册选择</van-uploader></span>
+      <span
+        ><van-uploader
+          :after-read="afterRead"
+          max-count="1"
+          accept="image/png, image/jpeg, image/gif"
+          >从手机相册选择</van-uploader
+        ></span
+      >
       <span>查看上一张头像</span>
       <span class="save-avatar">保存图片</span>
       <span @click="showUpdateAvatar = false" class="cancel-update-avatar"

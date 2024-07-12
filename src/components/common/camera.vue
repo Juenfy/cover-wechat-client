@@ -91,7 +91,6 @@ const previewImage = () => {
         title: "提示",
         message: "确认使用这张图片作为头像吗？",
       }).then(() => {
-        alert(e.url);
         fileApi.uploadBase64({ base64: e.url }).then((res) => {
           handleResponse(
             res,
