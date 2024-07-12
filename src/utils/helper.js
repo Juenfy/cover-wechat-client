@@ -9,7 +9,7 @@ export const handleResponse = (res, cb, router, showSucces = false) => {
     return false;
   }
   if (showSucces) showSuccessToast(res.msg);
-  cb(res);
+  cb();
 };
 
 export const timestampFormat = (timestamp) => {

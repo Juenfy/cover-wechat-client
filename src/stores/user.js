@@ -18,9 +18,14 @@ export const useUserStore = defineStore(
       isLogin.value = false;
     };
 
+    const updateInfo = (key, val) => {
+      info.value[key] = val;
+    };
+
     return {
       handleLogin,
       handleLogout,
+      updateInfo,
       isLogin,
       info,
     };

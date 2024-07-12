@@ -1,11 +1,12 @@
 <script setup>
 import { useUserStore } from "@/stores/user";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, watch } from "vue";
 import CommonCamera from "@/components/common/camera.vue";
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);
 const userStore = useUserStore();
+const avatar = ref(userStore.info.avatar);
 const showMore = ref(false);
 const showAvatar = ref(false);
 const showUpdateAvatar = ref(false);
@@ -22,10 +23,17 @@ const openCamera = () => {
 };
 
 const takePhotoCb = (photo) => {
-  //   showCommonCamera.value = false;
+  showCommonCamera.value = false;
   alert(photo);
-  console.log(photo);
+  // console.log(photo);
+  avatar.value = photo;
 };
+watch(
+  () => userStore.info.avatar,
+  (val) => {
+    avatar.value = val;
+  }
+);
 </script>
 <template>
   <van-popup
@@ -148,7 +156,7 @@ const takePhotoCb = (photo) => {
     <van-popup
       v-model:show="showAvatar"
       position="right"
-      style="height: 100%; width: 100%; background: var(--theme-black)"
+      style="height: 100%; width: 100%; background: var(--van-black)"
       duration="0.2"
     >
       <header>
@@ -179,7 +187,7 @@ const takePhotoCb = (photo) => {
       <main>
         <van-image
           width="inhert"
-          :src="userStore.info.avatar"
+          :src="avatar"
           style="position: absolute; top: 50%; transform: translateY(-50%)"
         />
       </main>

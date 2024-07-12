@@ -1,21 +1,38 @@
 <script setup>
 import { ref, onUnmounted } from "vue";
-import { showFailToast } from "vant";
+import { useRouter } from "vue-router";
+import { showFailToast, showConfirmDialog, showImagePreview } from "vant";
+import * as fileApi from "@/api/file";
+import { handleResponse } from "@/utils/helper";
+import { useUserStore } from "@/stores/user";
+import * as userApi from "@/api/user";
+const userStore = useUserStore();
 const props = defineProps({ show: Boolean });
 const emit = defineEmits(["hide", "takePhotoCb"]);
+const router = useRouter();
 const video = ref(null);
 const canvas = ref(null);
 const stream = ref(null);
+const ctx = ref(null);
 const usingFrontCamera = ref(true);
+const constraints = ref({
+  audio: false,
+  video: {
+    facingMode: "user",
+  },
+});
+
+const photoList = ref([]);
+
+const lastPhoto = ref(null);
 
 const startCamera = async () => {
-  const constraints = {
-    video: {
-      facingMode: usingFrontCamera.value ? "user" : { exact: "environment" },
-    },
-  };
+  constraints.value.video.facingMode = usingFrontCamera.value
+    ? "user"
+    : { exact: "environment" };
   try {
-    stream.value = await navigator.mediaDevices.getUserMedia(constraints);
+    ctx.value = canvas.value.getContext("2d");
+    stream.value = await navigator.mediaDevices.getUserMedia(constraints.value);
     video.value.srcObject = stream.value;
     // 额外的绑定处理，确保在所有浏览器中正常工作
     video.value.onloadedmetadata = () => {
@@ -44,17 +61,54 @@ const switchCamera = async (event) => {
   await startCamera();
 };
 
-const takePhoto = (event) => {
+const takePhoto = async (event) => {
   console.log("点击拍照");
   event.stopPropagation(); // 防止事件冒泡
-  const context = canvas.value.getContext("2d");
   canvas.value.width = video.value.videoWidth;
-  canvas.value.height = video.value.videoHeight;
-  context.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height);
-  // alert(canvas.value.toDataURL("image/png"));
-  emit("takePhotoCb", canvas.value.toDataURL("image/png"));
+  canvas.value.height = video.value.videoWidth;
+  ctx.value.drawImage(
+    video.value,
+    0,
+    0,
+    canvas.value.width,
+    canvas.value.height
+  );
+  lastPhoto.value = canvas.value.toDataURL("image/jpeg");
+  photoList.value.push(lastPhoto.value);
+  // emit("takePhotoCb", lastPhoto.value);
 };
 
+const previewImage = () => {
+  showImagePreview({
+    images: photoList.value,
+    startPosition: photoList.value.length - 1,
+    beforeClose: (e) => {
+      console.log(e);
+      return true;
+    },
+    onClose: (e) => {
+      showConfirmDialog({
+        title: "提示",
+        message: "确认使用这张图片作为头像吗？",
+      }).then(() => {
+        alert(e.url);
+        fileApi.uploadBase64({ base64: e.url }).then((res) => {
+          handleResponse(
+            res,
+            () => {
+              userApi.putUpdate({ avatar: res.data.path }).then(() => {
+                userStore.updateInfo("avatar", res.data.url);
+                emit("hide");
+              });
+            },
+            router,
+            true
+          );
+        });
+      });
+    },
+  });
+};
 onUnmounted(async () => {
   await stopCamera();
 });
@@ -69,12 +123,25 @@ onUnmounted(async () => {
     style="width: 100%; height: 100%"
   >
     <div class="camera">
-      <div class="header">
-        <van-nav-bar title="相机" left-arrow @click-left="$emit('hide')" />
-      </div>
+      <header>
+        <div class="back-button" @click="$emit('hide')">
+          <svg viewBox="0 0 24 24">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+          </svg>
+        </div>
+      </header>
       <div class="container">
         <video ref="video" autoplay playsinline></video>
         <div class="controls">
+          <div class="pictures" @click="previewImage">
+            <van-image
+              width="70"
+              height="70"
+              fit="cover"
+              v-if="lastPhoto"
+              :src="lastPhoto"
+            />
+          </div>
           <div class="switch-button" @click="switchCamera">
             <svg viewBox="0 0 24 24">
               <path
@@ -84,6 +151,7 @@ onUnmounted(async () => {
           </div>
           <div class="camera-button" @click="takePhoto"></div>
         </div>
+
         <div @click="takePhoto" class="camera-button"></div>
         <div @click="switchCamera" class="switch-button"></div>
       </div>
@@ -99,6 +167,35 @@ onUnmounted(async () => {
   flex-direction: column;
   height: 100%;
   width: 100%;
+  background-color: var(--van-black);
+  header {
+    position: relative;
+    width: 100%;
+    .back-button {
+      background-color: rgba(255, 255, 255, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.1s ease;
+      z-index: 20; /* 确保按钮在video元素之上 */
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      left: 20px;
+      top: 10px;
+    }
+    .back-button:hover {
+      background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .back-button svg {
+      height: 24px;
+      width: 24px;
+      fill: var(--van-white);
+    }
+  }
   .container {
     display: flex;
     flex-direction: column;
@@ -109,7 +206,7 @@ onUnmounted(async () => {
     width: 100%;
     video {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 1; /* 宽高比为 1:1 */
       object-fit: cover; /* 保持视频比例，裁剪超出部分 */
       pointer-events: none; /* 防止video元素阻止点击事件 */
     }
@@ -121,11 +218,15 @@ onUnmounted(async () => {
       justify-content: center;
       align-items: center;
       z-index: 10; /* 确保按钮在video元素之上 */
+      .pictures,
       .camera-button {
         width: 70px;
         height: 70px;
-        border: 6px solid rgba(255, 255, 255, 0.8);
-        border-radius: 50%;
+        overflow: hidden;
+      }
+      .pictures,
+      .camera-button,
+      .switch-button {
         background-color: rgba(255, 255, 255, 0.4);
         display: flex;
         justify-content: center;
@@ -134,13 +235,23 @@ onUnmounted(async () => {
         transition: background-color 0.1s ease;
         z-index: 20; /* 确保按钮在video元素之上 */
       }
+      .pictures {
+        border-radius: 4px;
+        opacity: 0.8;
+        position: absolute;
+        left: 20px;
+      }
+      .camera-button {
+        border: 6px solid rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+      }
 
       .camera-button::before {
         content: "";
         width: 58px;
         height: 58px;
         border-radius: 50%;
-        background-color: #fff;
+        background-color: var(--van-white);
         transition: transform 0.1s ease;
       }
 
@@ -150,18 +261,11 @@ onUnmounted(async () => {
 
       .switch-button {
         position: absolute;
-        right: 20px;
-        bottom: 10px;
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.4);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        transition: background-color 0.1s ease;
-        z-index: 20; /* 确保按钮在video元素之上 */
+        right: 20px;
+        bottom: 10px;
       }
 
       .switch-button:hover {
@@ -171,7 +275,7 @@ onUnmounted(async () => {
       .switch-button svg {
         width: 24px;
         height: 24px;
-        fill: #fff;
+        fill: var(--van-white);
       }
     }
   }

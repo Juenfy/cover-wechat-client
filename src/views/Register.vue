@@ -5,6 +5,7 @@ import { showSuccessToast, showFailToast } from "vant";
 import { Verify } from "@/components/Verifition";
 import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
+import * as fileApi from "@/api/file";
 const userStore = useUserStore();
 const router = useRouter();
 const formData = reactive({
@@ -15,6 +16,7 @@ const formData = reactive({
   password: "",
   captchaVerification: "",
 });
+const avatar = ref([]);
 const captchaEnable = ref(true);
 const verify = ref();
 const captchaType = ref("blockPuzzle"); // blockPuzzle 滑块 clickWord 点击文字
@@ -48,7 +50,17 @@ const getCode = async () => {
 };
 
 const afterRead = (file) => {
-  console.log(file);
+  avatar.value = [];
+  const data = new FormData();
+  data.append("file", file.file);
+  fileApi.upload(data).then((res) => {
+    console.log(res);
+    if (res.code == 200001) {
+      formData.avatar = res.data.path;
+      avatar.value = [{ url: res.data.url, imageFit: "contain" }];
+    }
+    console.log(formData);
+  });
 };
 </script>
 
@@ -57,10 +69,12 @@ const afterRead = (file) => {
     <h3>手机号注册</h3>
     <van-uploader
       :after-read="afterRead"
-      v-model="formData.avatar"
+      v-model="avatar"
       accept="image/*"
       style="margin: 2rem 0"
-      :preview-image="false"
+      :deletable="false"
+      :reupload="true"
+      max-count="1"
     />
     <van-form @submit="getCode">
       <van-cell-group inset>
