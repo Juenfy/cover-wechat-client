@@ -53,6 +53,7 @@ const afterRead = (file) => {
   avatar.value = [];
   const data = new FormData();
   data.append("file", file.file);
+  data.append("avatar", true);
   fileApi.upload(data).then((res) => {
     console.log(res);
     if (res.code == 200001) {
