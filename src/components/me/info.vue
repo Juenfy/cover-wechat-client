@@ -213,7 +213,12 @@ const afterRead = (file) => {
         <van-image
           width="inhert"
           :src="avatar"
-          style="position: absolute; top: 50%; transform: translateY(-50%)"
+          style="
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+          "
         />
       </main>
     </van-popup>
