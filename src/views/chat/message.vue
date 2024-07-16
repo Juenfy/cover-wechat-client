@@ -292,8 +292,17 @@ onUnmounted(async () => {
           </van-grid-item>
           <van-grid-item>
             <template #default>
+              <div class="more-bottom-item">
+                <div class="more-bottom-icon">
+                  <van-icon name="photograph" size="30" />
+                </div>
+                <span class="more-bottom-text">拍摄</span>
+              </div>
+            </template>
+          </van-grid-item>
+          <van-grid-item>
+            <template #default>
               <van-uploader
-                :after-read="afterRead"
                 :max-size="uploadMaxSize"
                 @oversize="onOversize"
                 @click="onMoreBottomItemClick('file')"
@@ -301,7 +310,7 @@ onUnmounted(async () => {
               >
                 <div class="more-bottom-item">
                   <div class="more-bottom-icon">
-                    <van-icon name="photograph" size="30" />
+                    <van-icon name="description" size="30" />
                   </div>
                   <span class="more-bottom-text">文件</span>
                 </div>
