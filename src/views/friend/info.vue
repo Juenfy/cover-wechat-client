@@ -6,6 +6,8 @@ import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import * as userApi from "@/api/user";
 import { RelationShip } from "@/enums/friend";
+import { showImagePreview } from "vant";
+
 const router = useRouter();
 const route = useRoute();
 const homeInfo = ref({});
@@ -48,6 +50,12 @@ const updateCb = async () => {
   getHomeInfo();
 };
 
+const previewImage = (url) => {
+  showImagePreview({
+    images: [url],
+  });
+};
+
 onMounted(() => {
   getHomeInfo();
 });
@@ -76,6 +84,7 @@ onMounted(() => {
                 width="4rem"
                 height="4rem"
                 :src="homeInfo.avatar"
+                @click="previewImage(homeInfo.avatar)"
               />
               <div class="text">
                 <span class="nickname"
