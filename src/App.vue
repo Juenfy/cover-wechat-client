@@ -21,7 +21,8 @@ import {
   messageList,
   imagePreviewList,
 } from "@/utils/websocket";
-import { File, Image, Video } from "@/enums/file";
+import { File, Image, Video, Content } from "@/enums/file";
+import { Text } from "@/enums/message";
 
 const WebSocketClient = inject("WebSocketClient");
 const route = useRoute();
@@ -82,6 +83,8 @@ const onMessage = (data) => {
         route.fullPath != "/chat" &&
         route.fullPath.indexOf("/chat/message") == -1
       ) {
+        if (data.data.type != Text)
+          data.data.content = Content[data.data.type] ?? Content[File];
         message.value = data.data;
         showMessagePopup.value = true;
         messageAction.value = ActionSend;
