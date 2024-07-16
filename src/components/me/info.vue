@@ -226,10 +226,7 @@ const afterRead = (file) => {
     >
       <span @click="openCamera">拍照</span>
       <span
-        ><van-uploader
-          :after-read="afterRead"
-          max-count="1"
-          accept="image/png, image/jpeg, image/gif"
+        ><van-uploader :after-read="afterRead" max-count="1" accept="image/*"
           >从手机相册选择</van-uploader
         ></span
       >
