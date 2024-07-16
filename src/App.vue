@@ -15,7 +15,13 @@ import {
 } from "@/enums/app";
 import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
 import { showDialog } from "vant";
-import { startWebSocket, getChatList, messageList } from "@/utils/websocket";
+import {
+  startWebSocket,
+  getChatList,
+  messageList,
+  imagePreviewList,
+} from "@/utils/websocket";
+import { File, Image, Video } from "@/enums/file";
 
 const WebSocketClient = inject("WebSocketClient");
 const route = useRoute();
@@ -63,6 +69,8 @@ const onMessage = (data) => {
       // 当前聊天窗口，推进消息
       if (route.fullPath == currentPath) {
         messageList.value.push(data.data);
+        if (data.data.type == Image)
+          imagePreviewList.value.push(data.data.content);
       }
 
       if (route.fullPath == "/chat") {

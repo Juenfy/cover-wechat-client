@@ -62,7 +62,7 @@ import { ref } from "vue";
 import * as chatApi from "@/api/chat";
 export const chatList = ref([]);
 export const messageList = ref([]);
-
+export const imagePreviewList = ref([]);
 export const getChatList = () => {
   chatApi.getList().then((res) => {
     console.log("getChatList", res);

@@ -13,10 +13,15 @@ import "emoji-picker-element";
 import * as messageApi from "@/api/message";
 import * as chatApi from "@/api/chat";
 import { useAppStore } from "@/stores/app";
-import { messageList } from "@/utils/websocket";
+import { messageList, imagePreviewList } from "@/utils/websocket";
 import { UnreadChat } from "@/enums/app";
 import ChatInfo from "@/components/chat/info.vue";
+import { showFailToast, showImagePreview } from "vant";
+import * as fileApi from "@/api/file";
+import { File, Image, Video } from "@/enums/file";
+import { Text } from "@/enums/message";
 
+const uploadMaxSize = ref(5 * 1024 * 1024);
 const router = useRouter();
 const route = useRoute();
 const appStore = useAppStore();
@@ -31,6 +36,7 @@ const queryData = reactive({
   is_group: route.params.is_group,
 });
 const showChatInfo = ref(false);
+const moreBottomAction = ref("");
 
 const handleMoreClick = (e) => {
   popupEmojiBottom.value = false;
@@ -45,6 +51,7 @@ const handleEmojiClick = (e) => {
     popupEmojiBottom.value = !popupEmojiBottom.value;
   }, 200);
 };
+
 const onSelectEmoji = (emoji) => {
   content.value += emoji.detail.unicode;
   input.value.focus();
@@ -59,14 +66,16 @@ const onClickAvatar = (item) => {
   });
 };
 
-const sendMessage = () => {
+const sendMessage = (type) => {
   if (content.value) {
     queryData.content = content.value;
-    queryData.type = "text";
+    queryData.type = type;
     messageApi.send(queryData).then((res) => {
       console.log("sendMessage", res);
       if (res.code == 200001) {
         messageList.value.push(res.data);
+        if (res.data.type == Image)
+          imagePreviewList.value.push(res.data.content);
       }
     });
 
@@ -90,6 +99,9 @@ const getMessageList = async () => {
     console.log("getMessageList", res);
     if (res.code == 200001) {
       messageList.value = res.data;
+      messageList.value.forEach((item) => {
+        if (item.type == Image) imagePreviewList.value.push(item.content);
+      });
     }
   });
 };
@@ -103,6 +115,50 @@ const getChatInfo = async () => {
   });
 };
 
+const onMoreBottomItemClick = (action) => {
+  moreBottomAction.value = action;
+};
+
+const onOversize = (file) => {
+  showFailToast("文件大小超过50MB限制");
+};
+
+const beforeRead = (file) => {
+  switch (moreBottomAction.value) {
+    case "photo":
+      if (file.type.startsWith("video/") || file.type.startsWith("image/")) {
+        return true;
+      }
+      showFailToast("请选择一个图片或视频文件");
+      return false;
+      break;
+  }
+};
+
+const afterRead = (file) => {
+  console.log(file);
+  const data = new FormData();
+  data.append("file", file.file);
+  fileApi.upload(data).then((res) => {
+    console.log(res);
+    if (res.code == 200001) {
+      queryData.file_id = res.data.id;
+      content.value = res.data.path;
+      sendMessage(res.data.type);
+    }
+  });
+};
+
+const previewImage = (url) => {
+  let index = 0;
+  imagePreviewList.value.forEach((v, i) => {
+    if (v == url) index = i;
+  });
+  showImagePreview({
+    images: imagePreviewList.value,
+    startPosition: index,
+  });
+};
 onUpdated(() => {
   nextTick(() => {
     // 滚动到底部
@@ -162,7 +218,19 @@ onUnmounted(async () => {
                 </span>
                 <div class="msg">
                   <div class="tri"></div>
-                  <div class="msg_inner">{{ item.content }}</div>
+                  <div class="msg_inner" v-if="item.type == Text">
+                    {{ item.content }}
+                  </div>
+                  <div
+                    class="msg_inner msg_image"
+                    v-else-if="item.type == Image"
+                  >
+                    <van-image
+                      fit="contain"
+                      :src="item.content"
+                      @click="previewImage(item.content)"
+                    />
+                  </div>
                 </div>
               </div>
             </article>
@@ -181,7 +249,7 @@ onUnmounted(async () => {
         <input
           type="text"
           v-model="content"
-          @keyup.enter="sendMessage"
+          @keyup.enter="sendMessage('text')"
           ref="input"
         />
         <div class="right">
@@ -202,7 +270,44 @@ onUnmounted(async () => {
           center
           :border="false"
         >
-          <van-grid-item icon="photo" text="图片" />
+          <van-grid-item>
+            <template #default>
+              <van-uploader
+                :before-read="beforeRead"
+                :after-read="afterRead"
+                accept="image/*, video/*"
+                :max-size="uploadMaxSize"
+                @oversize="onOversize"
+                max-count="1"
+                @click="onMoreBottomItemClick('photo')"
+              >
+                <div class="more-bottom-item">
+                  <div class="more-bottom-icon">
+                    <van-icon name="photo" size="30"></van-icon>
+                  </div>
+                  <span class="more-bottom-text">照片</span>
+                </div>
+              </van-uploader>
+            </template>
+          </van-grid-item>
+          <van-grid-item>
+            <template #default>
+              <van-uploader
+                :after-read="afterRead"
+                :max-size="uploadMaxSize"
+                @oversize="onOversize"
+                @click="onMoreBottomItemClick('file')"
+                max-count="1"
+              >
+                <div class="more-bottom-item">
+                  <div class="more-bottom-icon">
+                    <van-icon name="photograph" size="30" />
+                  </div>
+                  <span class="more-bottom-text">文件</span>
+                </div>
+              </van-uploader>
+            </template>
+          </van-grid-item>
         </van-grid>
       </div>
       <emoji-picker
@@ -219,6 +324,11 @@ onUnmounted(async () => {
     :info="chatInfo"
   />
 </template>
+<style lang="css">
+:root:root {
+  --van-grid-item-content-background: transparent;
+}
+</style>
 <style scoped lang="less">
 .container {
   display: flex;
@@ -283,6 +393,8 @@ onUnmounted(async () => {
             border-radius: 0 0.2rem 0.2rem 0.2rem;
             box-shadow: 0.1rem 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
             text-align: left;
+            word-wrap: break-word; /* 在单词的任意位置断行 */
+            word-break: break-all; /* 在单词的任意位置断行 */
           }
         }
       }
@@ -360,6 +472,26 @@ onUnmounted(async () => {
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.2s ease-in-out;
+      .more-bottom-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        .more-bottom-icon {
+          height: 4rem;
+          width: 4rem;
+          background: var(--van-white);
+          border-radius: 0.8rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .more-bottom-text {
+          margin-top: 5px;
+          font-size: 12px;
+          color: var(--theme-text-color-tint);
+        }
+      }
     }
     > .more-bottom-popup,
     > .emoji-bottom-popup {
