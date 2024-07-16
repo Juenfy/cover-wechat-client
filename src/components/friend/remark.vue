@@ -18,7 +18,7 @@ const onSubmit = () => {
   friendApi.putUpdate(formData).then((res) => {
     handleResponse(
       res,
-      async (res) => {
+      async () => {
         await emit("updateCb");
         emit("hide");
       },
