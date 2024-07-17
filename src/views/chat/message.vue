@@ -16,12 +16,18 @@ import { useAppStore } from "@/stores/app";
 import { messageList, imagePreviewList } from "@/utils/websocket";
 import { UnreadChat } from "@/enums/app";
 import ChatInfo from "@/components/chat/info.vue";
-import { showFailToast, showImagePreview } from "vant";
+import {
+  closeToast,
+  showFailToast,
+  showImagePreview,
+  showLoadingToast,
+} from "vant";
 import * as fileApi from "@/api/file";
 import { File, Image, Video } from "@/enums/file";
 import { Text } from "@/enums/message";
 
-const uploadMaxSize = ref(5 * 1024 * 1024);
+const uploadPercent = ref(0);
+const uploadMaxSize = ref(30 * 1024 * 1024);
 const router = useRouter();
 const route = useRoute();
 const appStore = useAppStore();
@@ -120,7 +126,7 @@ const onMoreBottomItemClick = (action) => {
 };
 
 const onOversize = (file) => {
-  showFailToast("文件大小超过50MB限制");
+  showFailToast("文件大小超过30MB限制");
 };
 
 const beforeRead = (file) => {
@@ -137,16 +143,25 @@ const beforeRead = (file) => {
 
 const afterRead = (file) => {
   console.log(file);
+  showLoadingToast(`上传中${uploadPercent.value}%`);
   const data = new FormData();
   data.append("file", file.file);
-  fileApi.upload(data).then((res) => {
-    console.log(res);
-    if (res.code == 200001) {
-      queryData.file_id = res.data.id;
-      content.value = res.data.path;
-      sendMessage(res.data.type);
-    }
-  });
+  fileApi
+    .upload(data, (progressEvent) => {
+      uploadPercent.value = Math.floor(progressEvent.progress * 100);
+      console.log(uploadPercent.value);
+    })
+    .then((res) => {
+      console.log(res);
+      if (res.code == 200001) {
+        queryData.file_id = res.data.id;
+        content.value = res.data.path;
+        sendMessage(res.data.type);
+      }
+    })
+    .finally(() => {
+      closeToast(true);
+    });
 };
 
 const previewImage = (url) => {
@@ -230,6 +245,21 @@ onUnmounted(async () => {
                       :src="item.content"
                       @click="previewImage(item.content)"
                     />
+                  </div>
+                  <div
+                    class="msg_innser msg_video"
+                    v-else-if="item.type == Video"
+                  >
+                    <div class="van-image">
+                      <video
+                        controls
+                        :src="item.content"
+                        loop
+                        playsinline
+                        class="van-image__img"
+                        style="object-fit: contain"
+                      ></video>
+                    </div>
                   </div>
                 </div>
               </div>
