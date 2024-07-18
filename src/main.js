@@ -8,7 +8,10 @@ import Vant from "vant";
 import mitt from "mitt";
 import { WebSocketClient } from "@/utils/websocket";
 import VConsole from "vconsole";
-// const vconsole = new VConsole();
+
+if (import.meta.env.VITE_APP_DEBUG === "true") {
+  const vconsole = new VConsole();
+}
 
 import "@/assets/animation.css";
 import "@/assets/main.less";
@@ -25,7 +28,8 @@ const emitter = mitt();
 app.provide("emitter", emitter);
 
 //连接websocket
-const url = "ws://47.94.250.51:2346";
+const url = import.meta.env.VITE_APP_WEBSOCKET;
+console.log(url);
 const ws = new WebSocketClient(url, emitter);
 app.provide("WebSocketClient", ws);
 const noticeAudio = new Audio("/audio/notification/default.mp3");
