@@ -1,6 +1,6 @@
 # <center>仿微信客户端</center>
 
-在线体验：http://47.94.250.51:5173
+在线体验：http://124.71.219.151:5173
 
 服务端传送门：https://github.com/Juenfy/cover-wechat-api
 
