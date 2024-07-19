@@ -24,58 +24,61 @@ const deleteFriend = () => {};
         :border="false"
       />
     </header>
-    <main class="main">
-      <van-cell-group>
-        <van-cell
-          title="设置备注和标签"
-          is-link
-          clickable
-          @click="$emit('showFR')"
-          :center="true"
+    <section class="bg-nav">
+      <div class="header"></div>
+      <div class="container">
+        <van-cell-group>
+          <van-cell
+            title="设置备注和标签"
+            is-link
+            clickable
+            @click="$emit('showFR')"
+            :center="true"
+            size="large"
+            :value="props.info.display_nickname"
+          />
+          <van-cell
+            title="朋友权限"
+            is-link
+            clickable
+            @click="$emit('showFP')"
+            :center="true"
+            size="large"
+          />
+        </van-cell-group>
+        <van-cell-group>
+          <van-cell
+            title="把他推荐给朋友"
+            is-link
+            to=""
+            :center="true"
+            size="large"
+          />
+        </van-cell-group>
+        <van-cell-group>
+          <van-cell title="设置位星标朋友" :center="true" size="large">
+            <template #right-icon>
+              <van-switch v-model="friendSetting.star" />
+            </template>
+          </van-cell>
+        </van-cell-group>
+        <van-cell-group>
+          <van-cell title="加入黑名单" :center="true" size="large">
+            <template #right-icon>
+              <van-switch v-model="friendSetting.blacklist" />
+            </template>
+          </van-cell>
+          <van-cell title="投诉" is-link to="" :center="true" size="large" />
+        </van-cell-group>
+        <van-button
           size="large"
-          :value="props.info.display_nickname"
-        />
-        <van-cell
-          title="朋友权限"
-          is-link
-          clickable
-          @click="$emit('showFP')"
-          :center="true"
-          size="large"
-        />
-      </van-cell-group>
-      <van-cell-group>
-        <van-cell
-          title="把他推荐给朋友"
-          is-link
-          to=""
-          :center="true"
-          size="large"
-        />
-      </van-cell-group>
-      <van-cell-group>
-        <van-cell title="设置位星标朋友" :center="true" size="large">
-          <template #right-icon>
-            <van-switch v-model="friendSetting.star" />
-          </template>
-        </van-cell>
-      </van-cell-group>
-      <van-cell-group>
-        <van-cell title="加入黑名单" :center="true" size="large">
-          <template #right-icon>
-            <van-switch v-model="friendSetting.blacklist" />
-          </template>
-        </van-cell>
-        <van-cell title="投诉" is-link to="" :center="true" size="large" />
-      </van-cell-group>
-      <van-button
-        size="large"
-        :square="true"
-        style="margin-top: 0.5rem; border: none; color: var(--van-red)"
-        @click="deleteFriend"
-        >删除联系人</van-button
-      >
-    </main>
+          :square="true"
+          style="margin-top: 0.5rem; border: none; color: var(--van-red)"
+          @click="deleteFriend"
+          >删除联系人</van-button
+        >
+      </div>
+    </section>
   </van-popup>
 </template>
 

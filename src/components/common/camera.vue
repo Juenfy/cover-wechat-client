@@ -156,8 +156,6 @@ onUnmounted(async () => {
       </div>
       <canvas ref="canvas" style="display: none"></canvas>
     </div>
-    <header></header>
-    <main></main>
   </van-popup>
 </template>
 <style scoped lang="less">

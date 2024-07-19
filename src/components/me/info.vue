@@ -70,72 +70,76 @@ const afterRead = (file) => {
     <header>
       <van-nav-bar title="个人信息" left-arrow @click-left="$emit('hide')" />
     </header>
-    <main>
-      <van-cell-group>
-        <van-cell
-          title="头像"
-          is-link
-          clickable
-          @click="showAvatar = true"
-          :center="true"
-          size="large"
-        >
-          <template #value>
-            <van-image
-              height="3.5rem"
-              width="3.5rem"
-              radius="0.1rem"
-              :src="userStore.info.avatar"
-            />
-          </template>
-        </van-cell>
-        <van-cell
-          title="名字"
-          :value="userStore.info.nickname"
-          is-link
-          :center="true"
-          size="large"
-        />
-        <van-cell
-          title="拍一拍"
-          :value="userStore.info.wechat"
-          is-link
-          :center="true"
-          size="large"
-        />
-        <van-cell
-          title="微信号"
-          :value="userStore.info.wechat"
-          is-link
-          :center="true"
-          size="large"
-        />
-        <van-cell title="我的二维码" is-link :center="true" size="large">
-          <template #value>
-            <van-icon name="qr" size="1rem" />
-          </template>
-        </van-cell>
-        <van-cell
-          title="更多"
-          is-link
-          clickable
-          @click="showMore = true"
-          :center="true"
-          size="large"
-        />
-      </van-cell-group>
-      <van-cell-group>
-        <van-cell title="来电铃声" is-link :center="true" size="large" />
-      </van-cell-group>
+    <section>
+      <div class="header"></div>
+      <div class="container">
+        <van-cell-group>
+          <van-cell
+            title="头像"
+            is-link
+            clickable
+            @click="showAvatar = true"
+            :center="true"
+            size="large"
+          >
+            <template #value>
+              <van-image
+                height="3.5rem"
+                width="3.5rem"
+                radius="0.1rem"
+                :src="userStore.info.avatar"
+              />
+            </template>
+          </van-cell>
+          <van-cell
+            title="名字"
+            :value="userStore.info.nickname"
+            is-link
+            :center="true"
+            size="large"
+          />
+          <van-cell
+            title="拍一拍"
+            :value="userStore.info.wechat"
+            is-link
+            :center="true"
+            size="large"
+          />
+          <van-cell
+            title="微信号"
+            :value="userStore.info.wechat"
+            is-link
+            :center="true"
+            size="large"
+          />
+          <van-cell title="我的二维码" is-link :center="true" size="large">
+            <template #value>
+              <van-icon name="qr" size="1rem" />
+            </template>
+          </van-cell>
+          <van-cell
+            title="更多"
+            is-link
+            clickable
+            @click="showMore = true"
+            :center="true"
+            size="large"
+          />
+        </van-cell-group>
+        <van-cell-group>
+          <van-cell title="来电铃声" is-link :center="true" size="large" />
+        </van-cell-group>
 
-      <van-cell-group>
-        <van-cell title="微信豆" is-link :center="true" size="large" />
-      </van-cell-group>
+        <van-cell-group>
+          <van-cell title="微信豆" is-link :center="true" size="large" />
+        </van-cell-group>
 
-      <van-cell-group>
-        <van-cell title="我的地址" is-link :center="true" size="large" />
-      </van-cell-group>
-    </main>
+        <van-cell-group>
+          <van-cell title="我的地址" is-link :center="true" size="large" />
+        </van-cell-group>
+      </div>
+    </section>
+
     <!--更多-->
     <van-popup
       v-model:show="showMore"
@@ -150,32 +154,35 @@ const afterRead = (file) => {
       <header>
         <van-nav-bar left-arrow @click-left="showMore = false" />
       </header>
-      <main>
-        <van-cell-group>
-          <van-cell
-            title="性别"
-            :value="gender[userStore.info.gender]"
-            is-link
-            clickable
-            :center="true"
-            size="large"
-          />
-          <van-cell
-            title="地区"
-            value="中国 广州"
-            is-link
-            :center="true"
-            size="large"
-          />
-          <van-cell
-            title="个性签名"
-            :value="userStore.info.sign"
-            is-link
-            :center="true"
-            size="large"
-          />
-        </van-cell-group>
-      </main>
+      <section class="bg-nav">
+        <div class="header"></div>
+        <div class="container">
+          <van-cell-group>
+            <van-cell
+              title="性别"
+              :value="gender[userStore.info.gender]"
+              is-link
+              clickable
+              :center="true"
+              size="large"
+            />
+            <van-cell
+              title="地区"
+              value="中国 广州"
+              is-link
+              :center="true"
+              size="large"
+            />
+            <van-cell
+              title="个性签名"
+              :value="userStore.info.sign"
+              is-link
+              :center="true"
+              size="large"
+            />
+          </van-cell-group>
+        </div>
+      </section>
     </van-popup>
     <!--查看头像-->
     <van-popup
@@ -209,18 +216,21 @@ const afterRead = (file) => {
           </template>
         </van-nav-bar>
       </header>
-      <main>
-        <van-image
-          width="inhert"
-          :src="avatar"
-          style="
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 100%;
-          "
-        />
-      </main>
+      <section class="bg-black">
+        <div class="header"></div>
+        <div class="container">
+          <van-image
+            width="inhert"
+            :src="avatar"
+            style="
+              position: absolute;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 100%;
+            "
+          />
+        </div>
+      </section>
     </van-popup>
     <!--更换头像菜单-->
     <van-popup

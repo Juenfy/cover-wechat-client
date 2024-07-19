@@ -41,7 +41,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main>
+  <div class="common me">
     <van-cell-group :border="false">
       <van-cell is-link clickable @click="showMeInfo = true" :center="true">
         <template #title>
@@ -100,18 +100,15 @@ onMounted(() => {
       @click="onLogout"
       >退出登录</van-button
     >
-  </main>
+  </div>
   <me-info :show="showMeInfo" @hide="showMeInfo = false" />
 </template>
 
 <style scoped lang="less">
-.van-nav-bar {
-  background: var(--van-white);
-}
 .van-cell-group {
   margin-bottom: 0.5rem;
 }
-main {
+.me {
   position: fixed;
   width: 100%;
   height: 100%;

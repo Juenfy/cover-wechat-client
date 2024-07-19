@@ -14,7 +14,7 @@ if (import.meta.env.VITE_APP_DEBUG === "true") {
 }
 
 import "@/assets/animation.css";
-import "@/assets/main.less";
+import "@/assets/style.less";
 import "vant/lib/index.css";
 import "@/assets/theme.css";
 

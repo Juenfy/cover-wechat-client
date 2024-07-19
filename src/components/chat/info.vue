@@ -66,128 +66,131 @@ onMounted(() => {});
     <header>
       <van-nav-bar title="聊天详情" left-arrow @click-left="$emit('hide')" />
     </header>
-    <main class="main">
-      <van-cell-group :style="{ padding: '1rem 0' }">
-        <van-grid
-          :column-num="5"
-          icon-size="3.5rem"
-          :border="false"
-          :square="true"
-        >
-          <van-grid-item
-            :icon="item.avatar"
-            :text="item.nickname"
-            :to="'/friend/info?keywords=' + item.wechat"
-            v-for="item in chatInfo.users"
-            :key="item.id"
+    <section class="bg-nav">
+      <div class="header"></div>
+      <div class="container">
+        <van-cell-group :style="{ padding: '1rem 0' }">
+          <van-grid
+            :column-num="5"
+            icon-size="3.5rem"
+            :border="false"
+            :square="true"
+          >
+            <van-grid-item
+              :icon="item.avatar"
+              :text="item.nickname"
+              :to="'/friend/info?keywords=' + item.wechat"
+              v-for="item in chatInfo.users"
+              :key="item.id"
+            />
+            <van-grid-item icon="/add.png" text="邀请" to="" />
+          </van-grid>
+        </van-cell-group>
+        <van-cell-group v-if="chatInfo.is_group == 1">
+          <van-cell
+            title="群聊名称"
+            is-link
+            clickable
+            size="large"
+            :value="chatInfo.group_name"
           />
-          <van-grid-item icon="/add.png" text="邀请" to="" />
-        </van-grid>
-      </van-cell-group>
-      <van-cell-group v-if="chatInfo.is_group == 1">
-        <van-cell
-          title="群聊名称"
-          is-link
-          clickable
-          size="large"
-          :value="chatInfo.group_name"
-        />
-        <van-cell
-          title="群二维码"
-          is-link
-          clickable
-          size="large"
-          :value="chatInfo.group_name"
-        />
-        <van-cell
-          title="群公告"
-          is-link
-          clickable
-          size="large"
-          :value="chatInfo.group.notice ? chatInfo.group.notice : '未设置'"
-        />
-        <van-cell
-          title="备注"
-          is-link
-          clickable
-          size="large"
-          :value="chatInfo.group.name"
-        />
-      </van-cell-group>
+          <van-cell
+            title="群二维码"
+            is-link
+            clickable
+            size="large"
+            :value="chatInfo.group_name"
+          />
+          <van-cell
+            title="群公告"
+            is-link
+            clickable
+            size="large"
+            :value="chatInfo.group.notice ? chatInfo.group.notice : '未设置'"
+          />
+          <van-cell
+            title="备注"
+            is-link
+            clickable
+            size="large"
+            :value="chatInfo.group.name"
+          />
+        </van-cell-group>
 
-      <van-cell-group>
-        <van-cell
-          title="查找聊天内容"
-          is-link
-          clickable
-          @click="onSearchChatRecordClick"
-          size="large"
-        />
-      </van-cell-group>
-      <van-cell-group>
-        <van-cell title="消息免打扰" size="large">
-          <template #right-icon>
-            <van-switch
-              v-model="chatInfo.muted"
-              @update:model-value="updateMuted"
-            />
-          </template>
-        </van-cell>
-        <van-cell title="置顶聊天" size="large">
-          <template #right-icon>
-            <van-switch
-              v-model="chatInfo.top"
-              @update:model-value="updateTop"
-            />
-          </template>
-        </van-cell>
-        <!-- <van-cell title="提醒" size="large">
+        <van-cell-group>
+          <van-cell
+            title="查找聊天内容"
+            is-link
+            clickable
+            @click="onSearchChatRecordClick"
+            size="large"
+          />
+        </van-cell-group>
+        <van-cell-group>
+          <van-cell title="消息免打扰" size="large">
+            <template #right-icon>
+              <van-switch
+                v-model="chatInfo.muted"
+                @update:model-value="updateMuted"
+              />
+            </template>
+          </van-cell>
+          <van-cell title="置顶聊天" size="large">
+            <template #right-icon>
+              <van-switch
+                v-model="chatInfo.top"
+                @update:model-value="updateTop"
+              />
+            </template>
+          </van-cell>
+          <!-- <van-cell title="提醒" size="large">
           <template #right-icon>
             <van-switch v-model="chatInfo.remind" @update:model-value="updateRemind"/>
           </template>
         </van-cell> -->
-      </van-cell-group>
-      <van-cell-group v-if="chatInfo.is_group == 1">
-        <van-cell
-          title="我在本群的昵称"
-          is-link
-          clickable
-          size="large"
-          :value="chatInfo.group.nickname"
-        />
-        <van-cell title="显示群成员昵称" size="large">
-          <template #right-icon>
-            <van-switch
-              v-model="chatInfo.display_nickname"
-              @update:model-value="updateDisplayNickname"
-            />
-          </template>
-        </van-cell>
-      </van-cell-group>
-      <van-cell-group>
-        <van-cell title="设置当前聊天背景" is-link to="/chat" size="large" />
-      </van-cell-group>
-      <van-cell-group>
-        <van-cell
-          title="清除聊天记录"
-          clickable
-          size="large"
-          @click="showClearChat = true"
-        />
-      </van-cell-group>
-      <van-cell-group>
-        <van-popup
-          v-model:show="showClearChat"
-          round
-          position="bottom"
-          style="background: var(--van-tabbar-background)"
-          class="clear-chat-menu"
-        >
-          <span class="clear-chat">清空聊天记录</span>
-          <span @click="showClearChat = false">取消</span>
-        </van-popup>
-      </van-cell-group>
-    </main>
+        </van-cell-group>
+        <van-cell-group v-if="chatInfo.is_group == 1">
+          <van-cell
+            title="我在本群的昵称"
+            is-link
+            clickable
+            size="large"
+            :value="chatInfo.group.nickname"
+          />
+          <van-cell title="显示群成员昵称" size="large">
+            <template #right-icon>
+              <van-switch
+                v-model="chatInfo.display_nickname"
+                @update:model-value="updateDisplayNickname"
+              />
+            </template>
+          </van-cell>
+        </van-cell-group>
+        <van-cell-group>
+          <van-cell title="设置当前聊天背景" is-link to="/chat" size="large" />
+        </van-cell-group>
+        <van-cell-group>
+          <van-cell
+            title="清除聊天记录"
+            clickable
+            size="large"
+            @click="showClearChat = true"
+          />
+        </van-cell-group>
+        <van-cell-group>
+          <van-popup
+            v-model:show="showClearChat"
+            round
+            position="bottom"
+            style="background: var(--van-tabbar-background)"
+            class="clear-chat-menu"
+          >
+            <span class="clear-chat">清空聊天记录</span>
+            <span @click="showClearChat = false">取消</span>
+          </van-popup>
+        </van-cell-group>
+      </div>
+    </section>
   </van-popup>
 </template>
 

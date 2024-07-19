@@ -64,7 +64,7 @@ onMounted(() => {
     :autofocus="true"
     duration="0.2"
   >
-    <header
+    <div
       style="
         width: 100%;
         background: var(--van-nav-bar-background);
@@ -78,8 +78,8 @@ onMounted(() => {
         @search="handleSearch"
         @cancel="handleCancel"
       />
-    </header>
-    <main>
+    </div>
+    <div class="common common-search">
       <template v-if="action == SearchFriend">
         <van-cell-group
           title="联系人"
@@ -174,11 +174,11 @@ onMounted(() => {
       <template v-if="action == 'home' && isSearch">
         <div></div>
       </template>
-    </main>
+    </div>
   </van-popup>
 </template>
 <style scoped lang="less">
-main {
+.common-search {
   .no-result {
     width: 100%;
     text-align: center;

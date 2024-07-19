@@ -25,48 +25,52 @@ const onSearchFocus = () => {
   >
     <header>
       <van-nav-bar title="添加朋友" left-arrow @click-left="$emit('hide')" />
-      <van-search
-        placeholder="账号/手机号"
-        input-align="center"
-        @focus="onSearchFocus"
-      />
     </header>
-    <main>
-      <p style="text-align: center; line-height: 1">
-        我的微信号：phpdalao
-        <van-icon name="qr" color="var(--van-primary-color)" />
-      </p>
-      <van-cell-group>
-        <van-cell is-link to="" :center="true" size="large">
-          <template #title>
-            <van-image
-              height="2rem"
-              width="2rem"
-              radius="0.1rem"
-              src="/group-create.png"
-            />
-            <div class="left-box">
-              <span>面对面建群</span>
-              <span>与身边的朋友进入同一个群聊</span>
-            </div>
-          </template>
-        </van-cell>
-        <van-cell is-link to="/me/qrcode/scan" :center="true" size="large">
-          <template #title>
-            <van-image
-              height="2rem"
-              width="2rem"
-              radius="0.1rem"
-              src="/scan.png"
-            />
-            <div class="left-box">
-              <span>扫一扫</span>
-              <span>扫描二维码名片</span>
-            </div>
-          </template>
-        </van-cell>
-      </van-cell-group>
-    </main>
+    <section>
+      <div class="header"></div>
+      <div class="container">
+        <van-search
+          placeholder="账号/手机号"
+          input-align="center"
+          @focus="onSearchFocus"
+        />
+        <div class="common">
+          <p style="text-align: center; line-height: 1">
+            我的微信号：phpdalao
+            <van-icon name="qr" color="var(--van-primary-color)" />
+          </p>
+          <van-cell-group>
+            <van-cell is-link to="" :center="true" size="large">
+              <template #title>
+                <van-image
+                  height="2rem"
+                  width="2rem"
+                  radius="0.1rem"
+                  src="/group-create.png"
+                />
+                <div class="left-box">
+                  <span>面对面建群</span>
+                  <span>与身边的朋友进入同一个群聊</span>
+                </div>
+              </template>
+            </van-cell>
+            <van-cell is-link to="/me/qrcode/scan" :center="true" size="large">
+              <template #title>
+                <van-image
+                  height="2rem"
+                  width="2rem"
+                  radius="0.1rem"
+                  src="/scan.png"
+                />
+                <div class="left-box">
+                  <span>扫一扫</span>
+                  <span>扫描二维码名片</span>
+                </div>
+              </template>
+            </van-cell>
+          </van-cell-group>
+        </div>
+      </div>
+    </section>
   </van-popup>
 </template>
-<style scoped lang="less"></style>

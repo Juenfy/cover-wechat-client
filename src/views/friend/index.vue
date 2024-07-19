@@ -41,7 +41,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="friend-list">
+  <div class="friend-list">
     <van-index-bar :index-list="indexList">
       <van-cell
         title="新的朋友"
@@ -93,7 +93,7 @@ onMounted(async () => {
         </van-swipe-cell>
       </div>
     </van-index-bar>
-  </main>
+  </div>
   <friend-new
     :show="showFriendNew"
     @hide="showFriendNew = false"
@@ -102,3 +102,16 @@ onMounted(async () => {
   <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
   <group-list :show="showGroupList" @hide="showGroupList = false" />
 </template>
+
+<style lang="css">
+.friend-list .van-cell__left-icon {
+  height: 3rem;
+  font-size: 3rem;
+  line-height: 3rem;
+  margin-right: 1rem;
+  border-radius: 0.2rem;
+}
+.friend-list .van-cell__left-icon img {
+  border-radius: 0.2rem;
+}
+</style>

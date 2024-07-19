@@ -10,7 +10,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <main class="main">
+  <div class="common discover">
     <van-cell-group>
       <van-cell :center="true" is-link to="/discover/moment">
         <template #title>
@@ -31,7 +31,7 @@ onMounted(() => {
         </template>
       </van-cell>
     </van-cell-group>
-  </main>
+  </div>
 </template>
 
 <style>

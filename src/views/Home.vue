@@ -55,92 +55,99 @@ onMounted(() => {
 
 <template>
   <div v-if="userStore.isLogin">
-    <header>
-      <van-nav-bar
-        v-if="appStore.showNavbar"
-        :title="appStore.navTitle"
-        @click-right="!showPopover"
-      >
-        <template #right>
-          <van-popover
-            v-if="tabBarActive == 0"
-            v-model:show="showPopover"
-            theme="dark"
-            :actions="HomeActions"
-            @select="onSelect"
-            placement="bottom-end"
-          >
-            <template #reference>
-              <van-icon name="add-o" size="20" color="#191919" />
-            </template>
-          </van-popover>
-          <van-icon
-            name="friends-o"
-            size="20"
-            color="#191919"
-            v-if="tabBarActive == 1"
-            @click="showFriendAdd = true"
+    <div>
+      <header>
+        <van-nav-bar
+          v-if="appStore.showNavbar"
+          :title="appStore.navTitle"
+          @click-right="!showPopover"
+        >
+          <template #right>
+            <van-popover
+              v-if="tabBarActive == 0"
+              v-model:show="showPopover"
+              theme="dark"
+              :actions="HomeActions"
+              @select="onSelect"
+              placement="bottom-end"
+            >
+              <template #reference>
+                <van-icon name="add-o" size="20" color="#191919" />
+              </template>
+            </van-popover>
+            <van-icon
+              name="friends-o"
+              size="20"
+              color="#191919"
+              v-if="tabBarActive == 1"
+              @click="showFriendAdd = true"
+            />
+          </template>
+        </van-nav-bar>
+      </header>
+
+      <section>
+        <div class="header" v-if="appStore.showNavbar"></div>
+        <div class="container">
+          <van-search
+            placeholder="搜索"
+            v-if="appStore.showSearch"
+            input-align="center"
+            @focus="onSearchFocus"
           />
-        </template>
-      </van-nav-bar>
-      <van-search
-        placeholder="搜索"
-        v-if="appStore.showSearch"
-        input-align="center"
-        @focus="onSearchFocus"
+          <router-view />
+        </div>
+        <div class="footer"></div>
+      </section>
+      <footer>
+        <van-tabbar
+          v-model="tabBarActive"
+          :route="true"
+          z-index="999"
+          @change="(index) => (tabBarActive = index)"
+        >
+          <van-tabbar-item
+            :icon="tabBarActive == 0 ? 'chat' : 'chat-o'"
+            to="/chat"
+            :badge-props="{
+              content: appStore.unread.chat > 0 ? appStore.unread.chat : '',
+              max: 99,
+            }"
+            >消息</van-tabbar-item
+          >
+          <van-tabbar-item
+            :icon="tabBarActive == 1 ? 'friends' : 'friends-o'"
+            :badge-props="{
+              content: appStore.unread.friend > 0 ? appStore.unread.friend : '',
+              max: 99,
+            }"
+            to="/friend"
+            >通讯录</van-tabbar-item
+          >
+          <van-tabbar-item
+            :icon="tabBarActive == 2 ? 'eye' : 'eye-o'"
+            :badge-props="{
+              content:
+                appStore.unread.discover > 0 ? appStore.unread.discover : '',
+              max: 99,
+            }"
+            to="/discover"
+            >发现</van-tabbar-item
+          >
+          <van-tabbar-item
+            :icon="tabBarActive == 3 ? 'contact' : 'contact-o'"
+            to="/me"
+            >我</van-tabbar-item
+          >
+        </van-tabbar>
+      </footer>
+
+      <chat-group-create
+        :show="showChatGroupCreate"
+        @hide="showChatGroupCreate = false"
       />
-    </header>
-
-    <router-view />
-
-    <footer>
-      <van-tabbar
-        v-model="tabBarActive"
-        :route="true"
-        z-index="999"
-        @change="(index) => (tabBarActive = index)"
-      >
-        <van-tabbar-item
-          :icon="tabBarActive == 0 ? 'chat' : 'chat-o'"
-          to="/chat"
-          :badge-props="{
-            content: appStore.unread.chat > 0 ? appStore.unread.chat : '',
-            max: 99,
-          }"
-          >消息</van-tabbar-item
-        >
-        <van-tabbar-item
-          :icon="tabBarActive == 1 ? 'friends' : 'friends-o'"
-          :badge-props="{
-            content: appStore.unread.friend > 0 ? appStore.unread.friend : '',
-            max: 99,
-          }"
-          to="/friend"
-          >通讯录</van-tabbar-item
-        >
-        <van-tabbar-item
-          :icon="tabBarActive == 2 ? 'eye' : 'eye-o'"
-          :badge-props="{
-            content:
-              appStore.unread.discover > 0 ? appStore.unread.discover : '',
-            max: 99,
-          }"
-          to="/discover"
-          >发现</van-tabbar-item
-        >
-        <van-tabbar-item
-          :icon="tabBarActive == 3 ? 'contact' : 'contact-o'"
-          to="/me"
-          >我</van-tabbar-item
-        >
-      </van-tabbar>
-    </footer>
-
-    <chat-group-create
-      :show="showChatGroupCreate"
-      @hide="showChatGroupCreate = false"
-    />
-    <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
+      <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
+    </div>
   </div>
   <div class="main index" v-else>
     <footer>
@@ -153,20 +160,20 @@ onMounted(() => {
 </template>
 
 <style scoped lang="less">
-.index {
-  background-image: url(./../assets/home-bg.jpeg);
-  background-position: center;
-  background-size: cover;
-}
-footer {
-  width: inherit;
-  position: fixed;
-  left: 0;
-  bottom: 2rem;
-  display: flex;
-  justify-content: space-between;
-  button {
-    width: 7rem;
-  }
-}
+// .index {
+//   background-image: url(./../assets/home-bg.jpeg);
+//   background-position: center;
+//   background-size: cover;
+// }
+// footer {
+//   width: inherit;
+//   position: fixed;
+//   left: 0;
+//   bottom: 2rem;
+//   display: flex;
+//   justify-content: space-between;
+//   button {
+//     width: 7rem;
+//   }
+// }
 </style>

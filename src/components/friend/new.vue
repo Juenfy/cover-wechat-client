@@ -76,78 +76,89 @@ watch(
         @click-left="$emit('hide')"
         @click-right="showFriendAdd = true"
       />
-      <van-search
-        placeholder="账号/手机号"
-        input-align="center"
-        @focus="onSearchFocus"
-      />
     </header>
-    <main>
-      <van-cell-group title="近三天" v-if="applyList.three_day.length > 0">
-        <van-swipe-cell v-for="item in applyList.three_day" :key="item.id">
-          <van-cell :center="true" @click="handleHomeClick(item)">
-            <template #title>
-              <van-image
-                height="2.5rem"
-                width="2.5rem"
-                radius="0.2rem"
-                :src="item.friend.avatar"
-              />
-              <div class="left-box" style="">
-                <span>{{ item.friend.nickname }}</span>
-                <span>{{ item.remark }}</span>
-              </div>
-            </template>
-            <template #right-icon>
-              <div class="right-box" style="">
-                <span>{{ ApplyStatus[item.status] }}</span>
-              </div>
-            </template>
-          </van-cell>
-          <template #right>
-            <van-button
-              square
-              type="danger"
-              text="删除"
-              style="height: inherit"
-              @click="deleteApply(item.id)"
-            />
-          </template>
-        </van-swipe-cell>
-      </van-cell-group>
-      <van-cell-group title="三天前" v-if="applyList.over_three_day.length > 0">
-        <van-swipe-cell v-for="item in applyList.over_three_day" :key="item.id">
-          <van-cell :center="true" @click="handleHomeClick(item)">
-            <template #title>
-              <van-image
-                height="2.5rem"
-                width="2.5rem"
-                radius="0.2rem"
-                :src="item.friend.avatar"
-              />
-              <div class="left-box" style="">
-                <span>{{ item.friend.nickname }}</span>
-                <span>{{ item.remark }}</span>
-              </div>
-            </template>
-            <template #right-icon>
-              <div class="right-box" style="">
-                <span>{{ ApplyStatus[item.status] }}</span>
-              </div>
-            </template>
-          </van-cell>
-          <template #right>
-            <van-button
-              square
-              type="danger"
-              text="删除"
-              style="height: inherit"
-              @click="deleteApply(item.id)"
-            />
-          </template>
-        </van-swipe-cell>
-      </van-cell-group>
-    </main>
+    <section>
+      <div class="header"></div>
+      <div class="container">
+        <van-search
+          placeholder="账号/手机号"
+          input-align="center"
+          @focus="onSearchFocus"
+        />
+        <div class="common">
+          <van-cell-group title="近三天" v-if="applyList.three_day.length > 0">
+            <van-swipe-cell v-for="item in applyList.three_day" :key="item.id">
+              <van-cell :center="true" @click="handleHomeClick(item)">
+                <template #title>
+                  <van-image
+                    height="2.5rem"
+                    width="2.5rem"
+                    radius="0.2rem"
+                    :src="item.friend.avatar"
+                  />
+                  <div class="left-box" style="">
+                    <span>{{ item.friend.nickname }}</span>
+                    <span>{{ item.remark }}</span>
+                  </div>
+                </template>
+                <template #right-icon>
+                  <div class="right-box" style="">
+                    <span>{{ ApplyStatus[item.status] }}</span>
+                  </div>
+                </template>
+              </van-cell>
+              <template #right>
+                <van-button
+                  square
+                  type="danger"
+                  text="删除"
+                  style="height: inherit"
+                  @click="deleteApply(item.id)"
+                />
+              </template>
+            </van-swipe-cell>
+          </van-cell-group>
+          <van-cell-group
+            title="三天前"
+            v-if="applyList.over_three_day.length > 0"
+          >
+            <van-swipe-cell
+              v-for="item in applyList.over_three_day"
+              :key="item.id"
+            >
+              <van-cell :center="true" @click="handleHomeClick(item)">
+                <template #title>
+                  <van-image
+                    height="3rem"
+                    width="3rem"
+                    radius="0.2rem"
+                    :src="item.friend.avatar"
+                  />
+                  <div class="left-box" style="">
+                    <span>{{ item.friend.nickname }}</span>
+                    <span>{{ item.remark }}</span>
+                  </div>
+                </template>
+                <template #right-icon>
+                  <div class="right-box" style="">
+                    <span>{{ ApplyStatus[item.status] }}</span>
+                  </div>
+                </template>
+              </van-cell>
+              <template #right>
+                <van-button
+                  square
+                  type="danger"
+                  text="删除"
+                  style="height: inherit"
+                  @click="deleteApply(item.id)"
+                />
+              </template>
+            </van-swipe-cell>
+          </van-cell-group>
+        </div>
+      </div>
+    </section>
   </van-popup>
 
   <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />

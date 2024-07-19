@@ -40,57 +40,62 @@ const onChangePerm = (e) => {
         :border="false"
       />
     </header>
-    <main class="main">
-      <van-radio-group
-        v-model="friendSetting.FriendPerm.SettingFriendPerm"
-        @change="onChangePerm"
-      >
-        <van-cell-group :border="false" title="设置朋友权限">
-          <van-cell
-            title="聊天、朋友圈、微信运动等"
-            size="large"
-            clickable
-            @click="friendSetting.FriendPerm.SettingFriendPerm = 'ALLOW_ALL'"
-          >
+    <section class="bg-nav">
+      <div class="header"></div>
+      <div class="container">
+        <van-radio-group
+          v-model="friendSetting.FriendPerm.SettingFriendPerm"
+          @change="onChangePerm"
+        >
+          <van-cell-group :border="false" title="设置朋友权限">
+            <van-cell
+              title="聊天、朋友圈、微信运动等"
+              size="large"
+              clickable
+              @click="friendSetting.FriendPerm.SettingFriendPerm = 'ALLOW_ALL'"
+            >
+              <template #right-icon>
+                <van-radio name="ALLOW_ALL" />
+              </template>
+            </van-cell>
+            <van-cell
+              title="仅聊天"
+              size="large"
+              clickable
+              @click="friendSetting.FriendPerm.SettingFriendPerm = 'ONLY_CHAT'"
+            >
+              <template #right-icon>
+                <van-radio name="ONLY_CHAT" />
+              </template>
+            </van-cell>
+          </van-cell-group>
+        </van-radio-group>
+        <van-cell-group
+          :border="false"
+          title="朋友圈和状态"
+          v-if="friendSetting.FriendPerm.SettingFriendPerm === 'ALLOW_ALL'"
+        >
+          <van-cell title="不让他看" size="large">
             <template #right-icon>
-              <van-radio name="ALLOW_ALL" />
+              <van-switch
+                v-model="
+                  friendSetting.FriendPerm.MomentAndStatus.DontLetHimSeeIt
+                "
+                @change="onChangePerm"
+              />
             </template>
           </van-cell>
-          <van-cell
-            title="仅聊天"
-            size="large"
-            clickable
-            @click="friendSetting.FriendPerm.SettingFriendPerm = 'ONLY_CHAT'"
-          >
+          <van-cell title="不看他" size="large">
             <template #right-icon>
-              <van-radio name="ONLY_CHAT" />
+              <van-switch
+                v-model="friendSetting.FriendPerm.MomentAndStatus.DontSeeHim"
+                @change="onChangePerm"
+              />
             </template>
           </van-cell>
         </van-cell-group>
-      </van-radio-group>
-      <van-cell-group
-        :border="false"
-        title="朋友圈和状态"
-        v-if="friendSetting.FriendPerm.SettingFriendPerm === 'ALLOW_ALL'"
-      >
-        <van-cell title="不让他看" size="large">
-          <template #right-icon>
-            <van-switch
-              v-model="friendSetting.FriendPerm.MomentAndStatus.DontLetHimSeeIt"
-              @change="onChangePerm"
-            />
-          </template>
-        </van-cell>
-        <van-cell title="不看他" size="large">
-          <template #right-icon>
-            <van-switch
-              v-model="friendSetting.FriendPerm.MomentAndStatus.DontSeeHim"
-              @change="onChangePerm"
-            />
-          </template>
-        </van-cell>
-      </van-cell-group>
-    </main>
+      </div>
+    </section>
   </van-popup>
 </template>
 <style scoped lang="less"></style>

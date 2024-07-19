@@ -56,17 +56,20 @@ watch(
         </template>
       </van-nav-bar>
     </header>
-    <main>
-      <h2>设置备注和标签</h2>
-      <van-form>
-        <van-cell-group title="备注">
-          <van-field
-            v-model="formData.nickname"
-            name="备注名"
-            placeholder="添加备注名"
-          />
-        </van-cell-group>
-        <!-- <van-cell-group title="标签">
+    <section>
+      <div class="header"></div>
+      <div class="container">
+        <div class="common friend-remark">
+          <h2>设置备注和标签</h2>
+          <van-form>
+            <van-cell-group title="备注">
+              <van-field
+                v-model="formData.nickname"
+                name="备注名"
+                placeholder="添加备注名"
+              />
+            </van-cell-group>
+            <!-- <van-cell-group title="标签">
           <van-field
             v-model="username"
             is-link
@@ -76,15 +79,17 @@ watch(
             @click="showPicker = true"
           />
         </van-cell-group> -->
-        <van-cell-group title="描述">
-          <van-field
-            v-model="formData.desc"
-            name="描述"
-            placeholder="添加文字"
-          />
-        </van-cell-group>
-      </van-form>
-    </main>
+            <van-cell-group title="描述">
+              <van-field
+                v-model="formData.desc"
+                name="描述"
+                placeholder="添加文字"
+              />
+            </van-cell-group>
+          </van-form>
+        </div>
+      </div>
+    </section>
   </van-popup>
 </template>
 
@@ -92,7 +97,7 @@ watch(
 .van-nav-bar {
   background: var(--van-white);
 }
-main {
+.friend-remark {
   padding: 4rem 2rem;
   h2 {
     text-align: center;

@@ -45,43 +45,48 @@ watch(
   >
     <header>
       <van-nav-bar title="群聊" left-arrow @click-left="$emit('hide')" />
-      <van-search
-        placeholder="搜索"
-        input-align="center"
-        @focus="onSearchFocus"
-      />
     </header>
-    <main>
-      <van-cell-group>
-        <van-cell v-for="item in groupList" :key="item.id">
-          <router-link
-            :to="{
-              name: 'chat-message',
-              params: {
-                to_user: item.id,
-                is_group: item.is_group,
-              },
-            }"
-            class="to-group-list"
-          >
-            <div class="group-item-left">
-              <div class="avatar-box">
-                <img
-                  alt="avatar"
-                  v-for="avatar in item.to.avatars"
-                  :key="avatar"
-                  :src="avatar"
-                />
-              </div>
-            </div>
-            <div class="group-item-right">
-              {{ item.nickname }}
-            </div>
-          </router-link>
-        </van-cell>
-      </van-cell-group>
-      <div class="group-item-bottom">{{ groupList.length }}个群聊</div>
-    </main>
+    <section>
+      <div class="header"></div>
+      <div class="container">
+        <van-search
+          placeholder="搜索"
+          input-align="center"
+          @focus="onSearchFocus"
+        />
+        <div class="common">
+          <van-cell-group>
+            <van-cell v-for="item in groupList" :key="item.id">
+              <router-link
+                :to="{
+                  name: 'chat-message',
+                  params: {
+                    to_user: item.id,
+                    is_group: item.is_group,
+                  },
+                }"
+                class="to-group-list"
+              >
+                <div class="group-item-left">
+                  <div class="avatar-box">
+                    <img
+                      alt="avatar"
+                      v-for="avatar in item.to.avatars"
+                      :key="avatar"
+                      :src="avatar"
+                    />
+                  </div>
+                </div>
+                <div class="group-item-right">
+                  {{ item.nickname }}
+                </div>
+              </router-link>
+            </van-cell>
+          </van-cell-group>
+          <div class="group-item-bottom">{{ groupList.length }}个群聊</div>
+        </div>
+      </div>
+    </section>
   </van-popup>
 </template>
 <style scope lang="less">

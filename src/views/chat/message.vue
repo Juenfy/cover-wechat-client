@@ -8,6 +8,7 @@ import {
   reactive,
   onUpdated,
   nextTick,
+  watch,
 } from "vue";
 import "emoji-picker-element";
 import * as messageApi from "@/api/message";
@@ -36,7 +37,8 @@ const popupEmojiBottom = ref(false);
 const content = ref("");
 const input = ref(null);
 const chatInfo = ref({});
-const msgBox = ref(null);
+const msgBoxRef = ref(null);
+const footerRef = ref(null);
 const queryData = reactive({
   to_user: route.params.to_user,
   is_group: route.params.is_group,
@@ -174,10 +176,15 @@ const previewImage = (url) => {
     startPosition: index,
   });
 };
+
 onUpdated(() => {
   nextTick(() => {
     // 滚动到底部
-    msgBox.value.scrollTop = msgBox.value.scrollHeight;
+    msgBoxRef.value.scrollTop = msgBoxRef.value.scrollHeight;
+  });
+  watch(footerRef.value.clientHeight, (newVal) => {
+    console.log(newVal);
+    msgBoxRef.value.scrollTop = msgBoxRef.value.scrollHeight;
   });
 });
 
@@ -191,8 +198,8 @@ onUnmounted(async () => {
 });
 </script>
 <template>
-  <div class="container">
-    <header class="header">
+  <div class="message-box">
+    <header>
       <van-nav-bar
         :title="chatInfo.nickname"
         left-arrow
@@ -208,154 +215,159 @@ onUnmounted(async () => {
         </template>
       </van-nav-bar>
     </header>
-    <main class="main middle" ref="msgBox">
-      <ul class="message-list">
-        <li
-          v-for="item in messageList"
-          :key="item.id"
-          :class="item.is_tips == 1 ? 'li-tips-message' : ''"
-        >
-          <div v-if="item.is_tips == 0" class="normal-message">
-            <article :class="item.right ? 'right' : ''">
-              <div class="avatar">
-                <img
-                  alt="avatar"
-                  :src="item.from.avatar"
-                  @click="onClickAvatar(item)"
-                />
-              </div>
-              <div class="content">
-                <span
-                  :class="item.right ? 'nickname right' : 'nickname'"
-                  v-if="chatInfo.display_nickname"
-                >
-                  {{ item.from.nickname }}
-                </span>
-                <div class="msg">
-                  <div class="tri"></div>
-                  <div class="msg_inner" v-if="item.type == Text">
-                    {{ item.content }}
-                  </div>
-                  <div
-                    class="msg_inner msg_image"
-                    v-else-if="item.type == Image"
+    <section class="bg-nav">
+      <div class="header"></div>
+      <div class="container" ref="msgBoxRef">
+        <ul class="message-list">
+          <li
+            v-for="item in messageList"
+            :key="item.id"
+            :class="item.is_tips == 1 ? 'li-tips-message' : ''"
+          >
+            <div v-if="item.is_tips == 0" class="normal-message">
+              <article :class="item.right ? 'right' : ''">
+                <div class="avatar">
+                  <img
+                    alt="avatar"
+                    :src="item.from.avatar"
+                    @click="onClickAvatar(item)"
+                  />
+                </div>
+                <div class="content">
+                  <span
+                    :class="item.right ? 'nickname right' : 'nickname'"
+                    v-if="chatInfo.display_nickname"
                   >
-                    <van-image
-                      fit="contain"
-                      :src="item.content"
-                      @click="previewImage(item.content)"
-                    />
-                  </div>
-                  <div
-                    class="msg_innser msg_video"
-                    v-else-if="item.type == Video"
-                  >
-                    <div class="van-image">
-                      <video
-                        controls
+                    {{ item.from.nickname }}
+                  </span>
+                  <div class="msg">
+                    <div class="tri"></div>
+                    <div class="msg_inner" v-if="item.type == Text">
+                      {{ item.content }}
+                    </div>
+                    <div
+                      class="msg_inner msg_image"
+                      v-else-if="item.type == Image"
+                    >
+                      <van-image
+                        fit="contain"
                         :src="item.content"
-                        loop
-                        playsinline
-                        class="van-image__img"
-                        style="object-fit: contain"
-                      ></video>
+                        @click="previewImage(item.content)"
+                      />
+                    </div>
+                    <div
+                      class="msg_innser msg_video"
+                      v-else-if="item.type == Video"
+                    >
+                      <div class="van-image">
+                        <video
+                          controls
+                          :src="item.content"
+                          loop
+                          playsinline
+                          class="van-image__img"
+                          style="object-fit: contain"
+                        ></video>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </article>
-          </div>
-          <div v-else class="tips-message">
-            {{ item.content }}
-          </div>
-        </li>
-      </ul>
-    </main>
-    <footer class="footer">
-      <div class="msg-box-top">
-        <div class="left">
-          <van-icon name="volume-o" />
-        </div>
-        <input
-          type="text"
-          v-model="content"
-          @keyup.enter="sendMessage('text')"
-          ref="input"
-        />
-        <div class="right">
-          <van-icon name="smile-o" @click="handleEmojiClick" />
-          <van-icon name="add-o" @click="handleMoreClick" />
-        </div>
+              </article>
+            </div>
+            <div v-else class="tips-message">
+              {{ item.content }}
+            </div>
+          </li>
+        </ul>
       </div>
-      <div
-        :class="
-          popupMoreBottom ? 'more-bottom more-bottom-popup' : 'more-bottom'
-        "
-      >
-        <van-grid
-          :column-num="4"
-          style="width: inherit"
-          gutter="1rem"
-          square
-          center
-          :border="false"
+      <div class="footer" ref="footerRef">
+        <div class="msg-box-top">
+          <div class="left">
+            <van-icon name="volume-o" />
+          </div>
+          <input
+            type="text"
+            v-model="content"
+            @keyup.enter="sendMessage('text')"
+            ref="input"
+          />
+          <div class="right">
+            <van-icon name="smile-o" @click="handleEmojiClick" />
+            <van-icon name="add-o" @click="handleMoreClick" />
+          </div>
+        </div>
+        <div
+          :class="
+            popupMoreBottom ? 'more-bottom more-bottom-popup' : 'more-bottom'
+          "
         >
-          <van-grid-item>
-            <template #default>
-              <van-uploader
-                :before-read="beforeRead"
-                :after-read="afterRead"
-                accept="image/*, video/*"
-                :max-size="uploadMaxSize"
-                @oversize="onOversize"
-                max-count="1"
-                @click="onMoreBottomItemClick('photo')"
-              >
+          <van-grid
+            :column-num="4"
+            style="width: inherit"
+            gutter="1rem"
+            square
+            center
+            :border="false"
+          >
+            <van-grid-item>
+              <template #default>
+                <van-uploader
+                  :before-read="beforeRead"
+                  :after-read="afterRead"
+                  accept="image/*, video/*"
+                  :max-size="uploadMaxSize"
+                  @oversize="onOversize"
+                  max-count="1"
+                  @click="onMoreBottomItemClick('photo')"
+                >
+                  <div class="more-bottom-item">
+                    <div class="more-bottom-icon">
+                      <van-icon name="photo" size="30"></van-icon>
+                    </div>
+                    <span class="more-bottom-text">照片</span>
+                  </div>
+                </van-uploader>
+              </template>
+            </van-grid-item>
+            <van-grid-item>
+              <template #default>
                 <div class="more-bottom-item">
                   <div class="more-bottom-icon">
-                    <van-icon name="photo" size="30"></van-icon>
+                    <van-icon name="photograph" size="30" />
                   </div>
-                  <span class="more-bottom-text">照片</span>
+                  <span class="more-bottom-text">拍摄</span>
                 </div>
-              </van-uploader>
-            </template>
-          </van-grid-item>
-          <van-grid-item>
-            <template #default>
-              <div class="more-bottom-item">
-                <div class="more-bottom-icon">
-                  <van-icon name="photograph" size="30" />
-                </div>
-                <span class="more-bottom-text">拍摄</span>
-              </div>
-            </template>
-          </van-grid-item>
-          <van-grid-item>
-            <template #default>
-              <van-uploader
-                :max-size="uploadMaxSize"
-                @oversize="onOversize"
-                @click="onMoreBottomItemClick('file')"
-                max-count="1"
-              >
-                <div class="more-bottom-item">
-                  <div class="more-bottom-icon">
-                    <van-icon name="description" size="30" />
+              </template>
+            </van-grid-item>
+            <van-grid-item>
+              <template #default>
+                <van-uploader
+                  :max-size="uploadMaxSize"
+                  @oversize="onOversize"
+                  @click="onMoreBottomItemClick('file')"
+                  max-count="1"
+                >
+                  <div class="more-bottom-item">
+                    <div class="more-bottom-icon">
+                      <van-icon name="description" size="30" />
+                    </div>
+                    <span class="more-bottom-text">文件</span>
                   </div>
-                  <span class="more-bottom-text">文件</span>
-                </div>
-              </van-uploader>
-            </template>
-          </van-grid-item>
-        </van-grid>
+                </van-uploader>
+              </template>
+            </van-grid-item>
+          </van-grid>
+        </div>
+        <emoji-picker
+          :class="
+            popupEmojiBottom
+              ? 'emoji-bottom emoji-bottom-popup'
+              : 'emoji-bottom'
+          "
+          @emojiClick="onSelectEmoji"
+        />
       </div>
-      <emoji-picker
-        :class="
-          popupEmojiBottom ? 'emoji-bottom emoji-bottom-popup' : 'emoji-bottom'
-        "
-        @emojiClick="onSelectEmoji"
-      />
-    </footer>
+    </section>
   </div>
   <chat-info
     :show="showChatInfo"
@@ -369,182 +381,168 @@ onUnmounted(async () => {
 }
 </style>
 <style scoped lang="less">
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh; /* Full height of the viewport */
-  width: 100%;
-  // background-image: url(/src/assets/bg.png);
-  // background-position: center;
-  // background-size: cover;
-  background-color: var(--van-nav-bar-background);
-  .header {
-    width: inherit;
-  }
-  .middle {
-    overflow-y: scroll;
-    flex-grow: 1;
-    padding: 0;
-    position: relative;
-    width: inherit;
-    background: transparent;
-    .message-list {
-      padding: 0 1rem;
-      margin: 1.5rem 0 1.5rem 0;
-      > li {
-        display: block;
-      }
-      > li > .normal-message > article {
-        display: flex;
-        justify-content: flex-start;
-        margin-bottom: 0.5rem;
-        > .avatar {
-          margin-right: 0.7rem;
-          > img {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 0.2rem;
-          }
-        }
-        > .content > span {
-          color: var(--theme-text-color-tint);
-          font-size: 14px;
-          line-height: 18px;
+.message-box {
+  section {
+    // background-image: url(/src/assets/bg.png);
+    // background-position: center;
+    // background-size: cover;
+    .container {
+      .message-list {
+        padding: 0.5rem 1rem 0 1rem;
+        > li {
           display: block;
         }
-        > .content > .right {
-          text-align: right;
-        }
-        > .content > .msg {
+        > li > .normal-message > article {
           display: flex;
-          justify-content: space-between;
-          > .tri {
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 0 0.8rem 1rem 0;
-            border-color: transparent #ffffff transparent transparent;
+          justify-content: flex-start;
+          margin-bottom: 0.5rem;
+          > .avatar {
+            margin-right: 0.7rem;
+            > img {
+              width: 3.5rem;
+              height: 3.5rem;
+              border-radius: 0.2rem;
+            }
           }
-          > .msg_inner {
-            background-color: #fff;
-            width: 100%;
-            padding: 1rem 0.7rem;
-            border-radius: 0 0.2rem 0.2rem 0.2rem;
-            box-shadow: 0.1rem 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
-            text-align: left;
-            word-wrap: break-word; /* 在单词的任意位置断行 */
-            word-break: break-all; /* 在单词的任意位置断行 */
+          > .content > span {
+            color: var(--theme-text-color-tint);
+            font-size: 14px;
+            line-height: 18px;
+            display: block;
+          }
+          > .content > .right {
+            text-align: right;
+          }
+          > .content > .msg {
+            display: flex;
+            justify-content: space-between;
+            > .tri {
+              width: 0;
+              height: 0;
+              border-style: solid;
+              border-width: 0 0.8rem 1rem 0;
+              border-color: transparent #ffffff transparent transparent;
+            }
+            > .msg_inner {
+              background-color: #fff;
+              width: 100%;
+              padding: 1rem 0.7rem;
+              border-radius: 0 0.2rem 0.2rem 0.2rem;
+              box-shadow: 0.1rem 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
+              text-align: left;
+              word-wrap: break-word; /* 在单词的任意位置断行 */
+              word-break: break-all; /* 在单词的任意位置断行 */
+            }
           }
         }
-      }
 
-      > li > .normal-message > article.right {
-        flex-direction: row-reverse;
-        > .avatar {
-          margin-right: 0px;
-          margin-left: 0.7rem;
-        }
-        > .content > .msg {
+        > li > .normal-message > article.right {
           flex-direction: row-reverse;
-          > .tri {
-            width: 0;
-            height: 0;
-            border-style: solid;
-            border-width: 1rem 0.7rem 0 0;
-            border-color: #98e865 transparent transparent transparent;
+          > .avatar {
+            margin-right: 0px;
+            margin-left: 0.7rem;
           }
+          > .content > .msg {
+            flex-direction: row-reverse;
+            > .tri {
+              width: 0;
+              height: 0;
+              border-style: solid;
+              border-width: 1rem 0.7rem 0 0;
+              border-color: #98e865 transparent transparent transparent;
+            }
 
-          > .msg_inner {
-            border-radius: 0.2rem 0 0.2rem 0.2rem;
-            background-color: #98e865;
+            > .msg_inner {
+              border-radius: 0.2rem 0 0.2rem 0.2rem;
+              background-color: #98e865;
+            }
           }
         }
-      }
 
-      > li > .tips-message {
+        > li > .tips-message {
+          width: inherit;
+          text-align: center;
+          line-height: 4rem;
+          color: var(--theme-text-color);
+        }
+      }
+    }
+    .footer {
+      height: auto;
+      > div {
         width: inherit;
-        text-align: center;
-        line-height: 4rem;
-        color: var(--theme-text-color);
-      }
-    }
-  }
-  .footer {
-    width: inherit;
-    > div {
-      width: inherit;
-      padding: 1rem 0;
-      background-color: #f6f6f6;
-      display: flex;
-      border-top: 1px solid var(--van-nav-bar-border-color);
-    }
-    > .msg-box-top {
-      border-top: none;
-      > input {
-        background-color: var(--van-white);
-        border: none;
-        outline: none;
-        min-height: 2rem;
-        height: auto;
-        width: 75%;
-        border-radius: 0.2rem;
-      }
-      > .left,
-      > .right {
-        height: inherit;
-        font-size: 24px;
+        padding: 1rem 0;
+        background-color: #f6f6f6;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        border-top: 1px solid var(--van-nav-bar-border-color);
       }
-      > .left {
-        width: 10%;
-      }
-      > .right {
-        width: 15%;
-        justify-content: space-evenly;
-      }
-    }
-    > .more-bottom,
-    > .emoji-bottom {
-      padding: 0;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.2s ease-in-out;
-      .more-bottom-item {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        .more-bottom-icon {
-          height: 4rem;
-          width: 4rem;
-          background: var(--van-white);
-          border-radius: 0.8rem;
+      > .msg-box-top {
+        border-top: none;
+        > input {
+          background-color: var(--van-white);
+          border: none;
+          outline: none;
+          min-height: 2rem;
+          height: auto;
+          width: 75%;
+          border-radius: 0.2rem;
+        }
+        > .left,
+        > .right {
+          height: inherit;
+          font-size: 24px;
           display: flex;
           justify-content: center;
           align-items: center;
         }
-        .more-bottom-text {
-          margin-top: 5px;
-          font-size: 12px;
-          color: var(--theme-text-color-tint);
+        > .left {
+          width: 10%;
+        }
+        > .right {
+          width: 15%;
+          justify-content: space-evenly;
         }
       }
+      > .more-bottom,
+      > .emoji-bottom {
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease-in-out;
+        .more-bottom-item {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          .more-bottom-icon {
+            height: 4rem;
+            width: 4rem;
+            background: var(--van-white);
+            border-radius: 0.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          .more-bottom-text {
+            margin-top: 5px;
+            font-size: 12px;
+            color: var(--theme-text-color-tint);
+          }
+        }
+      }
+      > .more-bottom-popup,
+      > .emoji-bottom-popup {
+        max-height: 18rem;
+      }
+      > .more-bottom-popup {
+        padding: 1rem 0;
+      }
+      emoji-picker {
+        width: inherit;
+        height: 18rem;
+        --background: #f6f6f6;
+      }
     }
-    > .more-bottom-popup,
-    > .emoji-bottom-popup {
-      max-height: 18rem;
-    }
-    > .more-bottom-popup {
-      padding: 1rem 0;
-    }
-  }
-
-  emoji-picker {
-    width: inherit;
-    height: 18rem;
-    --background: #f6f6f6;
   }
 }
 </style>

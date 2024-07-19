@@ -73,110 +73,116 @@ onMounted(() => {
       </template>
     </van-nav-bar>
   </header>
-  <main>
-    <van-cell-group :border="false">
-      <van-cell>
-        <template #title>
-          <div class="card">
-            <div class="info">
-              <van-image
-                radius=".5rem"
-                width="4rem"
-                height="4rem"
-                :src="homeInfo.avatar"
-                @click="previewImage(homeInfo.avatar)"
-              />
-              <div class="text">
-                <span class="nickname"
-                  >{{ homeInfo.display_nickname
-                  }}<van-icon name="user" color="#008cff"
-                /></span>
-                <span
-                  class="n"
-                  v-if="homeInfo.display_nickname != homeInfo.nickname"
-                  >昵称：{{ homeInfo.nickname }}</span
-                >
-                <span class="vchat">微信号：{{ homeInfo.wechat }}</span>
-                <span class="area">地区：上海</span>
+  <section>
+    <div class="header"></div>
+    <div class="container">
+      <div class="common friend-info">
+        <van-cell-group :border="false">
+          <van-cell>
+            <template #title>
+              <div class="card">
+                <div class="info">
+                  <van-image
+                    radius=".5rem"
+                    width="4rem"
+                    height="4rem"
+                    :src="homeInfo.avatar"
+                    @click="previewImage(homeInfo.avatar)"
+                  />
+                  <div class="text">
+                    <span class="nickname"
+                      >{{ homeInfo.display_nickname
+                      }}<van-icon name="user" color="#008cff"
+                    /></span>
+                    <span
+                      class="n"
+                      v-if="homeInfo.display_nickname != homeInfo.nickname"
+                      >昵称：{{ homeInfo.nickname }}</span
+                    >
+                    <span class="vchat">微信号：{{ homeInfo.wechat }}</span>
+                    <span class="area">地区：上海</span>
+                  </div>
+                </div>
+                <div class="check-msg" v-if="homeInfo.check_msg">
+                  <span>{{ homeInfo.check_msg }}</span>
+                </div>
               </div>
-            </div>
-            <div class="check-msg" v-if="homeInfo.check_msg">
-              <span>{{ homeInfo.check_msg }}</span>
-            </div>
-          </div>
-        </template>
-      </van-cell>
-      <van-cell
-        title="备注和标签"
-        is-link
-        clickable
-        @click="showFriendRemark = true"
-        size="large"
-        v-if="homeInfo.relationship == RelationShip.Friend"
-      />
-      <van-cell
-        title="朋友权限"
-        is-link
-        clickable
-        @click="showFriendPerm = true"
-        size="large"
-        v-if="homeInfo.relationship == RelationShip.Friend"
-      />
-    </van-cell-group>
-    <van-cell-group :border="false">
-      <van-cell is-link to="index" size="large" :center="true">
-        <template #title>
-          <span>朋友圈</span>
-          <van-image
-            src="https://img.yzcdn.cn/vant/cat.jpeg"
-            style="width: 3rem; height: 3rem; margin-left: 1rem"
+            </template>
+          </van-cell>
+          <van-cell
+            title="备注和标签"
+            is-link
+            clickable
+            @click="showFriendRemark = true"
+            size="large"
+            v-if="homeInfo.relationship == RelationShip.Friend"
           />
-        </template>
-      </van-cell>
-    </van-cell-group>
-    <van-cell-group :border="false">
-      <van-cell
-        title="个性签名"
-        v-if="homeInfo.sign"
-        :value="homeInfo.sign"
-        size="large"
-      />
-      <van-cell
-        title="来源"
-        :value="homeInfo.source_text"
-        size="large"
-        v-if="homeInfo.relationship != RelationShip.Owner"
-      />
-    </van-cell-group>
-    <van-button
-      size="large"
-      :square="true"
-      icon="chat-o"
-      @click="onButtonClick"
-      v-if="
-        homeInfo.relationship == RelationShip.Owner ||
-        homeInfo.relationship == RelationShip.Friend
-      "
-      >发送消息</van-button
-    >
-    <van-button
-      size="large"
-      :square="true"
-      @click="onButtonClick"
-      v-if="
-        homeInfo.relationship == RelationShip.Apply ||
-        homeInfo.relationship == RelationShip.WaitCheck
-      "
-      >添加到通讯录</van-button
-    >
-    <van-button
-      size="large"
-      :square="true"
-      @click="onButtonClick"
-      v-if="homeInfo.relationship == RelationShip.GoCheck"
-      >前往验证</van-button
-    >
-  </main>
+          <van-cell
+            title="朋友权限"
+            is-link
+            clickable
+            @click="showFriendPerm = true"
+            size="large"
+            v-if="homeInfo.relationship == RelationShip.Friend"
+          />
+        </van-cell-group>
+        <van-cell-group :border="false">
+          <van-cell is-link to="index" size="large" :center="true">
+            <template #title>
+              <span>朋友圈</span>
+              <van-image
+                src="https://img.yzcdn.cn/vant/cat.jpeg"
+                style="width: 3rem; height: 3rem; margin-left: 1rem"
+              />
+            </template>
+          </van-cell>
+        </van-cell-group>
+        <van-cell-group :border="false">
+          <van-cell
+            title="个性签名"
+            v-if="homeInfo.sign"
+            :value="homeInfo.sign"
+            size="large"
+          />
+          <van-cell
+            title="来源"
+            :value="homeInfo.source_text"
+            size="large"
+            v-if="homeInfo.relationship != RelationShip.Owner"
+          />
+        </van-cell-group>
+        <van-button
+          size="large"
+          :square="true"
+          icon="chat-o"
+          @click="onButtonClick"
+          v-if="
+            homeInfo.relationship == RelationShip.Owner ||
+            homeInfo.relationship == RelationShip.Friend
+          "
+          >发送消息</van-button
+        >
+        <van-button
+          size="large"
+          :square="true"
+          @click="onButtonClick"
+          v-if="
+            homeInfo.relationship == RelationShip.Apply ||
+            homeInfo.relationship == RelationShip.WaitCheck
+          "
+          >添加到通讯录</van-button
+        >
+        <van-button
+          size="large"
+          :square="true"
+          @click="onButtonClick"
+          v-if="homeInfo.relationship == RelationShip.GoCheck"
+          >前往验证</van-button
+        >
+      </div>
+    </div>
+  </section>
+
   <friend-remark
     :show="showFriendRemark"
     @hide="showFriendRemark = false"
@@ -203,7 +209,7 @@ onMounted(() => {
 .van-cell-group {
   margin-bottom: 0.5rem;
 }
-main {
+.friend-info {
   position: fixed;
   width: 100%;
   height: 100%;
