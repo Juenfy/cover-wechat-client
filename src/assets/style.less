@@ -7,6 +7,7 @@ header,footer{
     display: inline-block;
     z-index: 999;
 }
+
 header{
     top: 0;
     height: 46px;
@@ -14,12 +15,30 @@ header{
         height: inherit!important;
     }
 }
+
 .bg-black {
   background-color: var(--van-black);
 }
+
 .bg-nav {
   background-color: var(--van-nav-bar-background);
 }
+
+.register,.login {
+  background: var(--van-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  .van-form {
+    width: 100%;
+    .van-cell-group,
+    .van-cell {
+      background: none;
+    }
+  }
+}
+
 section {
     width: 100%;
     height: 100vh;

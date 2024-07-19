@@ -89,7 +89,7 @@ onMounted(async () => {
     <section>
       <div class="header"></div>
       <div class="container">
-        <div class="common">
+        <div class="common friend-apply">
           <van-form @submit="onSubmit">
             <van-cell-group
               title="发送添加好友申请"
@@ -179,7 +179,7 @@ onMounted(async () => {
 .van-nav-bar {
   background: var(--vant-white);
 }
-.common {
+.friend-apply {
   background: var(--vant-white);
   .van-form {
     padding: 1rem 2rem;

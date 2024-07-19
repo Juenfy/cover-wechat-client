@@ -62,7 +62,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="main">
+  <section class="login">
     <h3>手机号登录</h3>
     <van-form @submit="getCode">
       <van-cell-group inset>
@@ -101,21 +101,5 @@ onMounted(() => {
       mode="pop"
       @success="onSubmit"
     />
-  </div>
+  </section>
 </template>
-<style scoped lang="less">
-.main {
-  background: var(--van-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  .van-form {
-    width: 100%;
-    .van-cell-group,
-    .van-cell {
-      background: none;
-    }
-  }
-}
-</style>

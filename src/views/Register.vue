@@ -66,7 +66,7 @@ const afterRead = (file) => {
 </script>
 
 <template>
-  <div class="main">
+  <section class="register">
     <h3>手机号注册</h3>
     <van-uploader
       :after-read="afterRead"
@@ -121,21 +121,5 @@ const afterRead = (file) => {
       mode="pop"
       @success="onSubmit"
     />
-  </div>
+  </section>
 </template>
-<style scoped lang="less">
-.main {
-  background: var(--van-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  .van-form {
-    width: 100%;
-    .van-cell-group,
-    .van-cell {
-      background: none;
-    }
-  }
-}
-</style>

@@ -149,31 +149,34 @@ onMounted(() => {
       <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
     </div>
   </div>
-  <div class="main index" v-else>
-    <footer>
+  <div class="index" v-else>
+    <div class="passport">
       <van-button type="primary" style="margin-left: 1rem" to="login"
         >登录</van-button
       >
       <van-button style="margin-right: 1rem" to="register">注册</van-button>
-    </footer>
+    </div>
   </div>
 </template>
 
 <style scoped lang="less">
-// .index {
-//   background-image: url(./../assets/home-bg.jpeg);
-//   background-position: center;
-//   background-size: cover;
-// }
-// footer {
-//   width: inherit;
-//   position: fixed;
-//   left: 0;
-//   bottom: 2rem;
-//   display: flex;
-//   justify-content: space-between;
-//   button {
-//     width: 7rem;
-//   }
-// }
+.index {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  background-image: url(./../assets/home-bg.jpeg);
+  background-position: center;
+  background-size: cover;
+}
+.passport {
+  width: inherit;
+  position: fixed;
+  left: 0;
+  bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  button {
+    width: 7rem;
+  }
+}
 </style>

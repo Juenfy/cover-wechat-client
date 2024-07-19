@@ -24,7 +24,7 @@ const showPostMomentMenu = ref(false);
     style="height: "
   >
     <van-cell-group>
-      <van-cell title="发布动态" @click="" />
+      <van-cell title="发布动态" />
     </van-cell-group>
   </van-popup>
 </template>
