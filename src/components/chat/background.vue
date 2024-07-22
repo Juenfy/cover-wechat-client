@@ -85,23 +85,27 @@ onMounted(() => {
         <van-cell-group>
           <van-cell title="选择背景图" is-link clickable size="large" />
         </van-cell-group>
+        <van-uploader
+          :after-read="afterRead"
+          :max-size="maxSize"
+          max-count="1"
+          @oversize="onOversize"
+          accept="image/jpg,image/png,image/webp,image/jpeg"
+          ><van-cell-group>
+            <van-cell title="从手机相册选择" is-link clickable size="large" />
+          </van-cell-group>
+        </van-uploader>
         <van-cell-group>
-          <van-cell is-link clickable size="large">
-            <template #title>
-              <van-uploader
-                :after-read="afterRead"
-                :max-size="maxSize"
-                max-count="1"
-                @oversize="onOversize"
-                accept="image/jpg,image/png,image/webp,image/jpeg"
-                >从手机相册选择</van-uploader
-              >
-            </template>
-          </van-cell>
           <van-cell title="拍一张" is-link clickable size="large" />
         </van-cell-group>
       </div>
     </section>
   </van-popup>
 </template>
-<style scoped lang="less"></style>
+<style lang="css">
+.van-uploader,
+.van-uploader__wrapper,
+.van-uploader__input-wrapper {
+  width: 100%;
+}
+</style>
