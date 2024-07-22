@@ -4,9 +4,12 @@ import { onMounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { SearchChatRecord } from "@/enums/app";
+import ChatBackground from "@/components/chat/background.vue";
 import * as chatApi from "@/api/chat";
+
 const router = useRouter();
 const showClearChat = ref(false);
+const showChatBackground = ref(false);
 const appStore = useAppStore();
 const props = defineProps({ show: Boolean, info: Object });
 const chatInfo = ref({});
@@ -42,12 +45,12 @@ const updateDisplayNickname = (value) => {
 
 const updateChatInfo = (value, key) => {
   console.log(value, key);
-  const data = {
+  let data = {
     is_group: chatInfo.value.is_group,
     to_user: chatInfo.value.to_user,
-    key: key,
-    value: value,
   };
+  data[key] = value;
+  console.log(data);
   chatApi.putUpdate(data).then((res) => {
     console.log(res);
   });
@@ -167,7 +170,13 @@ onMounted(() => {});
           </van-cell>
         </van-cell-group>
         <van-cell-group>
-          <van-cell title="设置当前聊天背景" is-link to="/chat" size="large" />
+          <van-cell
+            title="设置当前聊天背景"
+            is-link
+            clickable
+            @click="showChatBackground = true"
+            size="large"
+          />
         </van-cell-group>
         <van-cell-group>
           <van-cell
@@ -192,6 +201,11 @@ onMounted(() => {});
       </div>
     </section>
   </van-popup>
+  <chat-background
+    :show="showChatBackground"
+    @hide="showChatBackground = false"
+    :chatInfo="chatInfo"
+  />
 </template>
 
 <style lang="less" scoped>

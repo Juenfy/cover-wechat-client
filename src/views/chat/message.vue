@@ -145,13 +145,12 @@ const beforeRead = (file) => {
 
 const afterRead = (file) => {
   console.log(file);
-  showLoadingToast(`上传中${uploadPercent.value}%`);
   const data = new FormData();
   data.append("file", file.file);
   fileApi
     .upload(data, (progressEvent) => {
       uploadPercent.value = Math.floor(progressEvent.progress * 100);
-      console.log(uploadPercent.value);
+      showLoadingToast(`上传中${uploadPercent.value}%`);
     })
     .then((res) => {
       console.log(res);
@@ -198,7 +197,7 @@ onUnmounted(async () => {
 });
 </script>
 <template>
-  <div class="message-box">
+  <div class="message-box" v-if="chatInfo.from_user">
     <header>
       <van-nav-bar
         :title="chatInfo.nickname"
@@ -215,7 +214,14 @@ onUnmounted(async () => {
         </template>
       </van-nav-bar>
     </header>
-    <section class="bg-nav">
+    <section
+      class="bg-nav"
+      :style="
+        chatInfo.bg_file_path == ''
+          ? ''
+          : 'background-image: url(' + chatInfo.bg_file_path + ');'
+      "
+    >
       <div class="header"></div>
       <div class="container" ref="msgBoxRef">
         <ul class="message-list">
@@ -384,8 +390,8 @@ onUnmounted(async () => {
 .message-box {
   section {
     // background-image: url(/src/assets/bg.png);
-    // background-position: center;
-    // background-size: cover;
+    background-position: center;
+    background-size: cover;
     .container {
       .message-list {
         padding: 0.5rem 1rem 0 1rem;
