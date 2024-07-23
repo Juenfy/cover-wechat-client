@@ -16,7 +16,7 @@ const props = defineProps({
   show: Boolean,
   action: String,
   users: Array,
-  groupId: Number,
+  groupId: String,
 });
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);

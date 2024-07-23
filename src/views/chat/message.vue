@@ -8,7 +8,7 @@ import {
   reactive,
   onUpdated,
   nextTick,
-  watch,
+  onBeforeUnmount,
 } from "vue";
 import "emoji-picker-element";
 import * as messageApi from "@/api/message";
@@ -45,19 +45,53 @@ const queryData = reactive({
 });
 const showChatInfo = ref(false);
 const moreBottomAction = ref("");
+const audioIcon = "/audio.png";
+const keyboardIcon = "/keyboard.png";
+const emojiIcon = "/emoji.png";
+const leftIcon = ref(audioIcon);
+const rightFirstIcon = ref(emojiIcon);
+const isAudioRecord = ref(false);
+const isAudioRecording = ref(false);
+const isCancelAudioRecording = ref(false);
+const mediaRecorder = ref(null);
+const audioChunks = ref([]);
+const mediaStream = ref(null);
+const startY = ref(0);
+const waveOffset = ref(0);
+const animationFrame = ref(null);
 
-const handleMoreClick = (e) => {
+//底部图标点击交互
+const handleLeftIconClick = (e) => {
+  popupEmojiBottom.value = false;
+  popupMoreBottom.value = false;
+  isAudioRecord.value = !isAudioRecord.value;
+  if (isAudioRecord.value) {
+    leftIcon.value = keyboardIcon;
+  } else {
+    leftIcon.value = audioIcon;
+  }
+};
+
+const handleRightSecondIconClick = (e) => {
   popupEmojiBottom.value = false;
   setTimeout(() => {
     popupMoreBottom.value = !popupMoreBottom.value;
+    if (popupMoreBottom.value) {
+      isAudioRecord.value = false;
+      leftIcon.value = audioIcon;
+    }
   }, 200);
 };
 
-const handleEmojiClick = (e) => {
+const handleRightFirstIconClick = (e) => {
   popupMoreBottom.value = false;
   setTimeout(() => {
     popupEmojiBottom.value = !popupEmojiBottom.value;
-  }, 200);
+    if (popupEmojiBottom.value) {
+      isAudioRecord.value = false;
+      leftIcon.value = audioIcon;
+    }
+  }, 100);
 };
 
 const onSelectEmoji = (emoji) => {
@@ -65,6 +99,11 @@ const onSelectEmoji = (emoji) => {
   input.value.focus();
 };
 
+const onMoreBottomItemClick = (action) => {
+  moreBottomAction.value = action;
+};
+
+//点击头像跳转主页
 const onClickAvatar = (item) => {
   router.push({
     name: "friend-info",
@@ -74,6 +113,7 @@ const onClickAvatar = (item) => {
   });
 };
 
+//发送信息
 const sendMessage = (type) => {
   if (content.value) {
     queryData.content = content.value;
@@ -123,10 +163,6 @@ const getChatInfo = async () => {
   });
 };
 
-const onMoreBottomItemClick = (action) => {
-  moreBottomAction.value = action;
-};
-
 const onOversize = (file) => {
   showFailToast("文件大小超过30MB限制");
 };
@@ -144,9 +180,17 @@ const beforeRead = (file) => {
 };
 
 const afterRead = (file) => {
-  console.log(file);
+  uploadAndSendMessage(file.file);
+};
+
+const uploadAndSendMessage = (file, isAudio = false) => {
   const data = new FormData();
-  data.append("file", file.file);
+  if (isAudio) {
+    data.append("file", file, Math.random() + ".wav");
+  } else {
+    data.append("file", file);
+  }
+
   fileApi
     .upload(data, (progressEvent) => {
       uploadPercent.value = Math.floor(progressEvent.progress * 100);
@@ -176,23 +220,103 @@ const previewImage = (url) => {
   });
 };
 
+//录音
+const animateWave = () => {
+  waveOffset.value = (waveOffset.value + 1) % 100;
+  animationFrame.value = requestAnimationFrame(animateWave);
+};
+
+const wavePath = (n) => {
+  const amplitude = 10;
+  const frequency = 0.1;
+  let path = "M 0 15 ";
+  for (let x = 0; x <= 100; x++) {
+    const y =
+      15 + amplitude * Math.sin(frequency * (x + waveOffset.value + n * 20));
+    path += `L ${x} ${y} `;
+  }
+  return path;
+};
+
+const startRecording = (e) => {
+  console.log("开始录音", e);
+  startY.value = e.touches[0].clientY;
+  console.log(startY.value);
+  isAudioRecording.value = true;
+  isCancelAudioRecording.value = false;
+  audioChunks.value = [];
+  if (mediaRecorder.value) {
+    mediaRecorder.value.start();
+  }
+  animationFrame.value = requestAnimationFrame(animateWave);
+};
+
+const stopRecording = (e) => {
+  if (mediaRecorder.value && isAudioRecording.value) {
+    mediaRecorder.value.stop();
+    console.log(isCancelAudioRecording.value ? "取消录音" : "停止录音", e);
+  }
+  isAudioRecording.value = false;
+
+  cancelAnimationFrame(animationFrame.value);
+};
+
+const handleTouchMove = (e) => {
+  // console.log("touchmove", e);
+  const currentY = e.touches[0].clientY;
+  console.log(currentY);
+  if (startY.value - currentY > 100) {
+    // 上划距离超过50像素
+    isCancelAudioRecording.value = true;
+  } else {
+    isCancelAudioRecording.value = false;
+  }
+};
+
 onUpdated(() => {
   nextTick(() => {
     // 滚动到底部
     msgBoxRef.value.scrollTop = msgBoxRef.value.scrollHeight;
   });
-  watch(footerRef.value.clientHeight, (newVal) => {
-    console.log(newVal);
-    msgBoxRef.value.scrollTop = msgBoxRef.value.scrollHeight;
-  });
+});
+
+onBeforeUnmount(() => {
+  if (animationFrame.value) {
+    cancelAnimationFrame(animationFrame.value);
+  }
 });
 
 onMounted(async () => {
+  try {
+    mediaStream.value = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
+    mediaRecorder.value = new MediaRecorder(mediaStream.value);
+
+    mediaRecorder.value.ondataavailable = (event) => {
+      audioChunks.value.push(event.data);
+    };
+
+    mediaRecorder.value.onstop = () => {
+      const audioBlob = new Blob(audioChunks.value, { type: "audio/wav" });
+      audioChunks.value = [];
+      if (!isCancelAudioRecording.value) {
+        // 这里可以上传录音文件或进行其他处理
+        console.log("录音文件:", audioBlob);
+        uploadAndSendMessage(audioBlob, true);
+      }
+    };
+  } catch (error) {
+    console.error("获取音频权限失败:", error);
+  }
   await getChatInfo();
   await getMessageList();
 });
 
 onUnmounted(async () => {
+  if (mediaStream.value) {
+    mediaStream.value.getTracks().forEach((track) => track.stop());
+  }
   await readMessage();
 });
 </script>
@@ -289,17 +413,29 @@ onUnmounted(async () => {
       <div class="footer" ref="footerRef">
         <div class="msg-box-top">
           <div class="left">
-            <van-icon name="volume-o" />
+            <van-icon :name="leftIcon" @click="handleLeftIconClick" />
           </div>
+          <van-button
+            v-if="isAudioRecord"
+            type="primary"
+            @touchstart="startRecording"
+            @touchend="stopRecording"
+            @touchmove="handleTouchMove"
+            >按住说话</van-button
+          >
           <input
+            v-else
             type="text"
             v-model="content"
             @keyup.enter="sendMessage('text')"
             ref="input"
           />
           <div class="right">
-            <van-icon name="smile-o" @click="handleEmojiClick" />
-            <van-icon name="add-o" @click="handleMoreClick" />
+            <van-icon
+              :name="rightFirstIcon"
+              @click="handleRightFirstIconClick"
+            />
+            <van-icon name="/more.png" @click="handleRightSecondIconClick" />
           </div>
         </div>
         <div
@@ -380,12 +516,32 @@ onUnmounted(async () => {
     @hide="showChatInfo = false"
     :info="chatInfo"
   />
+
+  <div class="audio-recording" v-if="isAudioRecording">
+    <div :class="isCancelAudioRecording ? 'bubble bubble-cancel' : 'bubble'">
+      <svg
+        class="waveform"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 100 30"
+      >
+        <path
+          v-for="n in 5"
+          :key="n"
+          :d="wavePath(n)"
+          stroke="white"
+          stroke-width="2"
+          fill="none"
+          :opacity="1 - n * 0.15"
+        />
+      </svg>
+    </div>
+    <div class="recording-text">
+      {{
+        isCancelAudioRecording ? "松开手指，取消发送" : "正在录音... 上划取消"
+      }}
+    </div>
+  </div>
 </template>
-<style lang="css">
-:root:root {
-  --van-grid-item-content-background: transparent;
-}
-</style>
 <style scoped lang="less">
 .message-box {
   section {
@@ -497,14 +653,19 @@ onUnmounted(async () => {
       }
       > .msg-box-top {
         border-top: none;
-        > input {
+        > input,
+        button {
           background-color: var(--van-white);
           border: none;
           outline: none;
-          min-height: 2rem;
-          height: auto;
+          height: 34px;
           width: 75%;
           border-radius: 0.2rem;
+          color: var(--van-black);
+        }
+        > input {
+          padding: 0;
+          text-indent: 10px;
         }
         > .left,
         > .right {
@@ -563,5 +724,67 @@ onUnmounted(async () => {
       }
     }
   }
+}
+</style>
+
+<style lang="css">
+:root:root {
+  --van-grid-item-content-background: transparent;
+}
+
+.audio-recording {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.bubble {
+  position: relative;
+  background-color: var(--theme-main-color);
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid var(--theme-main-color);
+}
+
+.bubble-cancel {
+  background-color: var(--theme-danger-color);
+}
+
+.bubble-cancel::before {
+  border-top: 10px solid var(--theme-danger-color);
+}
+
+.waveform {
+  width: 100px;
+  height: 30px;
+}
+
+.recording-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--theme-text-color-tint);
 }
 </style>

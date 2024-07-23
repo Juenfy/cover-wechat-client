@@ -1,6 +1,7 @@
 /* 定制主题 */
 :root:root {
   --theme-main-color: #57be6a;
+  --theme-danger-color: #f56c6c;
   --theme-text-color: #181818;
   --theme-text-color-tint: #a5a5a5;
   --theme-blue-tint: #5f688a;
