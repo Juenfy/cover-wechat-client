@@ -220,7 +220,6 @@ onMounted(() => {});
     :users="chatInfo.users"
     :groupId="chatInfo.to_user"
   />
-  />
 </template>
 
 <style lang="less" scoped>
