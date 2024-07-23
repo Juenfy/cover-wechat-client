@@ -54,13 +54,7 @@ const setChatBackground = (data) => {
     if (res.code == 200001) {
       showSuccessToast(res.msg);
       setTimeout(() => {
-        router.push({
-          name: "chat-message",
-          params: {
-            to_user: props.chatInfo.to_user,
-            is_group: props.chatInfo.is_group,
-          },
-        });
+        location.reload();
       }, 1000);
     }
   });

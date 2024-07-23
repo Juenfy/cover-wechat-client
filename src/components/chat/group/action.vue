@@ -4,8 +4,9 @@ import { ref, watch, inject } from "vue";
 import * as friendApi from "@/api/friend";
 import * as groupApi from "@/api/group";
 import { showFailToast, showSuccessToast } from "vant";
-import router from "@/router";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const WebSocketClient = inject("WebSocketClient");
 const checkedList = ref([]);
 const choseText = ref("多选");
@@ -90,10 +91,14 @@ const onSubmit = () => {
         WebSocketClient.send(sendData.value);
         setTimeout(() => {
           emit("hide");
-          router.push({
-            name: "chat-message",
-            params: { to_user: res.data.group_id, is_group: 1 },
-          });
+          if (props.action == "create") {
+            router.push({
+              name: "chat-message",
+              params: { to_user: res.data.group_id, is_group: 1 },
+            });
+          } else {
+            location.reload();
+          }
         }, 2000);
       } else {
         showFailToast(res.msg);
