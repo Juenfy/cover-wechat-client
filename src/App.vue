@@ -64,8 +64,9 @@ const onMessage = (data) => {
   console.log("App:onMessage", data);
   switch (data.action) {
     case ActionSend:
-      let currentPath =
-        "/chat/message/" + data.data.from.id + "/" + data.data.is_group;
+      let toUSer =
+        data.data.is_group == 1 ? data.data.to_user : data.data.from.id;
+      let currentPath = "/chat/message/" + toUSer + "/" + data.data.is_group;
       console.log(route.fullPath, currentPath);
       // 当前聊天窗口，推进消息
       if (route.fullPath == currentPath) {
