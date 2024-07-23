@@ -24,7 +24,7 @@ import {
   showLoadingToast,
 } from "vant";
 import * as fileApi from "@/api/file";
-import { File, Image, Video } from "@/enums/file";
+import { File, Image, Video, Audio } from "@/enums/file";
 import { Text } from "@/enums/message";
 
 const uploadPercent = ref(0);
@@ -398,6 +398,18 @@ onUnmounted(async () => {
                           class="van-image__img"
                           style="object-fit: contain"
                         ></video>
+                      </div>
+                    </div>
+                    <div
+                      class="msg_innser msg_audio"
+                      v-else-if="item.type == Audio"
+                    >
+                      <div class="van-image">
+                        <audio
+                          :src="item.content"
+                          controls
+                          type="audio/wav"
+                        ></audio>
                       </div>
                     </div>
                   </div>
