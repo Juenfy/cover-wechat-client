@@ -1,5 +1,5 @@
 <script setup>
-import ChatGroupCreate from "@/components/chat/group/create.vue";
+import ChatGroupAction from "@/components/chat/group/action.vue";
 import FriendAdd from "@/components/friend/add.vue";
 import { useRoute, useRouter } from "vue-router";
 import { onMounted, reactive, ref } from "vue";
@@ -142,9 +142,12 @@ onMounted(() => {
         </van-tabbar>
       </footer>
 
-      <chat-group-create
+      <chat-group-action
         :show="showChatGroupCreate"
         @hide="showChatGroupCreate = false"
+        action="create"
+        :users="[]"
+        groupId="0"
       />
       <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
     </div>

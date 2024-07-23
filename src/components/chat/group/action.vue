@@ -11,12 +11,17 @@ const checkedList = ref([]);
 const choseText = ref("多选");
 const friendList = ref({});
 const searchFriendList = ref([]);
-const props = defineProps({ show: Boolean });
+const props = defineProps({
+  show: Boolean,
+  action: String,
+  users: Array,
+  groupId: Number,
+});
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);
 const sendData = ref({
   who: "group",
-  action: "create",
+  action: "action",
   data: {},
 });
 const indexList = ref([]);
@@ -24,9 +29,18 @@ const searchFocus = ref(false);
 const keywords = ref("");
 
 const getFriendList = () => {
+  let userIds = props.users.map((item) => item.id);
+  console.log(userIds);
   friendApi.getList().then((res) => {
     friendList.value = res.data;
-    indexList.value = Object.keys(res.data).reverse();
+    indexList.value = Object.keys(res.data);
+    indexList.value.forEach((element) => {
+      friendList.value[element].forEach((item, index) => {
+        friendList.value[element][index].disabled = userIds.includes(
+          item.friend
+        );
+      });
+    });
   });
 };
 
@@ -63,23 +77,28 @@ const onSubmit = () => {
   if (checkedList.value.length == 0) {
     return showFailToast("请选择好友");
   }
-
-  groupApi.postCreate({ group_users: checkedList.value }).then((res) => {
-    if (res.code == 200001) {
-      showSuccessToast(res.msg);
-      sendData.value.data = res.data;
-      WebSocketClient.send(sendData.value);
-      setTimeout(() => {
-        emit("hide");
-        router.push({
-          name: "chat-message",
-          params: { to_user: res.data.group_id, is_group: 1 },
-        });
-      }, 2000);
-    } else {
-      showFailToast(res.msg);
-    }
-  });
+  groupApi
+    .postAction({
+      group_users: checkedList.value,
+      action: props.action,
+      group_id: props.groupId,
+    })
+    .then((res) => {
+      if (res.code == 200001) {
+        showSuccessToast(res.msg);
+        sendData.value.data = res.data;
+        WebSocketClient.send(sendData.value);
+        setTimeout(() => {
+          emit("hide");
+          router.push({
+            name: "chat-message",
+            params: { to_user: res.data.group_id, is_group: 1 },
+          });
+        }, 2000);
+      } else {
+        showFailToast(res.msg);
+      }
+    });
 };
 
 watch(
@@ -124,8 +143,20 @@ watch(
         />
         <div class="friend-list">
           <van-index-bar v-if="!searchFocus" :index-list="indexList">
-            <van-cell title="选择一个群" size="large" is-link to="" />
-            <van-cell title="新面对面群" size="large" is-link to="" />
+            <van-cell
+              title="选择一个群"
+              size="large"
+              is-link
+              to=""
+              v-if="props.action == 'create'"
+            />
+            <van-cell
+              title="新面对面群"
+              size="large"
+              is-link
+              to=""
+              v-if="props.action == 'create'"
+            />
             <div v-for="val in indexList" :key="val">
               <van-index-anchor :index="val" />
               <van-cell
@@ -138,6 +169,7 @@ watch(
                 <template #icon>
                   <van-checkbox
                     v-model="friendList[val][index].checked"
+                    :disabled="friendList[val][index].disabled"
                     @change="
                       (checked) => {
                         friendList[val][index].checked = checked;

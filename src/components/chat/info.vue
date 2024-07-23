@@ -1,5 +1,6 @@
 <!--聊天设置页面-->
 <script setup>
+import ChatGroupAction from "@/components/chat/group/action.vue";
 import { onMounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
@@ -10,6 +11,7 @@ import * as chatApi from "@/api/chat";
 const router = useRouter();
 const showClearChat = ref(false);
 const showChatBackground = ref(false);
+const showChatGroupInvite = ref(false);
 const appStore = useAppStore();
 const props = defineProps({ show: Boolean, info: Object });
 const chatInfo = ref({});
@@ -86,7 +88,12 @@ onMounted(() => {});
               v-for="item in chatInfo.users"
               :key="item.id"
             />
-            <van-grid-item icon="/add.png" text="邀请" to="" />
+            <van-grid-item
+              icon="/add.png"
+              text="邀请"
+              clickable
+              @click="showChatGroupInvite = true"
+            />
           </van-grid>
         </van-cell-group>
         <van-cell-group v-if="chatInfo.is_group == 1">
@@ -205,6 +212,14 @@ onMounted(() => {});
     :show="showChatBackground"
     @hide="showChatBackground = false"
     :chatInfo="chatInfo"
+  />
+  <chat-group-action
+    :show="showChatGroupInvite"
+    @hide="showChatGroupInvite = false"
+    action="invite"
+    :users="chatInfo.users"
+    :groupId="chatInfo.to_user"
+  />
   />
 </template>
 

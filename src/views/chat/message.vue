@@ -197,7 +197,7 @@ onUnmounted(async () => {
 });
 </script>
 <template>
-  <div class="message-box" v-if="chatInfo.from_user">
+  <div class="message-box">
     <header>
       <van-nav-bar
         :title="chatInfo.nickname"
@@ -464,12 +464,25 @@ onUnmounted(async () => {
             }
           }
         }
-
+        > li.li-tips-message {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 1rem;
+        }
         > li > .tips-message {
-          width: inherit;
+          width: 60%;
           text-align: center;
-          line-height: 4rem;
+          font-size: 12px;
+          line-height: 2rem;
           color: var(--theme-text-color);
+          background-color: #f6f6f6;
+          opacity: 0.8;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          word-break: break-all;
+          border-radius: 4px;
         }
       }
     }

@@ -18,7 +18,7 @@ const indexList = ref([]);
 const getFriendList = async () => {
   friendApi.getList().then((res) => {
     friendList.value = res.data;
-    indexList.value = Object.keys(res.data).reverse();
+    indexList.value = Object.keys(res.data);
   });
 };
 
