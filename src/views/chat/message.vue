@@ -186,7 +186,7 @@ const afterRead = (file) => {
 const uploadAndSendMessage = (file, isAudio = false) => {
   const data = new FormData();
   if (isAudio) {
-    data.append("file", "audio.wav");
+    data.append("file", file, "audio.wav");
   } else {
     data.append("file", file);
   }
