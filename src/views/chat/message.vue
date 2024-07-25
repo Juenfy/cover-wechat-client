@@ -24,7 +24,7 @@ import {
   showLoadingToast,
 } from "vant";
 import * as fileApi from "@/api/file";
-import { File, Image, Video, Audio } from "@/enums/file";
+import { File, Image, Video, Audio as AudioEnum } from "@/enums/file";
 import { Text } from "@/enums/message";
 
 const uploadPercent = ref(0);
@@ -402,7 +402,7 @@ onUnmounted(async () => {
                     </div>
                     <div
                       class="msg_innser msg_audio"
-                      v-else-if="item.type == Audio"
+                      v-else-if="item.type == AudioEnum"
                     >
                       <div class="van-image">
                         <audio

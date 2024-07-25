@@ -73,24 +73,22 @@ onMounted(() => {});
     </header>
     <section class="bg-nav">
       <div class="header"></div>
-      <div class="container">
+      <div class="container chat-info-container">
         <van-cell-group :style="{ padding: '1rem 0' }">
           <van-grid
             :column-num="5"
-            icon-size="3.5rem"
+            icon-size="3rem"
             :border="false"
             :square="true"
           >
             <van-grid-item
               :icon="item.avatar"
-              :text="item.nickname"
               :to="'/friend/info?keywords=' + item.wechat"
               v-for="item in chatInfo.users"
               :key="item.id"
             />
             <van-grid-item
               icon="/add.png"
-              text="邀请"
               clickable
               @click="showChatGroupInvite = true"
             />
@@ -221,23 +219,29 @@ onMounted(() => {});
     :groupId="chatInfo.to_user"
   />
 </template>
-
-<style lang="less" scoped>
-.van-cell-group {
-  margin-bottom: 0.5rem;
+<style lang="css">
+.van-icon__image {
+  border-radius: 4px;
 }
-.clear-chat-menu {
-  background: var(--van-nav-bar-background);
-  span {
-    background: var(--van-white);
-    display: block;
-    text-align: center;
-    font-size: var(--van-cell-large-title-font-size);
-    line-height: 4rem;
-  }
-  .clear-chat {
+</style>
+<style lang="less" scoped>
+.chat-info-container {
+  .van-cell-group {
     margin-bottom: 0.5rem;
-    color: var(--van-red);
+  }
+  .clear-chat-menu {
+    background: var(--van-nav-bar-background);
+    span {
+      background: var(--van-white);
+      display: block;
+      text-align: center;
+      font-size: var(--van-cell-large-title-font-size);
+      line-height: 4rem;
+    }
+    .clear-chat {
+      margin-bottom: 0.5rem;
+      color: var(--van-red);
+    }
   }
 }
 </style>
