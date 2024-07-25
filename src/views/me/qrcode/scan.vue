@@ -59,10 +59,12 @@ const onDetect = async (detectedCodes) => {
   paused.value = true;
   await timeout(500);
   paused.value = false;
+  result.value = result.value[0].split("?");
+  console.log(result.value);
   router.push({
     name: "friend-info",
-    params: {
-      wechat: result.value[0],
+    query: {
+      keywords: result.value[0],
     },
   });
 };

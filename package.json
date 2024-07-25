@@ -16,6 +16,7 @@
     "mitt": "^3.0.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "qrcode": "^1.5.3",
     "si-grenoble": "^0.6.0",
     "vant": "^4.8.11",
     "vconsole": "^3.15.1",

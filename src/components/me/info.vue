@@ -112,7 +112,13 @@ const afterRead = (file) => {
             :center="true"
             size="large"
           />
-          <van-cell title="我的二维码" is-link :center="true" size="large">
+          <van-cell
+            title="我的二维码"
+            is-link
+            to="/me/qrcode/index"
+            :center="true"
+            size="large"
+          >
             <template #value>
               <van-icon name="qr" size="1rem" />
             </template>
