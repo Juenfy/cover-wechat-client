@@ -89,6 +89,12 @@ onMounted(() => {
     </van-cell-group>
     <van-cell-group>
       <van-cell title="深夜模式" :center="true" size="large">
+        <template #title>
+          <van-image height="1.5rem" width="1.5rem" src="/dark.png" />
+          <div class="left-box" style="">
+            <span>深夜模式</span>
+          </div>
+        </template>
         <template #right-icon>
           <van-switch v-model="darkMode" @change="onChangeDarkMode" />
         </template>
@@ -100,7 +106,6 @@ onMounted(() => {
           <van-image height="1.5rem" width="1.5rem" src="/setting.png" />
           <div class="left-box" style="">
             <span>设置</span>
-            <span></span>
           </div>
         </template>
       </van-cell>
