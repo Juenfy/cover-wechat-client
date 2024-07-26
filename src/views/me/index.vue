@@ -6,7 +6,6 @@ import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import * as userApi from "@/api/user";
-import { watch } from "vue";
 const router = useRouter();
 const appStore = useAppStore();
 const userStore = useUserStore();
