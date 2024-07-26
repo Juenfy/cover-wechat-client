@@ -90,12 +90,12 @@ onMounted(() => {
                     @click="previewImage(homeInfo.avatar)"
                   />
                   <div class="text">
-                    <span class="nickname"
+                    <span class="display-nickname"
                       >{{ homeInfo.display_nickname
                       }}<van-icon name="user" color="#008cff"
                     /></span>
                     <span
-                      class="n"
+                      class="nickname"
                       v-if="homeInfo.display_nickname != homeInfo.nickname"
                       >昵称：{{ homeInfo.nickname }}</span
                     >
@@ -203,26 +203,20 @@ onMounted(() => {
   />
 </template>
 <style scoped lang="less">
-.van-nav-bar {
-  background: var(--van-white);
-}
 .van-cell-group {
   margin-bottom: 0.5rem;
 }
+.van-nav-bar {
+  background: var(--friend-info-van-nav-bar);
+}
 .friend-info {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background-color: var(--van-nav-bar-background);
   button {
     margin-top: 0.5rem;
     border: none;
-    color: var(--theme-blue-tint);
     font-weight: bold;
   }
   .card {
     width: 100%;
-    background-color: var(--van-white);
     .info,
     .check-msg {
       display: flex;
@@ -236,13 +230,14 @@ onMounted(() => {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
-        span {
-          color: var(--theme-text-color-tint);
-        }
-        .nickname {
-          color: var(--van-text-color);
+        .display-nickname {
           font-weight: bold;
           font-size: 20px;
+        }
+        .nickname,
+        .area,
+        .vchat {
+          color: var(--theme-gray-70);
         }
       }
     }
@@ -251,8 +246,6 @@ onMounted(() => {
       span {
         display: block;
         width: 100%;
-        background: var(--van-action-bar-background);
-        color: var(--theme-text-color-tint);
         padding: 1rem;
         border-radius: 0.2rem;
         margin-bottom: 1.5rem;

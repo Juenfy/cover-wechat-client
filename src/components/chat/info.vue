@@ -69,7 +69,12 @@ onMounted(() => {});
     duration="0.2"
   >
     <header>
-      <van-nav-bar title="聊天详情" left-arrow @click-left="$emit('hide')" />
+      <van-nav-bar
+        title="聊天详情"
+        left-arrow
+        @click-left="$emit('hide')"
+        :border="false"
+      />
     </header>
     <section class="bg-nav">
       <div class="header"></div>
@@ -191,18 +196,24 @@ onMounted(() => {});
             @click="showClearChat = true"
           />
         </van-cell-group>
-        <van-cell-group>
-          <van-popup
-            v-model:show="showClearChat"
-            round
-            position="bottom"
-            style="background: var(--van-tabbar-background)"
-            class="clear-chat-menu"
-          >
-            <span class="clear-chat">清空聊天记录</span>
-            <span @click="showClearChat = false">取消</span>
-          </van-popup>
-        </van-cell-group>
+        <van-popup
+          v-model:show="showClearChat"
+          round
+          position="bottom"
+          class="clear-chat-menu"
+        >
+          <van-cell-group>
+            <van-cell title="清空聊天记录" clickable size="large" />
+          </van-cell-group>
+          <van-cell-group>
+            <van-cell
+              title="取消"
+              clickable
+              @click="showClearChat = false"
+              size="large"
+            />
+          </van-cell-group>
+        </van-popup>
       </div>
     </section>
   </van-popup>
@@ -223,6 +234,13 @@ onMounted(() => {});
 .van-icon__image {
   border-radius: 4px;
 }
+.clear-chat-menu .van-cell__title {
+  text-align: center;
+  line-height: 3rem;
+}
+.clear-chat-menu .van-cell-group:first-child .van-cell__title {
+  color: red;
+}
 </style>
 <style lang="less" scoped>
 .chat-info-container {
@@ -231,16 +249,8 @@ onMounted(() => {});
   }
   .clear-chat-menu {
     background: var(--van-nav-bar-background);
-    span {
-      background: var(--van-white);
-      display: block;
-      text-align: center;
-      font-size: var(--van-cell-large-title-font-size);
-      line-height: 4rem;
-    }
-    .clear-chat {
-      margin-bottom: 0.5rem;
-      color: var(--van-red);
+    .van-cell-group:last-child {
+      margin-bottom: 0;
     }
   }
 }

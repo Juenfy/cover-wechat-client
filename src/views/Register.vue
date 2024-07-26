@@ -67,7 +67,7 @@ const afterRead = (file) => {
 
 <template>
   <section class="register">
-    <h3>手机号注册</h3>
+    <h3 style="color: var(--black-white-color)">手机号注册</h3>
     <van-uploader
       :after-read="afterRead"
       v-model="avatar"

@@ -44,7 +44,12 @@ watch(
     duration="0.2"
   >
     <header>
-      <van-nav-bar title="群聊" left-arrow @click-left="$emit('hide')" />
+      <van-nav-bar
+        title="群聊"
+        left-arrow
+        @click-left="$emit('hide')"
+        :border="false"
+      />
     </header>
     <section>
       <div class="header"></div>
@@ -94,7 +99,7 @@ watch(
 .to-group-list {
   display: flex;
   width: 100%;
-  color: var(--theme-text-color);
+  color: var(--theme-black-11);
 }
 
 .group-item-right,
@@ -114,13 +119,13 @@ watch(
 .group-item-bottom {
   width: 100%;
   padding-top: 1rem;
-  color: var(--theme-text-color-tint);
+  color: var(--theme-gray-70);
 }
 .group-item-left > .avatar-box {
   width: 3rem;
   height: 3rem;
   border-radius: 0.3rem;
-  background-color: var(--van-nav-bar-background);
+  background-color: var(--theme-white-de);
   img {
     width: 1.15rem;
     height: 1.15rem;

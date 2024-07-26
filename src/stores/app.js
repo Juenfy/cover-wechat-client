@@ -10,6 +10,13 @@ import {
 export const useAppStore = defineStore(
   "app",
   () => {
+    const theme = ref("light");
+    const icon = ref({
+      emoji: "/emoji-white.png",
+      audio: "/audio-white.png",
+      more: "/more-white.png",
+      keyboard: "/keyboard-white.png",
+    });
     const showSearch = ref(true);
     const showNavbar = ref(true);
     const navTitle = ref("");
@@ -91,6 +98,21 @@ export const useAppStore = defineStore(
       commonSearchPlaceholder.value = "搜索";
     };
 
+    const setTheme = (t) => {
+      theme.value = t;
+      if (t == "dark") {
+        icon.value.emoji = "/emoji-white.png";
+        icon.value.audio = "/audio-white.png";
+        icon.value.more = "/more-white.png";
+        icon.value.keyboard = "/keyboard-white.png";
+      } else {
+        icon.value.emoji = "/emoji.png";
+        icon.value.audio = "/audio.png";
+        icon.value.more = "/more.png";
+        icon.value.keyboard = "/keyboard.png";
+      }
+      console.log(theme.value);
+    };
     return {
       showNavbar,
       showSearch,
@@ -99,6 +121,8 @@ export const useAppStore = defineStore(
       commonSearchAction,
       commonSearchPlaceholder,
       unread,
+      theme,
+      icon,
       initHeader,
       setShowCommonSearch,
       initCommonSearch,
@@ -106,6 +130,7 @@ export const useAppStore = defineStore(
       unreadDecrBy,
       setUnread,
       clear,
+      setTheme,
     };
   },
   { persist: true }

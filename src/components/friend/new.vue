@@ -75,6 +75,7 @@ watch(
         :right-text="'添加朋友'"
         @click-left="$emit('hide')"
         @click-right="showFriendAdd = true"
+        :border="false"
       />
     </header>
     <section>

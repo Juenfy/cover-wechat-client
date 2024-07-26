@@ -9,7 +9,7 @@ const emit = defineEmits(["hide", "search"]);
 const keywords = ref("");
 const isSearch = ref(false);
 const searchResult = ref([]);
-const background = ref("var(--van-white)");
+const background = ref("var(--common-search-background)");
 const router = useRouter();
 
 const handleSearch = () => {
@@ -132,7 +132,7 @@ onMounted(() => {
           <div class="no-result" v-else>暂无搜索结果</div>
         </div>
         <div v-else>
-          <p style="text-align: center; color: var(--theme-text-color-tint)">
+          <p style="text-align: center; color: var(--theme-gray-70)">
             快速搜索聊天内容
           </p>
           <van-row
@@ -185,7 +185,7 @@ onMounted(() => {
     line-height: 4rem;
     height: 4rem;
     background: var(--van-white);
-    color: var(--theme-text-color-tint);
+    color: var(--theme-gray-70);
   }
   .van-cell-group__title {
     padding: 16px 1px !important;

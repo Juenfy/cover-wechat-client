@@ -125,12 +125,11 @@ watch(
     <header>
       <van-nav-bar
         title="选择联系人"
+        left-text="取消"
         @click-left="$emit('hide')"
         @click-right="onSubmit"
+        :border="false"
       >
-        <template #left>
-          <span>取消</span>
-        </template>
         <template #right>
           <van-button type="primary" size="small">完成</van-button>
         </template>
@@ -225,6 +224,7 @@ watch(
   .van-checkbox,
   .van-image {
     margin-right: 1rem;
+    border-radius: 4px;
   }
 }
 </style>

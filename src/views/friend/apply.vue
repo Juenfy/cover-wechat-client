@@ -88,7 +88,7 @@ onMounted(async () => {
     </header>
     <section>
       <div class="header"></div>
-      <div class="container">
+      <div class="container friend-apply-container">
         <div class="common friend-apply">
           <van-form @submit="onSubmit">
             <van-cell-group
@@ -177,14 +177,19 @@ onMounted(async () => {
 </template>
 <style scoped lang="less">
 .van-nav-bar {
-  background: var(--vant-white);
+  background: var(--friend-remark-nav-bar-background);
 }
-.friend-apply {
-  background: var(--vant-white);
-  .van-form {
-    padding: 1rem 2rem;
-    .remark {
-      height: 6rem;
+.friend-apply-container {
+  background: var(--friend-remark-background) !important;
+  [class*="van-hairline"]:after {
+    border: none !important;
+  }
+  .friend-apply {
+    .van-form {
+      padding: 1rem 2rem;
+      .remark {
+        height: 6rem;
+      }
     }
   }
 }

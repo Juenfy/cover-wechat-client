@@ -125,7 +125,7 @@ section {
     display: flex !important;
     justify-content: center;
     align-items: center;
-    background: transparent;
+    background: transparent !important;
     .qrcode-box,
     .info-box {
       display: flex;
@@ -150,7 +150,7 @@ section {
         }
         span:last-child {
           font-size: 12px;
-          color: var(--theme-text-color-inverse);
+          color: var(--theme-white-cd);
         }
       }
     }
@@ -162,7 +162,7 @@ section {
       }
       p {
         font-size: 13px;
-        color: var(--theme-text-color-inverse);
+        color: var(--theme-white-cd);
       }
     }
   }

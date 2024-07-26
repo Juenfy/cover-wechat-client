@@ -131,26 +131,28 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <router-view v-slot="{ Component, route }">
-    <transition :name="route.meta.transition ?? ''" mode="out-in">
-      <keep-alive>
-        <div :key="route.path" ref="">
-          <component :is="Component" :key="route.path" />
-        </div>
-      </keep-alive>
-    </transition>
-  </router-view>
-  <common-search
-    :show="appStore.showCommonSearch"
-    @hide="appStore.setShowCommonSearch(false)"
-    :action="appStore.commonSearchAction"
-    :placeholder="appStore.commonSearchPlaceholder"
-    @search="onSearch"
-  />
-  <message-popup
-    :show="showMessagePopup"
-    @hide="showMessagePopup = false"
-    :message="message"
-    :action="messageAction"
-  />
+  <van-config-provider :theme="appStore.theme">
+    <router-view v-slot="{ Component, route }">
+      <transition :name="route.meta.transition ?? ''" mode="out-in">
+        <keep-alive>
+          <div :key="route.path" ref="">
+            <component :is="Component" :key="route.path" />
+          </div>
+        </keep-alive>
+      </transition>
+    </router-view>
+    <common-search
+      :show="appStore.showCommonSearch"
+      @hide="appStore.setShowCommonSearch(false)"
+      :action="appStore.commonSearchAction"
+      :placeholder="appStore.commonSearchPlaceholder"
+      @search="onSearch"
+    />
+    <message-popup
+      :show="showMessagePopup"
+      @hide="showMessagePopup = false"
+      :message="message"
+      :action="messageAction"
+    />
+  </van-config-provider>
 </template>

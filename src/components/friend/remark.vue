@@ -58,9 +58,9 @@ watch(
     </header>
     <section>
       <div class="header"></div>
-      <div class="container">
+      <div class="container friend-remark-container">
         <div class="common friend-remark">
-          <h2>设置备注和标签</h2>
+          <h2 style="color: var(--black-white-color)">设置备注和标签</h2>
           <van-form>
             <van-cell-group title="备注">
               <van-field
@@ -95,12 +95,18 @@ watch(
 
 <style scoped lang="less">
 .van-nav-bar {
-  background: var(--van-white);
+  background: var(--friend-remark-nav-bar-background);
 }
-.friend-remark {
-  padding: 4rem 2rem;
-  h2 {
-    text-align: center;
+.friend-remark-container {
+  background: var(--friend-remark-background) !important;
+  [class*="van-hairline"]:after {
+    border: none !important;
+  }
+  .friend-remark {
+    padding: 4rem 2rem;
+    h2 {
+      text-align: center;
+    }
   }
 }
 </style>

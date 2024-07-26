@@ -63,7 +63,7 @@ onMounted(() => {
 
 <template>
   <section class="login">
-    <h3>手机号登录</h3>
+    <h3 style="color: var(--black-white-color)">手机号登录</h3>
     <van-form @submit="getCode">
       <van-cell-group inset>
         <van-field

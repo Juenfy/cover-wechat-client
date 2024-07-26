@@ -11,9 +11,6 @@ header,footer{
 header{
     top: 0;
     height: 46px;
-    .van-nav-bar{
-        height: inherit!important;
-    }
 }
 
 .bg-black {
@@ -25,17 +22,13 @@ header{
 }
 
 .register,.login {
-  background: var(--van-white);
+  background: var(--friend-remark-background);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  .van-form {
-    width: 100%;
-    .van-cell-group,
-    .van-cell {
-      background: none;
-    }
+  .van-uploader>.van-uploader__wrapper{
+    justify-content: center;
   }
 }
 
@@ -65,21 +58,18 @@ section {
 footer{
     bottom: 0;
     height: 64px;
-    .van-tab-bar{
-        height: inherit!important;
-    }
     z-index: 999;
 }
 
-.common {
+.common,.register,.login {
     /* 重写Vant Form样式*/
     .van-form .van-cell-group {
-      background: #f7f7f7;
+      background: var(--friend-remark-from-input-background);
       border-radius: 0.5rem;
       font-size: 1.2rem;
       padding: 1rem;
       .van-field{
-        background: #f7f7f7;
+        background: var(--friend-remark-from-input-background);
       }
     }
   
@@ -92,7 +82,7 @@ footer{
     .right-box {
       height: 2.5rem;
       span {
-        color: var(--theme-text-color-tint);
+        color: var(--theme-gray-70);
       }
     }
     .left-box {
@@ -113,7 +103,7 @@ footer{
         font-size: 18px;
       }
       > span:last-child {
-        color: var(--theme-text-color-tint);
+        color: var(--theme-gray-70);
       }
     }
   }

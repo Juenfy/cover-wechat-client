@@ -1,24 +1,85 @@
-/* 定制主题 */
+/* 主题通用 */
 :root:root {
-  --theme-main-color: #57be6a;
+  --theme-primary-color: #57be6a;
   --theme-danger-color: #f56c6c;
-  --theme-text-color: #181818;
-  --theme-text-color-tint: #a5a5a5;
-  --theme-text-color-inverse: #ededed;
-  --theme-blue-tint: #5f688a;
   --theme-black: #000;
-  --van-primary-color: var(--theme-main-color);
-  --van-text-color: var(--theme-text-color);
-  --van-tabbar-height: 4rem;
-  --van-tabbar-background: #f9f9f9;
-  --van-tabbar-item-active-background: var(--van-tabbar-background);
-  --van-tabbar-item-active-color: var(--theme-main-color);
-  --van-nav-bar-background: #ededed;
-  --van-nav-bar-border-color: #e3e3e3;
+  --theme-black-11: #111111;
+  --theme-black-18: #181818;
+  --theme-black-1c: #1c1c1c;
+  --theme-black-1e: #1e1e1e;
+  --theme-black-20: #202020;
+  --theme-black-21: #212121;
+  --theme-black-28: #282828;
+  --theme-black-4c: #4c4c4c;
+  --theme-white: #fff;
+  --theme-white-bc: #bcbcbc;
+  --theme-white-cd: #cdcdcd;
+  --theme-white-de: #dedede;
+  --theme-white-ed: #ededed;
+  --theme-white-f5: #f5f5f5;
+  --theme-white-f6: #f6f6f6;
+  --theme-white-f7: #f7f7f7;
+  --theme-gray-70: #707070;
+  --theme-red: red;
+  --van-tabbar-height: 64px;
+  --van-navbar-height: 46px;
+  --van-tabbar-item-active-color: var(--theme-primary-color);
+  --van-primary-color: var(--theme-primary-color);
+}
+
+/* 普通主题 */
+.van-theme-light {
+  .container {
+    background: var(--theme-white-ed);
+  }
+  .top-active {
+    background: var(--theme-white-ed);
+  }
+  --black-white-color: var(--theme-black);
+  --black4c-whitebc-color: var(--theme-black-4c);
+  --black20-white-color: var(--theme-white);
+  --van-nav-bar-background: var(--theme-white-ed);
+  --van-nav-bar-icon-color: var(--theme-black-18);
+  --van-nav-bar-text-color: var(--theme-black-18);
+  --common-search-background: var(--theme-white);
+  --messge-footer-background: var(--theme-white-f6);
+  --messge-footer-input-background: var(--theme-white);
+  --friend-info-van-nav-bar: var(--theme-white);
+  --friend-add-qrcode-text: var(--theme-black);
+  --friend-remark-nav-bar-background: var(--theme-white);
+  --friend-remark-background: var(--theme-white);
+  --friend-remark-from-input-background: var(--theme-white-f7);
   --van-search-background: var(--van-nav-bar-background);
-  --van-search-content-background: var(--van-white);
-  --van-search-action-text-color: var(--theme-blue-tint);
-  --van-nav-bar-icon-color: var(--van-text-color);
-  --van-action-bar-background: #f6f6f6;
-  --van-nav-bar-text-color: var(--theme-text-color);
+  --van-search-content-background: var(--theme-white);
+  --van-tabbar-background: var(--theme-white-f5);
+  --van-tabbar-item-active-background: var(--theme-white-f5);
+}
+
+/* 暗黑主题 */
+.van-theme-dark {
+  .container {
+    background: var(--theme-black-11);
+  }
+  .top-active {
+    background: var(--theme-black-21);
+  }
+  --black-white-color: var(--theme-white);
+  --black4c-whitebc-color: var(--theme-white-bc);
+  --black20-white-color: var(--theme-black-20);
+  --van-nav-bar-background: var(--theme-black-11);
+  --van-nav-bar-icon-color: var(--theme-white);
+  --van-nav-bar-text-color: var(--theme-white);
+  --common-search-background: var(--theme-black-18);
+  --messge-footer-background: var(--theme-black-1c);
+  --messge-footer-input-background: var(--theme-black-28);
+  --friend-info-van-nav-bar: var(--theme-black-1c);
+  --friend-add-qrcode-text: var(--theme-white);
+  --friend-remark-nav-bar-background: var(--theme-black-11);
+  --friend-remark-background: var(--theme-black-11);
+  --friend-remark-from-input-background: var(--theme-black-1e);
+  --van-search-background: var(--van-nav-bar-background);
+  --van-search-content-background: var(--theme-black-18);
+  --van-tabbar-background: var(--theme-black-1e);
+  --van-tabbar-item-active-background: var(--theme-black-1e);
+  --van-cell-group-background: var(--theme-black-18);
 }

@@ -206,17 +206,17 @@ const afterRead = (file) => {
             <van-icon
               name="arrow-left"
               size="20"
-              color="var(--theme-text-color-tint)"
+              color="var(--theme-white-cd)"
             />
           </template>
           <template #title>
-            <span style="color: var(--theme-text-color-tint)">个人头像</span>
+            <span style="color: var(--theme-white)">个人头像</span>
           </template>
           <template #right>
             <van-icon
               name="ellipsis"
               size="20"
-              color="var(--theme-text-color-tint)"
+              color="var(--theme-white-cd)"
               @click="showUpdateAvatar = true"
             />
           </template>
@@ -224,7 +224,7 @@ const afterRead = (file) => {
       </header>
       <section class="bg-black">
         <div class="header"></div>
-        <div class="container">
+        <div class="container" style="background: transparent">
           <van-image
             width="inhert"
             :src="avatar"
@@ -245,17 +245,26 @@ const afterRead = (file) => {
       position="bottom"
       class="update-avatar-menu"
     >
-      <span @click="openCamera">拍照</span>
-      <span
-        ><van-uploader :after-read="afterRead" max-count="1" accept="image/*"
-          >从手机相册选择</van-uploader
-        ></span
-      >
-      <span>查看上一张头像</span>
-      <span class="save-avatar">保存图片</span>
-      <span @click="showUpdateAvatar = false" class="cancel-update-avatar"
-        >取消</span
-      >
+      <van-cell-group>
+        <van-cell title="拍照" clickable @click="openCamera" size="large" />
+        <van-cell title="拍照" clickable size="large">
+          <template #title>
+            <van-uploader :after-read="afterRead" max-count="1" accept="image/*"
+              >从手机相册选择</van-uploader
+            >
+          </template>
+        </van-cell>
+        <van-cell title="查看上一张头像" clickable size="large" />
+        <van-cell title="保存图片" clickable size="large" />
+      </van-cell-group>
+      <van-cell-group>
+        <van-cell
+          title="取消"
+          clickable
+          @click="showUpdateAvatar = false"
+          size="large"
+        />
+      </van-cell-group>
     </van-popup>
   </van-popup>
   <common-camera
@@ -264,6 +273,12 @@ const afterRead = (file) => {
     @takePhotoCb="takePhotoCb"
   />
 </template>
+<style lang="css">
+.update-avatar-menu .van-cell__title {
+  text-align: center;
+  line-height: 2.5rem;
+}
+</style>
 <style scoped lang="less">
 .van-cell-group {
   margin-bottom: 0.5rem;
@@ -272,21 +287,9 @@ const afterRead = (file) => {
   border: none;
 }
 .update-avatar-menu {
-  background: var(--van-tabbar-background);
-  span {
-    background: var(--van-white);
-    display: block;
-    text-align: center;
-    font-size: var(--van-cell-large-title-font-size);
-    line-height: 3.5rem;
-    border-bottom: 1px solid var(--van-nav-bar-border-color);
-  }
-  .cancel-update-avatar,
-  .save-avatar {
-    border-bottom: none;
-  }
-  .cancel-update-avatar {
-    margin-top: 0.5rem;
+  background: var(--van-nav-bar-background);
+  .van-cell-group:last-child {
+    margin-bottom: 0;
   }
 }
 </style>

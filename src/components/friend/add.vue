@@ -24,7 +24,12 @@ const onSearchFocus = () => {
     duration="0.2"
   >
     <header>
-      <van-nav-bar title="添加朋友" left-arrow @click-left="$emit('hide')" />
+      <van-nav-bar
+        title="添加朋友"
+        left-arrow
+        @click-left="$emit('hide')"
+        :border="false"
+      />
     </header>
     <section>
       <div class="header"></div>
@@ -35,9 +40,15 @@ const onSearchFocus = () => {
           @focus="onSearchFocus"
         />
         <div class="common">
-          <p style="text-align: center; line-height: 1">
+          <p
+            style="
+              text-align: center;
+              line-height: 1;
+              color: var(--friend-add-qrcode-text);
+            "
+          >
             我的微信号：phpdalao
-            <van-icon name="qr" color="var(--van-primary-color)" />
+            <van-icon name="qr" color="var(--theme-primary-color)" />
           </p>
           <van-cell-group>
             <van-cell is-link to="" :center="true" size="large">

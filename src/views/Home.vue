@@ -61,6 +61,7 @@ onMounted(() => {
           v-if="appStore.showNavbar"
           :title="appStore.navTitle"
           @click-right="!showPopover"
+          :border="false"
         >
           <template #right>
             <van-popover
@@ -72,13 +73,12 @@ onMounted(() => {
               placement="bottom-end"
             >
               <template #reference>
-                <van-icon name="add-o" size="20" color="#191919" />
+                <van-icon name="add-o" size="20" />
               </template>
             </van-popover>
             <van-icon
               name="friends-o"
               size="20"
-              color="#191919"
               v-if="tabBarActive == 1"
               @click="showFriendAdd = true"
             />

@@ -45,11 +45,7 @@ const queryData = reactive({
 });
 const showChatInfo = ref(false);
 const moreBottomAction = ref("");
-const audioIcon = "/audio.png";
-const keyboardIcon = "/keyboard.png";
-const emojiIcon = "/emoji.png";
-const leftIcon = ref(audioIcon);
-const rightFirstIcon = ref(emojiIcon);
+const leftIcon = ref(appStore.icon.audio);
 const isAudioRecord = ref(false);
 const isAudioRecording = ref(false);
 const isCancelAudioRecording = ref(false);
@@ -66,9 +62,9 @@ const handleLeftIconClick = (e) => {
   popupMoreBottom.value = false;
   isAudioRecord.value = !isAudioRecord.value;
   if (isAudioRecord.value) {
-    leftIcon.value = keyboardIcon;
+    leftIcon.value = appStore.icon.keyboard;
   } else {
-    leftIcon.value = audioIcon;
+    leftIcon.value = appStore.icon.audio;
   }
 };
 
@@ -78,7 +74,7 @@ const handleRightSecondIconClick = (e) => {
     popupMoreBottom.value = !popupMoreBottom.value;
     if (popupMoreBottom.value) {
       isAudioRecord.value = false;
-      leftIcon.value = audioIcon;
+      leftIcon.value = appStore.icon.audio;
     }
   }, 200);
 };
@@ -89,7 +85,7 @@ const handleRightFirstIconClick = (e) => {
     popupEmojiBottom.value = !popupEmojiBottom.value;
     if (popupEmojiBottom.value) {
       isAudioRecord.value = false;
-      leftIcon.value = audioIcon;
+      leftIcon.value = appStore.icon.audio;
     }
   }, 100);
 };
@@ -328,13 +324,11 @@ onUnmounted(async () => {
         left-arrow
         @click-left="router.go(-1)"
         @click-right="showChatInfo = true"
-        style="
-          box-sizing: border-box;
-          border-bottom: 0.1rem solid var(--van-nav-bar-border-color);
-        "
+        :border="false"
+        style="opacity: 0.8"
       >
         <template #right>
-          <van-icon name="ellipsis" size="20" color="#191919" />
+          <van-icon name="ellipsis" size="20" />
         </template>
       </van-nav-bar>
     </header>
@@ -347,7 +341,11 @@ onUnmounted(async () => {
       "
     >
       <div class="header"></div>
-      <div class="container" ref="msgBoxRef">
+      <div
+        class="container"
+        ref="msgBoxRef"
+        :style="chatInfo.bg_file_path == '' ? '' : 'background: none;'"
+      >
         <ul class="message-list">
           <li
             v-for="item in messageList"
@@ -371,7 +369,10 @@ onUnmounted(async () => {
                     {{ item.from.nickname }}
                   </span>
                   <div class="msg">
-                    <div class="tri"></div>
+                    <div
+                      class="tri"
+                      v-if="[Video, AudioEnum].includes(item.type) === false"
+                    ></div>
                     <div class="msg_inner" v-if="item.type == Text">
                       {{ item.content }}
                     </div>
@@ -433,7 +434,7 @@ onUnmounted(async () => {
             @touchstart="startRecording"
             @touchend="stopRecording"
             @touchmove="handleTouchMove"
-            >按住说话</van-button
+            >按住 说话</van-button
           >
           <input
             v-else
@@ -444,10 +445,13 @@ onUnmounted(async () => {
           />
           <div class="right">
             <van-icon
-              :name="rightFirstIcon"
+              :name="appStore.icon.emoji"
               @click="handleRightFirstIconClick"
             />
-            <van-icon name="/more.png" @click="handleRightSecondIconClick" />
+            <van-icon
+              :name="appStore.icon.more"
+              @click="handleRightSecondIconClick"
+            />
           </div>
         </div>
         <div
@@ -579,7 +583,7 @@ onUnmounted(async () => {
             }
           }
           > .content > span {
-            color: var(--theme-text-color-tint);
+            color: var(--theme-gray-70);
             font-size: 14px;
             line-height: 18px;
             display: block;
@@ -594,7 +598,8 @@ onUnmounted(async () => {
               width: 0;
               height: 0;
               border-style: solid;
-              border-width: 0 0.8rem 1rem 0;
+              border-width: 0 0.7rem 1rem 0;
+              margin-right: -1px;
               border-color: transparent #ffffff transparent transparent;
             }
             > .msg_inner {
@@ -619,16 +624,15 @@ onUnmounted(async () => {
           > .content > .msg {
             flex-direction: row-reverse;
             > .tri {
-              width: 0;
-              height: 0;
-              border-style: solid;
+              margin-left: -1px;
               border-width: 1rem 0.7rem 0 0;
-              border-color: #98e865 transparent transparent transparent;
+              border-color: var(--theme-primary-color) transparent transparent
+                transparent;
             }
 
             > .msg_inner {
               border-radius: 0.2rem 0 0.2rem 0.2rem;
-              background-color: #98e865;
+              background-color: var(--theme-primary-color);
             }
           }
         }
@@ -643,8 +647,8 @@ onUnmounted(async () => {
           text-align: center;
           font-size: 12px;
           line-height: 2rem;
-          color: var(--theme-text-color);
-          background-color: #f6f6f6;
+          color: var(--theme-black-11);
+          background-color: var(--theme-white-f6);
           opacity: 0.8;
           white-space: nowrap;
           text-overflow: ellipsis;
@@ -656,12 +660,14 @@ onUnmounted(async () => {
     }
     .footer {
       height: auto;
-      > div {
+      > div,
+      emoji-picker {
         width: inherit;
         padding: 1rem 0;
-        background-color: #f6f6f6;
+        background-color: var(--messge-footer-background);
         display: flex;
         border-top: 1px solid var(--van-nav-bar-border-color);
+        opacity: 0.9;
       }
       > .msg-box-top {
         border-top: none;
@@ -672,12 +678,15 @@ onUnmounted(async () => {
           outline: none;
           height: 34px;
           width: 75%;
+          font-weight: bold;
           border-radius: 0.2rem;
-          color: var(--van-black);
+          color: var(--black-white-color);
+          background: var(--messge-footer-input-background);
         }
         > input {
           padding: 0;
           text-indent: 10px;
+          background: var(--messge-footer-input-background);
         }
         > .left,
         > .right {
@@ -709,16 +718,19 @@ onUnmounted(async () => {
           .more-bottom-icon {
             height: 4rem;
             width: 4rem;
-            background: var(--van-white);
+            background: var(--black20-white-color);
             border-radius: 0.8rem;
             display: flex;
             justify-content: center;
             align-items: center;
+            i {
+              color: var(--black4c-whitebc-color);
+            }
           }
           .more-bottom-text {
             margin-top: 5px;
             font-size: 12px;
-            color: var(--theme-text-color-tint);
+            color: var(--theme-gray-70);
           }
         }
       }
@@ -732,7 +744,7 @@ onUnmounted(async () => {
       emoji-picker {
         width: inherit;
         height: 18rem;
-        --background: #f6f6f6;
+        --background: var(--messge-footer-background);
       }
     }
   }
@@ -760,7 +772,7 @@ onUnmounted(async () => {
 
 .bubble {
   position: relative;
-  background-color: var(--theme-main-color);
+  background-color: var(--theme-primary-color);
   padding: 20px;
   border-radius: 10px;
   display: flex;
@@ -797,6 +809,6 @@ onUnmounted(async () => {
 .recording-text {
   font-size: 16px;
   font-weight: bold;
-  color: var(--theme-text-color-tint);
+  color: var(--theme-gray-70);
 }
 </style>

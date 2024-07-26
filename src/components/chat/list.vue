@@ -149,7 +149,7 @@ const handleTop = (item, isTop) => {
   width: 4rem;
   height: 4rem;
   border-radius: 0.3rem;
-  background-color: var(--van-nav-bar-background);
+  background-color: var(--theme-white-de);
 }
 
 .avatar-box > .avatar-group {
@@ -170,16 +170,13 @@ const handleTop = (item, isTop) => {
   overflow: hidden;
   word-break: break-all;
   width: 10rem;
+  font-size: 0.9rem;
 }
 
 .chat-item-center > .username {
   font-size: 1.2rem;
   margin-top: 0.2rem;
   margin-bottom: 0.8rem;
-}
-
-.chat-item-center > .text {
-  font-size: 0.9rem;
 }
 
 .chat-item-right {
@@ -194,6 +191,6 @@ const handleTop = (item, isTop) => {
 
 .chat-item-center > .text,
 .chat-item-right {
-  color: var(--theme-text-color-tint);
+  color: var(--theme-gray-70);
 }
 </style>

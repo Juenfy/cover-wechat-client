@@ -6,12 +6,13 @@ import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import * as userApi from "@/api/user";
+import { watch } from "vue";
 const router = useRouter();
 const appStore = useAppStore();
 const userStore = useUserStore();
 const WebSocketClient = inject("WebSocketClient");
 const showMeInfo = ref(false);
-
+const darkMode = ref(false);
 const onLogout = () => {
   showConfirmDialog({
     title: "提示",
@@ -35,8 +36,13 @@ const onLogout = () => {
     });
 };
 
+const onChangeDarkMode = (e) => {
+  appStore.setTheme(e ? "dark" : "light");
+};
+
 onMounted(() => {
   appStore.initHeader({ title: "我", navbar: false, search: false });
+  darkMode.value = appStore.theme == "dark";
 });
 </script>
 
@@ -81,6 +87,13 @@ onMounted(() => {
         </template>
       </van-cell>
     </van-cell-group>
+    <van-cell-group>
+      <van-cell title="深夜模式" :center="true" size="large">
+        <template #right-icon>
+          <van-switch v-model="darkMode" @change="onChangeDarkMode" />
+        </template>
+      </van-cell>
+    </van-cell-group>
     <van-cell-group :border="false">
       <van-cell :center="true" is-link to="/me/setting">
         <template #title>
@@ -112,10 +125,8 @@ onMounted(() => {
   position: fixed;
   width: 100%;
   height: 100%;
-  background-color: var(--van-nav-bar-background);
   .card {
     width: 100%;
-    background-color: var(--van-white);
     .info {
       display: flex;
       position: relative;
@@ -129,10 +140,8 @@ onMounted(() => {
         flex-direction: column;
         justify-content: space-evenly;
         span {
-          color: var(--theme-text-color-tint);
         }
         .nickname {
-          color: var(--van-text-color);
           font-weight: bold;
           font-size: 20px;
         }
