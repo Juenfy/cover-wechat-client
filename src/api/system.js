@@ -1,10 +1,10 @@
 import request from "@/utils/request";
-//注册
+//获取验证码
 export const getCodeApi = async (data) => {
   return await request.post("/api/system/captcha/get", data);
 };
 
-//登录
+//验证码校验
 export const reqCheckApi = async (data) => {
   return await request.post("/api/system/captcha/check", data);
 };

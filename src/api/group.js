@@ -4,7 +4,7 @@ import request from "@/utils/request";
 export const postAction = async (data) => {
   return await request.post("/api/group/action", data);
 };
-
+//获取群聊列表
 export const getList = async () => {
   return await request.get("/api/group/list");
 };

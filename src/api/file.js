@@ -10,7 +10,7 @@ export const upload = async (data, onUploadProgress) => {
     timeout: 300000,
   });
 };
-
+//文件base64上传
 export const uploadBase64 = async (data) => {
   return await request.post("/api/file/upload-base64", data);
 };
