@@ -5,7 +5,7 @@ import { ref, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useRoute } from "vue-router";
 import { chatList, getChatList, sortChatList } from "@/utils/websocket";
-import { UnreadChat, UnreadFriend, UnreadApply } from "@/enums/app";
+import { UnreadChat, UnreadApply } from "@/enums/app";
 const appStore = useAppStore();
 const route = useRoute();
 const loading = ref(false);
@@ -38,7 +38,6 @@ const computeUnread = () => {
   //通过好友验证消息未读数计算
   if (route.query.verify) {
     appStore.unreadIncrBy(UnreadChat);
-    appStore.unreadDecrBy(UnreadFriend, appStore.unread.apply);
     appStore.unreadDecrBy(UnreadApply, appStore.unread.apply);
   }
 };
