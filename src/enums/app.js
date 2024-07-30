@@ -17,6 +17,5 @@ export const HomeActions = [
 ];
 
 export const UnreadChat = "unread-chat";
-export const UnreadFriend = "unread-friend";
 export const UnreadDiscover = "unread-dicover";
 export const UnreadApply = "unread-apply";

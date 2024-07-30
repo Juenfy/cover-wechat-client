@@ -1,12 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { Home } from "@/enums/app";
-import {
-  UnreadDiscover,
-  UnreadChat,
-  UnreadFriend,
-  UnreadApply,
-} from "@/enums/app";
+import { UnreadDiscover, UnreadChat, UnreadApply } from "@/enums/app";
 export const useAppStore = defineStore(
   "app",
   () => {
@@ -25,7 +20,6 @@ export const useAppStore = defineStore(
     const commonSearchPlaceholder = ref("搜索");
     const defaultUnread = {
       chat: 0,
-      friend: 0,
       apply: 0,
       discover: 0,
     };
@@ -51,9 +45,6 @@ export const useAppStore = defineStore(
         case UnreadChat:
           unread.value.chat += incr;
           break;
-        case UnreadFriend:
-          unread.value.friend += incr;
-          break;
         case UnreadDiscover:
           unread.value.discover += incr;
           break;
@@ -68,10 +59,6 @@ export const useAppStore = defineStore(
         case UnreadChat:
           unread.value.chat -= decr;
           if (unread.value.chat < 0) unread.value.chat = 0;
-          break;
-        case UnreadFriend:
-          unread.value.friend -= decr;
-          if (unread.value.friend < 0) unread.value.friend = 0;
           break;
         case UnreadDiscover:
           unread.value.discover -= decr;

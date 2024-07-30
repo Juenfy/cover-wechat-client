@@ -5,7 +5,7 @@ import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import * as friendApi from "@/api/friend";
-import { SearchFriend, UnreadFriend, UnreadApply } from "@/enums/app";
+import { SearchFriend, UnreadApply } from "@/enums/app";
 import { ApplyStatus } from "@/enums/friend";
 const props = defineProps({ show: Boolean, unread: Number });
 //调用父组件关闭弹窗
@@ -54,11 +54,7 @@ const handleHomeClick = (item) => {
 };
 
 const readApply = () => {
-  console.log(appStore.unread);
-  if (appStore.unread.apply > 0) {
-    appStore.unreadDecrBy(UnreadApply, appStore.unread.apply);
-    appStore.unreadDecrBy(UnreadFriend, appStore.unread.apply);
-  }
+  appStore.unreadDecrBy(UnreadApply, appStore.unread.apply);
 };
 
 watch(

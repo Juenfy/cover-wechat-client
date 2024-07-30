@@ -7,12 +7,7 @@ import CommonSearch from "@/components/common/search.vue";
 import MessagePopup from "@/components/message/popup.vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
-import {
-  SearchFriend,
-  UnreadChat,
-  UnreadFriend,
-  UnreadApply,
-} from "@/enums/app";
+import { SearchFriend, UnreadChat, UnreadApply } from "@/enums/app";
 import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
 import { showDialog } from "vant";
 import {
@@ -114,7 +109,6 @@ const onMessage = async (data) => {
       break;
     case ActionApply:
       appStore.unreadIncrBy(UnreadApply);
-      appStore.unreadIncrBy(UnreadFriend);
       message.value = data.data;
       messageAction.value = ActionApply;
       showMessagePopup.value = true;
