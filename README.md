@@ -18,6 +18,10 @@ cd cover-wechat-front
 ```
 
 ```shell
+cp .env.example .env
+```
+
+```shell
 npm install
 ```
 
