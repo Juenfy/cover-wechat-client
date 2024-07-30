@@ -60,29 +60,24 @@ watch(
 );
 
 //全局消息监听
-const onMessage = (data) => {
+const onMessage = async (data) => {
   console.log("App:onMessage", data);
   switch (data.action) {
     case ActionSend:
-      let toUser =
-        data.data.is_group == 1 ? data.data.to_user : data.data.from.id;
-      let currentPath = "/chat/message/" + toUser + "/" + data.data.is_group;
+      let isGroup = data.data.is_group;
+      let toUser = isGroup == 1 ? data.data.to_user : data.data.from.id;
+      let currentPath = "/chat/message/" + toUser + "/" + isGroup;
       console.log(route.fullPath, currentPath);
-      // 当前聊天窗口，推进消息
-      if (route.fullPath == currentPath) {
-        messageList.value.push(data.data);
-        if (data.data.type == Image)
-          imagePreviewList.value.push(data.data.content);
-      }
-
+      //在消息列表页面就刷新列表
       if (route.fullPath == "/chat" || route.fullPath == "/chat?verify=1") {
-        getChatList();
+        await getChatList();
       }
 
       //不在聊天窗口或者消息列表页面就弹出消息气泡
       if (
         route.fullPath != "/chat" &&
-        route.fullPath.indexOf("/chat/message") == -1
+        route.fullPath != "/chat?verify=1" &&
+        route.fullPath != currentPath
       ) {
         if (data.data.type != Text)
           data.data.content = Content[data.data.type] ?? Content[File];
@@ -90,10 +85,21 @@ const onMessage = (data) => {
         showMessagePopup.value = true;
         messageAction.value = ActionSend;
       }
-      //消息未读数加1
-      appStore.unreadIncrBy(UnreadChat);
-      //播放消息通知音
-      noticeAudio.play();
+
+      // 当前聊天窗口，推进消息
+      if (route.fullPath == currentPath) {
+        messageList.value.push(data.data);
+        if (data.data.type == Image)
+          imagePreviewList.value.push(data.data.content);
+        //立刻标记已读
+        messageApi.read({ to_user: toUser, is_group: isGroup });
+      } else {
+        //消息未读数加1
+        appStore.unreadIncrBy(UnreadChat);
+        //播放消息通知音
+        noticeAudio.play();
+      }
+
       break;
     case ActionLogout:
       showDialog({

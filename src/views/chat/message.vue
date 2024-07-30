@@ -127,21 +127,11 @@ const sendMessage = (type) => {
   }
 };
 
-const readMessage = async () => {
-  if (queryData.to_user) {
-    messageApi.read(queryData).then((res) => {
-      console.log("readMessage", res);
-      if (res.code == 200001) {
-        appStore.unreadDecrBy(UnreadChat, chatInfo.value.unread);
-      }
-    });
-  }
-};
-
 const getMessageList = async () => {
   messageApi.getList(queryData.to_user, queryData.is_group).then((res) => {
     console.log("getMessageList", res);
     if (res.code == 200001) {
+      imagePreviewList.value = [];
       messageList.value = res.data;
       messageList.value.forEach((item) => {
         if (item.type == Image) imagePreviewList.value.push(item.content);
@@ -155,6 +145,9 @@ const getChatInfo = async () => {
     console.log("getChatInfo", res);
     if (res.code == 200001) {
       chatInfo.value = res.data;
+      if (chatInfo.value.unread > 0) {
+        appStore.unreadDecrBy(UnreadChat, chatInfo.value.unread);
+      }
     }
   });
 };
@@ -313,7 +306,6 @@ onUnmounted(async () => {
   if (mediaStream.value) {
     mediaStream.value.getTracks().forEach((track) => track.stop());
   }
-  await readMessage();
 });
 </script>
 <template>

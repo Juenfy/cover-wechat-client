@@ -12,9 +12,9 @@ const handleClick = () => {
   switch (props.action) {
     case ActionApply:
       router.push({
-        name: "friend-info",
+        name: "friend",
         query: {
-          keywords: props.message.keywords,
+          show_friend_new: 1,
         },
       });
       break;

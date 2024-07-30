@@ -28,14 +28,17 @@ const onSearchFocus = () => {
 
 const getApplyList = () => {
   friendApi.getApplyList().then((res) => {
-    applyList.value = res.data;
+    if (res.code == 200001) {
+      applyList.value = res.data;
+      readApply();
+    }
   });
 };
 
 const deleteApply = (id) => {
   friendApi.deleteApply(id).then((res) => {
     if (res.code == 200001) {
-      getApplyList;
+      getApplyList();
     }
   });
 };
@@ -49,13 +52,20 @@ const handleHomeClick = (item) => {
     },
   });
 };
+
+const readApply = () => {
+  console.log(appStore.unread);
+  if (appStore.unread.apply > 0) {
+    appStore.unreadDecrBy(UnreadApply, appStore.unread.apply);
+    appStore.unreadDecrBy(UnreadFriend, appStore.unread.apply);
+  }
+};
+
 watch(
   () => props.show,
   (newVal) => {
     if (newVal) {
       getApplyList();
-      appStore.unreadDecrBy(UnreadApply, props.unread);
-      appStore.unreadDecrBy(UnreadFriend, props.unread);
     }
   }
 );

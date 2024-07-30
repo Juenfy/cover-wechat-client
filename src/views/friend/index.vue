@@ -94,11 +94,7 @@ onMounted(async () => {
       </div>
     </van-index-bar>
   </div>
-  <friend-new
-    :show="showFriendNew"
-    @hide="showFriendNew = false"
-    @unread="appStore.unread.apply"
-  />
+  <friend-new :show="showFriendNew" @hide="showFriendNew = false" />
   <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
   <group-list :show="showGroupList" @hide="showGroupList = false" />
 </template>
