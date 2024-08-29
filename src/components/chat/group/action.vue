@@ -116,98 +116,45 @@ watch(
 );
 </script>
 <template>
-  <van-popup
-    v-model:show="props.show"
-    position="right"
-    :style="{ height: '100%', width: '100%' }"
-    duration="0.2"
-  >
+  <van-popup v-model:show="props.show" position="right" :style="{ height: '100%', width: '100%' }" duration="0.2">
     <header>
-      <van-nav-bar
-        title="选择联系人"
-        left-text="取消"
-        @click-left="$emit('hide')"
-        @click-right="onSubmit"
-        :border="false"
-      >
+      <van-nav-bar title="选择联系人" left-text="取消" @click-left="$emit('hide')" @click-right="onSubmit" :border="false">
         <template #right>
-          <van-button type="primary" size="small">完成</van-button>
+          <van-button type="primary" size="small" :disabled="checkedList.length <= 0">完成</van-button>
         </template>
       </van-nav-bar>
     </header>
     <section>
       <div class="header"></div>
       <div class="container">
-        <van-search
-          v-model="keywords"
-          placeholder="搜索"
-          @focus="searchFocus = true"
-          @blur="searchFocus = keywords.length > 0"
-          @update:model-value="searchResult"
-        />
+        <van-search v-model="keywords" placeholder="搜索" @focus="searchFocus = true"
+          @blur="searchFocus = keywords.length > 0" @update:model-value="searchResult" />
         <div class="friend-list">
           <van-index-bar v-if="!searchFocus" :index-list="indexList">
-            <van-cell
-              title="选择一个群"
-              size="large"
-              is-link
-              to=""
-              v-if="props.action == 'create'"
-            />
-            <van-cell
-              title="新面对面群"
-              size="large"
-              is-link
-              to=""
-              v-if="props.action == 'create'"
-            />
+            <van-cell title="选择一个群" size="large" is-link to="" v-if="props.action == 'create'" />
+            <van-cell title="新面对面群" size="large" is-link to="" v-if="props.action == 'create'" />
             <div v-for="val in indexList" :key="val">
               <van-index-anchor :index="val" />
-              <van-cell
-                :title="item.nickname"
-                size="large"
-                :center="true"
-                v-for="(item, index) in friendList[val]"
-                :key="item.friend"
-              >
+              <van-cell :title="item.nickname" size="large" :center="true" v-for="(item, index) in friendList[val]"
+                :key="item.friend">
                 <template #icon>
-                  <van-checkbox
-                    v-model="friendList[val][index].checked"
-                    :disabled="friendList[val][index].disabled"
-                    @change="
-                      (checked) => {
-                        friendList[val][index].checked = checked;
-                      }
-                    "
-                  ></van-checkbox>
+                  <van-checkbox v-model="friendList[val][index].checked" :disabled="friendList[val][index].disabled"
+                    @change="(checked) => {
+                      friendList[val][index].checked = checked;
+                    }
+                      "></van-checkbox>
                   <van-image width="3rem" height="3rem" :src="item.avatar" />
                 </template>
               </van-cell>
             </div>
           </van-index-bar>
-          <div
-            class="search-result"
-            v-else-if="keywords.length > 0 && searchFocus"
-          >
-            <van-nav-bar
-              left-text="搜索结果"
-              :right-text="choseText"
-              left-disabled
-              @click-right="onClickChoseText"
-            />
+          <div class="search-result" v-else-if="keywords.length > 0 && searchFocus">
+            <van-nav-bar left-text="搜索结果" :right-text="choseText" left-disabled @click-right="onClickChoseText" />
             <van-cell-group title="联系人" :border="false">
-              <van-cell
-                :title="item.nickname"
-                size="large"
-                :center="true"
-                v-for="(item, index) in searchFriendList"
-                :key="item.friend"
-              >
+              <van-cell :title="item.nickname" size="large" :center="true" v-for="(item, index) in searchFriendList"
+                :key="item.friend">
                 <template #icon>
-                  <van-checkbox
-                    v-model="searchFriendList[index].checked"
-                    v-if="choseText != '多选'"
-                  ></van-checkbox>
+                  <van-checkbox v-model="searchFriendList[index].checked" v-if="choseText != '多选'"></van-checkbox>
                   <van-image width="3rem" height="3rem" :src="item.avatar" />
                 </template>
               </van-cell>
@@ -221,6 +168,7 @@ watch(
 
 <style scoped lang="less">
 .friend-list {
+
   .van-checkbox,
   .van-image {
     margin-right: 1rem;

@@ -39,6 +39,10 @@ const onChangeDarkMode = (e) => {
   appStore.setTheme(e ? "dark" : "light");
 };
 
+const gotoStar = () => {
+  window.open("https://github.com/Juenfy/cover-wechat-api");
+};
+
 onMounted(() => {
   appStore.initHeader({ title: "我", navbar: false, search: false });
   darkMode.value = appStore.theme == "dark";
@@ -52,17 +56,10 @@ onMounted(() => {
         <template #title>
           <div class="card">
             <div class="info">
-              <van-image
-                radius=".5rem"
-                width="4rem"
-                height="4rem"
-                :src="userStore.info.avatar"
-              />
+              <van-image radius=".5rem" width="4rem" height="4rem" :src="userStore.info.avatar" />
               <div class="text">
-                <span class="nickname"
-                  >{{ userStore.info.nickname
-                  }}<van-icon name="user" color="#008cff"
-                /></span>
+                <span class="nickname">{{ userStore.info.nickname
+                  }}<van-icon name="user" color="#008cff" /></span>
                 <span class="vchat">微信号：{{ userStore.info.wechat }}</span>
                 <span class="area">地区：广州</span>
               </div>
@@ -79,10 +76,7 @@ onMounted(() => {
       <van-cell is-link to="index" size="large" :center="true">
         <template #title>
           <span>朋友圈</span>
-          <van-image
-            src="https://img.yzcdn.cn/vant/cat.jpeg"
-            style="width: 3rem; height: 3rem; margin-left: 1rem"
-          />
+          <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" style="width: 3rem; height: 3rem; margin-left: 1rem" />
         </template>
       </van-cell>
     </van-cell-group>
@@ -92,6 +86,7 @@ onMounted(() => {
           <van-image height="1.5rem" width="1.5rem" src="/dark.png" />
           <div class="left-box" style="">
             <span>深夜模式</span>
+            <span></span>
           </div>
         </template>
         <template #right-icon>
@@ -105,18 +100,15 @@ onMounted(() => {
           <van-image height="1.5rem" width="1.5rem" src="/setting.png" />
           <div class="left-box" style="">
             <span>设置</span>
+            <span></span>
           </div>
         </template>
       </van-cell>
     </van-cell-group>
-    <van-button
-      size="large"
-      :square="true"
-      icon="chat-o"
-      style="margin-top: 0.5rem; border: none; font-weight: bold"
-      @click="onLogout"
-      >退出登录</van-button
-    >
+    <van-button size="large" :square="true" icon="star-o" style="margin-top: 0.5rem; border: none; font-weight: bold"
+      @click="gotoStar">吴彦祖，给个star呗！</van-button>
+    <van-button size="large" :square="true" icon="chat-o" style="margin-top: 0.5rem; border: none; font-weight: bold"
+      @click="onLogout">退出登录</van-button>
   </div>
   <me-info :show="showMeInfo" @hide="showMeInfo = false" />
 </template>
@@ -125,26 +117,31 @@ onMounted(() => {
 .van-cell-group {
   margin-bottom: 0.5rem;
 }
+
 .me {
   position: fixed;
   width: 100%;
   height: 100%;
+
   .card {
     width: 100%;
+
     .info {
       display: flex;
       position: relative;
       justify-content: flex-start;
       justify-items: flex-start;
       padding: 1.5rem 1.5rem 2.5rem 1.5rem;
+
       .text {
         height: 4rem;
         margin-left: 1.5rem;
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
-        span {
-        }
+
+        span {}
+
         .nickname {
           font-weight: bold;
           font-size: 20px;

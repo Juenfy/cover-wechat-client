@@ -9,14 +9,16 @@ import {
   onUpdated,
   nextTick,
   onBeforeUnmount,
+  watch,
 } from "vue";
 import "emoji-picker-element";
 import * as messageApi from "@/api/message";
 import * as chatApi from "@/api/chat";
 import { useAppStore } from "@/stores/app";
-import { messageList, imagePreviewList } from "@/utils/websocket";
+import { chatInfo, getChatInfo, messageList, imagePreviewList } from "@/utils/websocket";
 import { UnreadChat } from "@/enums/app";
 import ChatInfo from "@/components/chat/info.vue";
+import ChatGroupUsers from "@/components/chat/group/users.vue";
 import {
   closeToast,
   showFailToast,
@@ -34,9 +36,10 @@ const route = useRoute();
 const appStore = useAppStore();
 const popupMoreBottom = ref(false);
 const popupEmojiBottom = ref(false);
+const atUsers = ref([]);
 const content = ref("");
-const input = ref(null);
-const chatInfo = ref({});
+const contentRef = ref(null);
+const textareaRef = ref(null);
 const msgBoxRef = ref(null);
 const footerRef = ref(null);
 const queryData = reactive({
@@ -44,6 +47,7 @@ const queryData = reactive({
   is_group: route.params.is_group,
 });
 const showChatInfo = ref(false);
+const showChatGroupUsers = ref(false);
 const moreBottomAction = ref("");
 const leftIcon = ref(appStore.icon.audio);
 const isAudioRecord = ref(false);
@@ -92,7 +96,7 @@ const handleRightFirstIconClick = (e) => {
 
 const onSelectEmoji = (emoji) => {
   content.value += emoji.detail.unicode;
-  input.value.focus();
+  textareaRef.value.focus();
 };
 
 const onMoreBottomItemClick = (action) => {
@@ -107,6 +111,52 @@ const onClickAvatar = (item) => {
       keywords: item.from.wechat,
     },
   });
+};
+
+//选择at的用户回调
+const selectAtUsers = (users) => {
+  showChatGroupUsers.value = false;
+  if (users.length <= 0) return false;
+  console.log("选择艾特的用户", users);
+  users.forEach((item) => {
+    item.start = content.value.length;
+    content.value += "@" + item.nickname + " ";
+    item.end = content.value.length;
+    atUsers.value.push(item);
+  });
+  console.log("最终艾特的用户", atUsers.value);
+};
+
+//监听消息变化
+watch(content, (newVal, oldVal) => {
+  if (
+    chatInfo.value.is_group == 1 &&
+    newVal.length > oldVal.length &&
+    newVal.charAt(newVal.length - 1) === "@"
+  ) {
+    content.value = newVal.substring(0, newVal.length - 1);
+    showChatGroupUsers.value = true;
+  }
+  //删除at用户处理
+  if (atUsers.value.length > 0 && newVal.length < oldVal.length) {
+    let lastAtUser = atUsers.value[atUsers.value.length - 1];
+    let end = lastAtUser.end;
+    let start = lastAtUser.start;
+    if (end == oldVal.length) {
+      content.value =
+        content.value.slice(0, start) + content.value.slice(end + 1);
+      atUsers.value.pop();
+      console.log(atUsers.value);
+    }
+  }
+});
+
+//消息输入框重置高度
+const autoResizeTextarea = (e) => {
+  const textarea = e.target;
+  console.log(textarea.scrollHeight);
+  console.log(textarea.scrollWidth);
+  textarea.style.height = `${textarea.scrollHeight}px`;
 };
 
 //发送信息
@@ -124,9 +174,12 @@ const sendMessage = (type) => {
     });
 
     content.value = "";
+    if (textareaRef.value.scrollHeight > 36)
+      textareaRef.value.style.height = '36px';
   }
 };
 
+//获取消息列表
 const getMessageList = async () => {
   messageApi.getList(queryData.to_user, queryData.is_group).then((res) => {
     console.log("getMessageList", res);
@@ -140,17 +193,17 @@ const getMessageList = async () => {
   });
 };
 
-const getChatInfo = async () => {
-  chatApi.getInfo(queryData.to_user, queryData.is_group).then((res) => {
-    console.log("getChatInfo", res);
-    if (res.code == 200001) {
-      chatInfo.value = res.data;
-      if (chatInfo.value.unread > 0) {
-        appStore.unreadDecrBy(UnreadChat, chatInfo.value.unread);
-      }
-    }
-  });
-};
+// const getChatInfo = async () => {
+//   chatApi.getInfo(queryData.to_user, queryData.is_group).then((res) => {
+//     console.log("getChatInfo", res);
+//     if (res.code == 200001) {
+//       chatInfo.value = res.data;
+//       if (chatInfo.value.unread > 0) {
+//         appStore.unreadDecrBy(UnreadChat, chatInfo.value.unread);
+//       }
+//     }
+//   });
+// };
 
 const onOversize = (file) => {
   showFailToast("文件大小超过30MB限制");
@@ -262,6 +315,10 @@ const handleTouchMove = (e) => {
   }
 };
 
+const onContentRightClick = (e) => {
+  console.log("onContentRightClick", e);
+};
+
 onUpdated(() => {
   nextTick(() => {
     // 滚动到底部
@@ -298,7 +355,11 @@ onMounted(async () => {
   } catch (error) {
     console.error("获取音频权限失败:", error);
   }
-  await getChatInfo();
+  await getChatInfo(queryData, (res) => {
+    if (res.data.unread > 0) {
+      appStore.unreadDecrBy(UnreadChat, res.data.unread);
+    }
+  });
   await getMessageList();
 });
 
@@ -311,98 +372,47 @@ onUnmounted(async () => {
 <template>
   <div class="message-box">
     <header>
-      <van-nav-bar
-        :title="chatInfo.nickname"
-        left-arrow
-        @click-left="router.go(-1)"
-        @click-right="showChatInfo = true"
-        :border="false"
-        style="opacity: 0.8"
-      >
+      <van-nav-bar :title="chatInfo.nickname" left-arrow @click-left="router.go(-1)" @click-right="showChatInfo = true"
+        :border="false" style="opacity: 0.8">
         <template #right>
           <van-icon name="ellipsis" size="20" />
         </template>
       </van-nav-bar>
     </header>
-    <section
-      class="bg-nav"
-      :style="
-        chatInfo.bg_file_path == ''
-          ? ''
-          : 'background-image: url(' + chatInfo.bg_file_path + ');'
-      "
-    >
+    <section class="bg-nav" :style="chatInfo.bg_file_path == ''
+      ? ''
+      : 'background-image: url(' + chatInfo.bg_file_path + ');'
+      ">
       <div class="header"></div>
-      <div
-        class="container"
-        ref="msgBoxRef"
-        :style="chatInfo.bg_file_path == '' ? '' : 'background: none;'"
-      >
+      <div class="container" ref="msgBoxRef" :style="chatInfo.bg_file_path == '' ? '' : 'background: none;'">
         <ul class="message-list">
-          <li
-            v-for="item in messageList"
-            :key="item.id"
-            :class="item.is_tips == 1 ? 'li-tips-message' : ''"
-          >
+          <li v-for="item in messageList" :key="item.id" :class="item.is_tips == 1 ? 'li-tips-message' : ''">
             <div v-if="item.is_tips == 0" class="normal-message">
               <article :class="item.right ? 'right' : ''">
                 <div class="avatar">
-                  <img
-                    alt="avatar"
-                    :src="item.from.avatar"
-                    @click="onClickAvatar(item)"
-                  />
+                  <img alt="avatar" :src="item.from.avatar" @click="onClickAvatar(item)" />
                 </div>
-                <div class="content">
-                  <span
-                    :class="item.right ? 'nickname right' : 'nickname'"
-                    v-if="chatInfo.display_nickname"
-                  >
+                <div class="content" ref="contentRef" @click.exact.prevent="onContentRightClick">
+                  <span :class="item.right ? 'nickname right' : 'nickname'" v-if="chatInfo.display_nickname">
                     {{ item.from.nickname }}
                   </span>
                   <div class="msg">
-                    <div
-                      class="tri"
-                      v-if="[Video, AudioEnum].includes(item.type) === false"
-                    ></div>
+                    <div class="tri" v-if="[Video, AudioEnum].includes(item.type) === false"></div>
                     <div class="msg_inner" v-if="item.type == Text">
                       {{ item.content }}
                     </div>
-                    <div
-                      class="msg_inner msg_image"
-                      v-else-if="item.type == Image"
-                    >
-                      <van-image
-                        fit="contain"
-                        :src="item.content"
-                        @click="previewImage(item.content)"
-                      />
+                    <div class="msg_inner msg_image" v-else-if="item.type == Image">
+                      <van-image fit="contain" :src="item.content" @click="previewImage(item.content)" />
                     </div>
-                    <div
-                      class="msg_innser msg_video"
-                      v-else-if="item.type == Video"
-                    >
+                    <div class="msg_innser msg_video" v-else-if="item.type == Video">
                       <div class="van-image">
-                        <video
-                          controls
-                          :src="item.content"
-                          loop
-                          playsinline
-                          class="van-image__img"
-                          style="object-fit: contain"
-                        ></video>
+                        <video controls :src="item.content" loop playsinline class="van-image__img"
+                          style="object-fit: contain"></video>
                       </div>
                     </div>
-                    <div
-                      class="msg_innser msg_audio"
-                      v-else-if="item.type == AudioEnum"
-                    >
+                    <div class="msg_innser msg_audio" v-else-if="item.type == AudioEnum">
                       <div class="van-image">
-                        <audio
-                          :src="item.content"
-                          controls
-                          type="audio/wav"
-                        ></audio>
+                        <audio :src="item.content" controls type="audio/wav"></audio>
                       </div>
                     </div>
                   </div>
@@ -420,56 +430,23 @@ onUnmounted(async () => {
           <div class="left">
             <van-icon :name="leftIcon" @click="handleLeftIconClick" />
           </div>
-          <van-button
-            v-if="isAudioRecord"
-            type="primary"
-            @touchstart="startRecording"
-            @touchend="stopRecording"
-            @touchmove="handleTouchMove"
-            >按住 说话</van-button
-          >
-          <input
-            v-else
-            type="text"
-            v-model="content"
-            @keyup.enter="sendMessage('text')"
-            ref="input"
-          />
+          <van-button v-if="isAudioRecord" type="primary" @touchstart="startRecording" @touchend="stopRecording"
+            @touchmove="handleTouchMove">按住 说话</van-button>
+          <textarea v-else type="text" v-model="content" @input="autoResizeTextarea" @keyup.enter="sendMessage('text')"
+            ref="textareaRef"></textarea>
           <div class="right">
-            <van-icon
-              :name="appStore.icon.emoji"
-              @click="handleRightFirstIconClick"
-            />
-            <van-icon
-              :name="appStore.icon.more"
-              @click="handleRightSecondIconClick"
-            />
+            <van-icon :name="appStore.icon.emoji" @click="handleRightFirstIconClick" />
+            <van-icon :name="appStore.icon.more" @click="handleRightSecondIconClick" />
           </div>
         </div>
-        <div
-          :class="
-            popupMoreBottom ? 'more-bottom more-bottom-popup' : 'more-bottom'
-          "
-        >
-          <van-grid
-            :column-num="4"
-            style="width: inherit"
-            gutter="1rem"
-            square
-            center
-            :border="false"
-          >
+        <div :class="popupMoreBottom ? 'more-bottom more-bottom-popup' : 'more-bottom'
+          ">
+          <van-grid :column-num="4" style="width: inherit" gutter="1rem" square center :border="false">
             <van-grid-item>
               <template #default>
-                <van-uploader
-                  :before-read="beforeRead"
-                  :after-read="afterRead"
-                  accept="image/*, video/*"
-                  :max-size="uploadMaxSize"
-                  @oversize="onOversize"
-                  max-count="1"
-                  @click="onMoreBottomItemClick('photo')"
-                >
+                <van-uploader :before-read="beforeRead" :after-read="afterRead" accept="image/*, video/*"
+                  :max-size="uploadMaxSize" @oversize="onOversize" max-count="1"
+                  @click="onMoreBottomItemClick('photo')">
                   <div class="more-bottom-item">
                     <div class="more-bottom-icon">
                       <van-icon name="photo" size="30"></van-icon>
@@ -491,12 +468,8 @@ onUnmounted(async () => {
             </van-grid-item>
             <van-grid-item>
               <template #default>
-                <van-uploader
-                  :max-size="uploadMaxSize"
-                  @oversize="onOversize"
-                  @click="onMoreBottomItemClick('file')"
-                  max-count="1"
-                >
+                <van-uploader :max-size="uploadMaxSize" @oversize="onOversize" @click="onMoreBottomItemClick('file')"
+                  max-count="1">
                   <div class="more-bottom-item">
                     <div class="more-bottom-icon">
                       <van-icon name="description" size="30" />
@@ -508,39 +481,21 @@ onUnmounted(async () => {
             </van-grid-item>
           </van-grid>
         </div>
-        <emoji-picker
-          :class="
-            popupEmojiBottom
-              ? 'emoji-bottom emoji-bottom-popup'
-              : 'emoji-bottom'
-          "
-          @emojiClick="onSelectEmoji"
-        />
+        <emoji-picker :class="popupEmojiBottom
+          ? 'emoji-bottom emoji-bottom-popup'
+          : 'emoji-bottom'
+          " @emojiClick="onSelectEmoji" />
       </div>
     </section>
   </div>
-  <chat-info
-    :show="showChatInfo"
-    @hide="showChatInfo = false"
-    :info="chatInfo"
-  />
-
+  <chat-info :show="showChatInfo" @hide="showChatInfo = false" :info="chatInfo" />
+  <chat-group-users v-if="chatInfo.is_group == 1" :show="showChatGroupUsers" @hide="showChatGroupUsers = false"
+    @select="selectAtUsers" :users="chatInfo.users" />
   <div class="audio-recording" v-if="isAudioRecording">
     <div :class="isCancelAudioRecording ? 'bubble bubble-cancel' : 'bubble'">
-      <svg
-        class="waveform"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 100 30"
-      >
-        <path
-          v-for="n in 5"
-          :key="n"
-          :d="wavePath(n)"
-          stroke="white"
-          stroke-width="2"
-          fill="none"
-          :opacity="1 - n * 0.15"
-        />
+      <svg class="waveform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30">
+        <path v-for="n in 5" :key="n" :d="wavePath(n)" stroke="white" stroke-width="2" fill="none"
+          :opacity="1 - n * 0.15" />
       </svg>
     </div>
     <div class="recording-text">
@@ -556,37 +511,46 @@ onUnmounted(async () => {
     // background-image: url(/src/assets/bg.png);
     background-position: center;
     background-size: cover;
+
     .container {
       .message-list {
         padding: 0.5rem 1rem 0 1rem;
-        > li {
+
+        >li {
           display: block;
         }
-        > li > .normal-message > article {
+
+        >li>.normal-message>article {
           display: flex;
           justify-content: flex-start;
           margin-bottom: 0.5rem;
-          > .avatar {
+
+          >.avatar {
             margin-right: 0.7rem;
-            > img {
+
+            >img {
               width: 3.5rem;
               height: 3.5rem;
               border-radius: 0.2rem;
             }
           }
-          > .content > span {
+
+          >.content>span {
             color: var(--theme-gray-70);
             font-size: 14px;
             line-height: 18px;
             display: block;
           }
-          > .content > .right {
+
+          >.content>.right {
             text-align: right;
           }
-          > .content > .msg {
+
+          >.content>.msg {
             display: flex;
             justify-content: space-between;
-            > .tri {
+
+            >.tri {
               width: 0;
               height: 0;
               border-style: solid;
@@ -594,47 +558,54 @@ onUnmounted(async () => {
               margin-right: -1px;
               border-color: transparent #ffffff transparent transparent;
             }
-            > .msg_inner {
+
+            >.msg_inner {
               background-color: #fff;
               width: 100%;
               padding: 1rem 0.7rem;
               border-radius: 0 0.2rem 0.2rem 0.2rem;
               box-shadow: 0.1rem 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
               text-align: left;
-              word-wrap: break-word; /* 在单词的任意位置断行 */
-              word-break: break-all; /* 在单词的任意位置断行 */
+              word-wrap: break-word;
+              /* 在单词的任意位置断行 */
+              word-break: break-all;
+              /* 在单词的任意位置断行 */
             }
           }
         }
 
-        > li > .normal-message > article.right {
+        >li>.normal-message>article.right {
           flex-direction: row-reverse;
-          > .avatar {
+
+          >.avatar {
             margin-right: 0px;
             margin-left: 0.7rem;
           }
-          > .content > .msg {
+
+          >.content>.msg {
             flex-direction: row-reverse;
-            > .tri {
+
+            >.tri {
               margin-left: -1px;
               border-width: 1rem 0.7rem 0 0;
-              border-color: var(--theme-primary-color) transparent transparent
-                transparent;
+              border-color: var(--theme-primary-color) transparent transparent transparent;
             }
 
-            > .msg_inner {
+            >.msg_inner {
               border-radius: 0.2rem 0 0.2rem 0.2rem;
               background-color: var(--theme-primary-color);
             }
           }
         }
-        > li.li-tips-message {
+
+        >li.li-tips-message {
           display: flex;
           justify-content: center;
           align-items: center;
           margin-bottom: 1rem;
         }
-        > li > .tips-message {
+
+        >li>.tips-message {
           width: 60%;
           text-align: center;
           font-size: 12px;
@@ -650,9 +621,11 @@ onUnmounted(async () => {
         }
       }
     }
+
     .footer {
       height: auto;
-      > div,
+
+      >div,
       emoji-picker {
         width: inherit;
         padding: 1rem 0;
@@ -661,52 +634,62 @@ onUnmounted(async () => {
         border-top: 1px solid var(--van-nav-bar-border-color);
         opacity: 0.9;
       }
-      > .msg-box-top {
+
+      >.msg-box-top {
         border-top: none;
-        > input,
+
+        >textarea,
         button {
-          background-color: var(--van-white);
           border: none;
           outline: none;
-          height: 34px;
+          height: 36px;
           width: 75%;
           font-weight: bold;
           border-radius: 0.2rem;
           color: var(--black-white-color);
           background: var(--messge-footer-input-background);
         }
-        > input {
-          padding: 0;
-          text-indent: 10px;
-          background: var(--messge-footer-input-background);
+
+        >textarea {
+          box-sizing: border-box;
+          padding: 9px 5px;
+          max-height: 100px;
+          resize: none;
+          overflow-y: scroll;
         }
-        > .left,
-        > .right {
+
+        >.left,
+        >.right {
           height: inherit;
           font-size: 24px;
           display: flex;
           justify-content: center;
           align-items: center;
         }
-        > .left {
+
+        >.left {
           width: 10%;
         }
-        > .right {
+
+        >.right {
           width: 15%;
           justify-content: space-evenly;
         }
       }
-      > .more-bottom,
-      > .emoji-bottom {
+
+      >.more-bottom,
+      >.emoji-bottom {
         padding: 0;
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.2s ease-in-out;
+
         .more-bottom-item {
           display: flex;
           justify-content: center;
           align-items: center;
           flex-direction: column;
+
           .more-bottom-icon {
             height: 4rem;
             width: 4rem;
@@ -715,10 +698,12 @@ onUnmounted(async () => {
             display: flex;
             justify-content: center;
             align-items: center;
+
             i {
               color: var(--black4c-whitebc-color);
             }
           }
+
           .more-bottom-text {
             margin-top: 5px;
             font-size: 12px;
@@ -726,13 +711,16 @@ onUnmounted(async () => {
           }
         }
       }
-      > .more-bottom-popup,
-      > .emoji-bottom-popup {
+
+      >.more-bottom-popup,
+      >.emoji-bottom-popup {
         max-height: 18rem;
       }
-      > .more-bottom-popup {
+
+      >.more-bottom-popup {
         padding: 1rem 0;
       }
+
       emoji-picker {
         width: inherit;
         height: 18rem;

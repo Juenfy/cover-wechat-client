@@ -1,18 +1,44 @@
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 0.2s ease;
 }
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: transform 0.3s ease;
+/* 确保过渡前后的状态 */
+.fade-enter {
+  opacity: 0;
 }
-.slide-right-enter-from,
-.slide-right-leave-to {
-  transform: translateX(-100%);
+.fade-enter-to {
+  opacity: 1;
+}
+.fade-leave {
+  opacity: 1;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+.slide-left-enter-active,
+.slide-left-leave-active {
+  transition: transform 0.2s ease;
+}
+.slide-left-enter-from,
+.slide-left-leave-to {
+  transform: translateX(100%);
+}
+/* 确保过渡前后的状态 */
+.slide-left-enter {
+  opacity: 0;
+}
+.slide-left-enter-to {
+  opacity: 1;
+}
+.slide-left-leave {
+  opacity: 1;
+}
+.slide-left-leave-to {
+  opacity: 0;
 }
 .bounce-enter-active {
   animation: bounce-in 0.5s;

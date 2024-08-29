@@ -60,9 +60,21 @@ export const startWebSocket = async (WebSocketClient, uid) => {
 
 import { ref } from "vue";
 import * as chatApi from "@/api/chat";
+export const chatInfo = ref({});
 export const chatList = ref([]);
 export const messageList = ref([]);
 export const imagePreviewList = ref([]);
+
+export const getChatInfo = (params, cb) => {
+  chatApi.getInfo(params.to_user, params.is_group).then((res) => {
+    console.log("getChatInfo", res);
+    if (res.code == 200001) {
+      chatInfo.value = res.data;
+      cb(res);
+    }
+  });
+}
+
 export const getChatList = () => {
   chatApi.getList().then((res) => {
     console.log("getChatList", res);

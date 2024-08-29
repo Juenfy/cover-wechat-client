@@ -115,6 +115,7 @@ watch(
   font-size: 1rem;
   text-indent: 1rem;
   text-align: left;
+  color: var(--friend-add-qrcode-text);
 }
 .group-item-bottom {
   width: 100%;

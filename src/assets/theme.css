@@ -32,6 +32,9 @@
   .container {
     background: var(--theme-white-ed);
   }
+  .bg-white {
+    background: var(--theme-white);
+  }
   .top-active {
     background: var(--theme-white-ed);
   }
@@ -57,9 +60,11 @@
 
 /* 暗黑主题 */
 .van-theme-dark {
-  .container {
+  .container,
+  .bg-white {
     background: var(--theme-black-11);
   }
+
   .top-active {
     background: var(--theme-black-21);
   }
