@@ -1,6 +1,6 @@
 <script setup>
 import { watch, ref } from "vue";
-import { chatInfo, getChatInfo } from "@/utils/websocket";
+import { chatInfo, getChatInfo, getMessageList } from "@/utils/websocket";
 import * as chatApi from "@/api/chat";
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);
@@ -81,11 +81,22 @@ const onSubmit = () => {
         to_user: props.chatInfo.to_user,
         is_group: props.chatInfo.is_group
       }
-      getChatInfo(queryData, (res) => {
-        if (res.code == 200001) {
-          emit('hide');
-        }
-      });
+      if (props.updateField == 'nickname') {
+        //刷新聊天记录
+        getMessageList(queryData, (res) => {
+          if (res.code == 200001) {
+            emit('hide');
+          }
+        });
+      } else {
+        //刷新聊天信息
+        getChatInfo(queryData, (res) => {
+          if (res.code == 200001) {
+            emit('hide');
+          }
+        });
+      }
+
     }
   });
 };

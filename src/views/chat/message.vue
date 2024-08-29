@@ -15,7 +15,7 @@ import "emoji-picker-element";
 import * as messageApi from "@/api/message";
 import * as chatApi from "@/api/chat";
 import { useAppStore } from "@/stores/app";
-import { chatInfo, getChatInfo, messageList, imagePreviewList } from "@/utils/websocket";
+import { chatInfo, getChatInfo, messageList, getMessageList, imagePreviewList } from "@/utils/websocket";
 import { UnreadChat } from "@/enums/app";
 import ChatInfo from "@/components/chat/info.vue";
 import ChatGroupUsers from "@/components/chat/group/users.vue";
@@ -179,32 +179,6 @@ const sendMessage = (type) => {
   }
 };
 
-//获取消息列表
-const getMessageList = async () => {
-  messageApi.getList(queryData.to_user, queryData.is_group).then((res) => {
-    console.log("getMessageList", res);
-    if (res.code == 200001) {
-      imagePreviewList.value = [];
-      messageList.value = res.data;
-      messageList.value.forEach((item) => {
-        if (item.type == Image) imagePreviewList.value.push(item.content);
-      });
-    }
-  });
-};
-
-// const getChatInfo = async () => {
-//   chatApi.getInfo(queryData.to_user, queryData.is_group).then((res) => {
-//     console.log("getChatInfo", res);
-//     if (res.code == 200001) {
-//       chatInfo.value = res.data;
-//       if (chatInfo.value.unread > 0) {
-//         appStore.unreadDecrBy(UnreadChat, chatInfo.value.unread);
-//       }
-//     }
-//   });
-// };
-
 const onOversize = (file) => {
   showFailToast("文件大小超过30MB限制");
 };
@@ -360,7 +334,7 @@ onMounted(async () => {
       appStore.unreadDecrBy(UnreadChat, res.data.unread);
     }
   });
-  await getMessageList();
+  await getMessageList(queryData, (res) => { });
 });
 
 onUnmounted(async () => {
@@ -505,231 +479,6 @@ onUnmounted(async () => {
     </div>
   </div>
 </template>
-<style scoped lang="less">
-.message-box {
-  section {
-    // background-image: url(/src/assets/bg.png);
-    background-position: center;
-    background-size: cover;
-
-    .container {
-      .message-list {
-        padding: 0.5rem 1rem 0 1rem;
-
-        >li {
-          display: block;
-        }
-
-        >li>.normal-message>article {
-          display: flex;
-          justify-content: flex-start;
-          margin-bottom: 0.5rem;
-
-          >.avatar {
-            margin-right: 0.7rem;
-
-            >img {
-              width: 3.5rem;
-              height: 3.5rem;
-              border-radius: 0.2rem;
-            }
-          }
-
-          >.content>span {
-            color: var(--theme-gray-70);
-            font-size: 14px;
-            line-height: 18px;
-            display: block;
-          }
-
-          >.content>.right {
-            text-align: right;
-          }
-
-          >.content>.msg {
-            display: flex;
-            justify-content: space-between;
-
-            >.tri {
-              width: 0;
-              height: 0;
-              border-style: solid;
-              border-width: 0 0.7rem 1rem 0;
-              margin-right: -1px;
-              border-color: transparent #ffffff transparent transparent;
-            }
-
-            >.msg_inner {
-              background-color: #fff;
-              width: 100%;
-              padding: 1rem 0.7rem;
-              border-radius: 0 0.2rem 0.2rem 0.2rem;
-              box-shadow: 0.1rem 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
-              text-align: left;
-              word-wrap: break-word;
-              /* 在单词的任意位置断行 */
-              word-break: break-all;
-              /* 在单词的任意位置断行 */
-            }
-          }
-        }
-
-        >li>.normal-message>article.right {
-          flex-direction: row-reverse;
-
-          >.avatar {
-            margin-right: 0px;
-            margin-left: 0.7rem;
-          }
-
-          >.content>.msg {
-            flex-direction: row-reverse;
-
-            >.tri {
-              margin-left: -1px;
-              border-width: 1rem 0.7rem 0 0;
-              border-color: var(--theme-primary-color) transparent transparent transparent;
-            }
-
-            >.msg_inner {
-              border-radius: 0.2rem 0 0.2rem 0.2rem;
-              background-color: var(--theme-primary-color);
-            }
-          }
-        }
-
-        >li.li-tips-message {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin-bottom: 1rem;
-        }
-
-        >li>.tips-message {
-          width: 60%;
-          text-align: center;
-          font-size: 12px;
-          line-height: 2rem;
-          color: var(--theme-black-11);
-          background-color: var(--theme-white-f6);
-          opacity: 0.8;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          word-break: break-all;
-          border-radius: 4px;
-        }
-      }
-    }
-
-    .footer {
-      height: auto;
-
-      >div,
-      emoji-picker {
-        width: inherit;
-        padding: 1rem 0;
-        background-color: var(--messge-footer-background);
-        display: flex;
-        border-top: 1px solid var(--van-nav-bar-border-color);
-        opacity: 0.9;
-      }
-
-      >.msg-box-top {
-        border-top: none;
-
-        >textarea,
-        button {
-          border: none;
-          outline: none;
-          height: 36px;
-          width: 75%;
-          font-weight: bold;
-          border-radius: 0.2rem;
-          color: var(--black-white-color);
-          background: var(--messge-footer-input-background);
-        }
-
-        >textarea {
-          box-sizing: border-box;
-          padding: 9px 5px;
-          max-height: 100px;
-          resize: none;
-          overflow-y: scroll;
-        }
-
-        >.left,
-        >.right {
-          height: inherit;
-          font-size: 24px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        >.left {
-          width: 10%;
-        }
-
-        >.right {
-          width: 15%;
-          justify-content: space-evenly;
-        }
-      }
-
-      >.more-bottom,
-      >.emoji-bottom {
-        padding: 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.2s ease-in-out;
-
-        .more-bottom-item {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-
-          .more-bottom-icon {
-            height: 4rem;
-            width: 4rem;
-            background: var(--black20-white-color);
-            border-radius: 0.8rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            i {
-              color: var(--black4c-whitebc-color);
-            }
-          }
-
-          .more-bottom-text {
-            margin-top: 5px;
-            font-size: 12px;
-            color: var(--theme-gray-70);
-          }
-        }
-      }
-
-      >.more-bottom-popup,
-      >.emoji-bottom-popup {
-        max-height: 18rem;
-      }
-
-      >.more-bottom-popup {
-        padding: 1rem 0;
-      }
-
-      emoji-picker {
-        width: inherit;
-        height: 18rem;
-        --background: var(--messge-footer-background);
-      }
-    }
-  }
-}
-</style>
 
 <style lang="css">
 :root:root {
