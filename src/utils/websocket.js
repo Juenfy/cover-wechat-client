@@ -61,6 +61,7 @@ export const startWebSocket = async (WebSocketClient, uid) => {
 import { ref } from "vue";
 import * as chatApi from "@/api/chat";
 import * as messageApi from "@/api/message";
+import { Image } from "@/enums/file";
 export const chatInfo = ref({});
 export const chatList = ref([]);
 export const messageList = ref([]);
