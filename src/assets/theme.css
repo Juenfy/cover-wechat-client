@@ -64,7 +64,10 @@
   .bg-white {
     background: var(--theme-black-11);
   }
-
+  .group-update .van-cell-group,
+  .group-update .van-cell {
+    background: transparent;
+  }
   .top-active {
     background: var(--theme-black-21);
   }

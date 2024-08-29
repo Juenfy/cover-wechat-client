@@ -126,6 +126,11 @@ const onSubmit = () => {
   padding: 0 2rem;
   box-sizing: border-box;
 
+  h1,
+  h4 {
+    color: var(--black-white-color);
+  }
+
   .avatar-box {
     width: 3rem;
     height: 3rem;
