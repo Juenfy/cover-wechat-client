@@ -164,6 +164,10 @@ const sendMessage = (type) => {
   if (content.value) {
     queryData.content = content.value;
     queryData.type = type;
+    if (atUsers.value.length > 0) {
+      const atUserIds = atUsers.value.map((item) => item.id);
+      queryData.at_users = atUserIds.join(',');
+    }
     messageApi.send(queryData).then((res) => {
       console.log("sendMessage", res);
       if (res.code == 200001) {
