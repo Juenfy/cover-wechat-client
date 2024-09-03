@@ -83,18 +83,18 @@ footer{
     display: flex;
     flex-direction: column;
     justify-content: center;
-
     > span {
       display: block;
-      width: 15rem;
-      overflow: hidden; /* 隐藏超出部分 */
-      text-overflow: ellipsis; /* 超出部分显示为省略号 */
+      line-height: 18px;
     }
-
     > span:first-child {
       font-size: 18px;
     }
     > span:last-child {
+      width: 15rem;
+      white-space: nowrap; /* 确保文本不会换行 */
+      overflow: hidden; /* 超出部分隐藏 */
+      text-overflow: ellipsis; /* 超出部分显示为省略号 */
       color: var(--theme-gray-70);
     }
   }
