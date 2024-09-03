@@ -120,7 +120,7 @@ watch(
     <header>
       <van-nav-bar title="选择联系人" left-text="取消" @click-left="$emit('hide')" @click-right="onSubmit" :border="false">
         <template #right>
-          <van-button type="primary" size="small" :disabled="checkedList.length <= 0">完成</van-button>
+          <van-button type="primary" size="small">完成</van-button>
         </template>
       </van-nav-bar>
     </header>
