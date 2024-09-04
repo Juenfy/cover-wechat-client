@@ -21,7 +21,7 @@ onMounted(() => {
           </div>
         </template>
       </van-cell>
-      <van-cell :center="true" is-link to="">
+      <van-cell :center="true" is-link to="/me/qrcode/scan">
         <template #title>
           <van-image height="1.5rem" width="1.5rem" src="/scan-o.png" />
           <div class="left-box" style="">

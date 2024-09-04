@@ -79,60 +79,32 @@ onMounted(async () => {
 <template>
   <div v-if="dataLoaded">
     <header>
-      <van-nav-bar
-        :title="formData.type == 'apply' ? '申请添加朋友' : '通过好友验证'"
-        left-arrow
-        @click-left="router.go(-1)"
-        :border="false"
-      />
+      <van-nav-bar :title="formData.type == 'apply' ? '申请添加朋友' : '通过好友验证'" left-arrow @click-left="router.go(-1)"
+        :border="false" />
     </header>
     <section>
       <div class="header"></div>
       <div class="container friend-apply-container">
         <div class="common friend-apply">
           <van-form @submit="onSubmit">
-            <van-cell-group
-              title="发送添加好友申请"
-              v-if="formData.type == 'apply'"
-            >
-              <van-field
-                v-model="formData.remark"
-                name="备注名"
-                placeholder="添加备注名"
-                class="remark"
-              />
+            <van-cell-group title="发送添加好友申请" v-if="formData.type == 'apply'">
+              <van-field v-model="formData.remark" name="备注名" placeholder="添加备注名" class="remark" />
             </van-cell-group>
             <van-cell-group title="设置备注">
-              <van-field
-                v-model="formData.nickname"
-                name="备注"
-                placeholder="添加备注"
-              />
+              <van-field v-model="formData.nickname" name="备注" placeholder="添加备注" />
             </van-cell-group>
-            <van-radio-group
-              v-model="formData.setting.FriendPerm.SettingFriendPerm"
-            >
+            <van-radio-group v-model="formData.setting.FriendPerm.SettingFriendPerm">
               <van-cell-group :border="false" title="设置朋友权限">
-                <van-cell
-                  title="聊天、朋友圈、微信运动等"
-                  size="large"
-                  clickable
-                  @click="
-                    formData.setting.FriendPerm.SettingFriendPerm = 'ALLOW_ALL'
-                  "
-                >
+                <van-cell title="聊天、朋友圈、微信运动等" size="large" clickable @click="
+                  formData.setting.FriendPerm.SettingFriendPerm = 'ALLOW_ALL'
+                  ">
                   <template #right-icon>
                     <van-radio name="ALLOW_ALL" />
                   </template>
                 </van-cell>
-                <van-cell
-                  title="仅聊天"
-                  size="large"
-                  clickable
-                  @click="
-                    formData.setting.FriendPerm.SettingFriendPerm = 'ONLY_CHAT'
-                  "
-                >
+                <van-cell title="仅聊天" size="large" clickable @click="
+                  formData.setting.FriendPerm.SettingFriendPerm = 'ONLY_CHAT'
+                  ">
                   <template #right-icon>
                     <van-radio name="ONLY_CHAT" />
                   </template>
@@ -142,30 +114,20 @@ onMounted(async () => {
             <van-cell-group :border="false" title="朋友圈和状态">
               <van-cell title="不让他看" size="large">
                 <template #right-icon>
-                  <van-switch
-                    v-model="
-                      formData.setting.FriendPerm.MomentAndStatus
-                        .DontLetHimSeeIt
-                    "
-                  />
+                  <van-switch v-model="formData.setting.FriendPerm.MomentAndStatus
+                    .DontLetHimSeeIt
+                    " active-value="1" inactive-value="0" />
                 </template>
               </van-cell>
               <van-cell title="不看他" size="large">
                 <template #right-icon>
-                  <van-switch
-                    v-model="
-                      formData.setting.FriendPerm.MomentAndStatus.DontSeeHim
-                    "
-                  />
+                  <van-switch v-model="formData.setting.FriendPerm.MomentAndStatus.DontSeeHim
+                    " active-value="1" inactive-value="0" />
                 </template>
               </van-cell>
             </van-cell-group>
             <div style="margin-top: 2rem; text-align: center">
-              <van-button
-                type="primary"
-                native-type="submit"
-                style="width: 12rem"
-              >
+              <van-button type="primary" native-type="submit" style="width: 12rem">
                 {{ formData.type == Apply ? "提交" : "完成" }}
               </van-button>
             </div>
@@ -179,14 +141,18 @@ onMounted(async () => {
 .van-nav-bar {
   background: var(--friend-remark-nav-bar-background);
 }
+
 .friend-apply-container {
   background: var(--friend-remark-background) !important;
+
   [class*="van-hairline"]:after {
     border: none !important;
   }
+
   .friend-apply {
     .van-form {
       padding: 1rem 2rem;
+
       .remark {
         height: 6rem;
       }

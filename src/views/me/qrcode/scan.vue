@@ -75,33 +75,22 @@ onMounted(() => {
 </script>
 <template>
   <div class="fullscreen" ref="wrapper">
-    <van-nav-bar
-      left-arrow
-      @click-left="router.go(-1)"
-      @click-right="onClickRight"
-      :border="false"
-      style="background: transparent"
-    >
+    <van-nav-bar left-arrow @click-left="router.go(-1)" @click-right="onClickRight" :border="false"
+      style="background: transparent">
       <template #left>
         <van-image src="/back.png" width="2rem" height="2rem"></van-image>
       </template>
-      <template #right v-if="!torchNotSupported"
-        ><van-image :src="icon" width="2rem" height="2rem"></van-image
-      ></template>
+      <template #right v-if="!torchNotSupported"><van-image :src="icon" width="2rem"
+          height="2rem"></van-image></template>
     </van-nav-bar>
-    <qrcode-stream
-      @error="onError"
-      :torch="torchActive"
-      @camera-on="onCameraOn"
-      @camera-off="onCameraOff"
-      @detect="onDetect"
-    >
+    <qrcode-stream @error="onError" :torch="torchActive" @camera-on="onCameraOn" @camera-off="onCameraOff"
+      @detect="onDetect">
     </qrcode-stream>
   </div>
 </template>
 <style scoped>
 .fullscreen {
-  background: transparent;
+  background: var(--black20-white-color);
   position: fixed;
   z-index: 1000;
   top: 0;
