@@ -114,38 +114,24 @@ onUnmounted(async () => {
 </script>
 
 <template>
-  <van-popup
-    v-model:show="props.show"
-    position="right"
-    @opened="startCamera"
-    @closed="stopCamera"
-    style="width: 100%; height: 100%"
-  >
+  <van-popup v-model:show="props.show" position="right" @opened="startCamera" @closed="stopCamera"
+    style="width: 100%; height: 100%">
     <div class="camera">
-      <header>
-        <div class="back-button" @click="$emit('hide')">
-          <svg viewBox="0 0 24 24">
-            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-          </svg>
-        </div>
-      </header>
+      <div class="back-button" @click="$emit('hide')">
+        <svg viewBox="0 0 24 24">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+        </svg>
+      </div>
       <div class="container">
         <video ref="video" autoplay playsinline></video>
         <div class="controls">
           <div class="pictures" @click="previewImage">
-            <van-image
-              width="70"
-              height="70"
-              fit="cover"
-              v-if="lastPhoto"
-              :src="lastPhoto"
-            />
+            <van-image width="70" height="70" fit="cover" v-if="lastPhoto" :src="lastPhoto" />
           </div>
           <div class="switch-button" @click="switchCamera">
             <svg viewBox="0 0 24 24">
               <path
-                d="M12 5V3L8 7l4 4V8c2.76 0 5 2.24 5 5 0 .34-.03.67-.08 1h2.02c.05-.33.06-.66.06-1 0-3.86-3.14-7-7-7zm-1 8c-2.76 0-5-2.24-5-5 0-.34.03-.67.08-1H4.06c-.05.33-.06.66-.06 1 0 3.86 3.14 7 7 7v2l4-4-4-4v3z"
-              />
+                d="M12 5V3L8 7l4 4V8c2.76 0 5 2.24 5 5 0 .34-.03.67-.08 1h2.02c.05-.33.06-.66.06-1 0-3.86-3.14-7-7-7zm-1 8c-2.76 0-5-2.24-5-5 0-.34.03-.67.08-1H4.06c-.05.33-.06.66-.06 1 0 3.86 3.14 7 7 7v2l4-4-4-4v3z" />
             </svg>
           </div>
           <div class="camera-button" @click="takePhoto"></div>
@@ -162,51 +148,60 @@ onUnmounted(async () => {
 .camera {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
   width: 100%;
-  background-color: var(--van-black);
-  header {
-    position: relative;
-    width: 100%;
-    .back-button {
-      background-color: rgba(255, 255, 255, 0.4);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      transition: background-color 0.1s ease;
-      z-index: 20; /* 确保按钮在video元素之上 */
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      left: 20px;
-      top: 10px;
-    }
-    .back-button:hover {
-      background-color: rgba(255, 255, 255, 0.6);
-    }
 
-    .back-button svg {
-      height: 24px;
-      width: 24px;
-      fill: var(--van-white);
-    }
+  .back-button {
+    background-color: rgba(255, 255, 255, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+    z-index: 20;
+    /* 确保按钮在video元素之上 */
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    left: 20px;
+    top: 10px;
   }
+
+  .back-button:hover {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .back-button svg {
+    height: 24px;
+    width: 24px;
+    fill: var(--van-white);
+  }
+
   .container {
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 水平居中 */
-    align-items: center; /* 垂直居中 */
-    flex: 1; /* 占满剩余空间 */
+    justify-content: center;
+    /* 水平居中 */
+    align-items: center;
+    /* 垂直居中 */
+    flex: 1;
+    /* 占满剩余空间 */
     position: relative;
     width: 100%;
+    height: 100vh;
+
     video {
       width: 100%;
-      aspect-ratio: 1; /* 宽高比为 1:1 */
-      object-fit: cover; /* 保持视频比例，裁剪超出部分 */
-      pointer-events: none; /* 防止video元素阻止点击事件 */
+      height: 100vh;
+      aspect-ratio: 1;
+      /* 宽高比为 1:1 */
+      object-fit: cover;
+      /* 保持视频比例，裁剪超出部分 */
+      pointer-events: none;
+      /* 防止video元素阻止点击事件 */
     }
+
     .controls {
       position: absolute;
       bottom: 20px;
@@ -214,13 +209,16 @@ onUnmounted(async () => {
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 10; /* 确保按钮在video元素之上 */
+      z-index: 10;
+
+      /* 确保按钮在video元素之上 */
       .pictures,
       .camera-button {
         width: 70px;
         height: 70px;
         overflow: hidden;
       }
+
       .pictures,
       .camera-button,
       .switch-button {
@@ -230,14 +228,17 @@ onUnmounted(async () => {
         align-items: center;
         cursor: pointer;
         transition: background-color 0.1s ease;
-        z-index: 20; /* 确保按钮在video元素之上 */
+        z-index: 20;
+        /* 确保按钮在video元素之上 */
       }
+
       .pictures {
         border-radius: 4px;
         opacity: 0.8;
         position: absolute;
         left: 20px;
       }
+
       .camera-button {
         border: 6px solid rgba(255, 255, 255, 0.8);
         border-radius: 50%;
