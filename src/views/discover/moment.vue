@@ -164,7 +164,7 @@ const onSelectAction = (action) => {
 
 //发布朋友圈的回调
 const postSuccessCb = async (data) => {
-  onLoadMomentList();
+  onRefreshMomentList();
   showPostMoment.value = false;
 };
 
