@@ -164,8 +164,9 @@ const onSelectAction = (action) => {
 
 //发布朋友圈的回调
 const postSuccessCb = async (data) => {
-  onRefreshMomentList();
   showPostMoment.value = false;
+  refreshing.value = true;
+  onRefreshMomentList();
 };
 
 const gotoFriendInfo = (keywords) => {
