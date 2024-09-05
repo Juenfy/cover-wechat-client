@@ -227,7 +227,7 @@ const gotoFriendInfo = (keywords) => {
                     <div style="color: var(--theme-blue-1970);" v-if="item.likes.length > 0">
                       <van-icon name="like-o"></van-icon>
                       <span style="margin-left: 4px;" v-for="(like, index) in item.likes" :key="like.id"
-                        @click="gotoFriendInfo(item.user.wechat)">{{
+                        @click="gotoFriendInfo(like.user.wechat)">{{
                           like.user.nickname + (index + 1 == item.likes.length ? '' : ',') }}</span>
                     </div>
                   </template>
