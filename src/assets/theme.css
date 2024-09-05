@@ -2,12 +2,13 @@
 :root:root {
   --theme-primary-color: #57be6a;
   --theme-danger-color: #f56c6c;
-  --theme-blue-1970: #483d8b;
+  --theme-blue-1970: #5b6a91;
   --theme-black: #000;
   --theme-black-11: #111111;
   --theme-black-18: #181818;
   --theme-black-1c: #1c1c1c;
   --theme-black-1e: #1e1e1e;
+  --theme-black-19: #191919;
   --theme-black-20: #202020;
   --theme-black-21: #212121;
   --theme-black-28: #282828;
@@ -41,7 +42,9 @@
   }
   --black-white-color: var(--theme-black);
   --black4c-whitebc-color: var(--theme-black-4c);
+  --black19-white-color: var(--theme-white);
   --black20-white-color: var(--theme-white);
+  --black20-whitef7-color: var(--theme-white-f7);
   --van-nav-bar-background: var(--theme-white-ed);
   --van-nav-bar-icon-color: var(--theme-black-18);
   --van-nav-bar-text-color: var(--theme-black-18);
@@ -74,7 +77,9 @@
   }
   --black-white-color: var(--theme-white);
   --black4c-whitebc-color: var(--theme-white-bc);
+  --black19-white-color: var(--theme-black-19);
   --black20-white-color: var(--theme-black-20);
+  --black20-whitef7-color: var(--theme-black-20);
   --van-nav-bar-background: var(--theme-black-11);
   --van-nav-bar-icon-color: var(--theme-white);
   --van-nav-bar-text-color: var(--theme-white);

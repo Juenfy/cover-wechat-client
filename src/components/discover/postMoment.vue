@@ -1,6 +1,6 @@
 <script setup>
 import { watch, ref } from "vue";
-import { TypeText, TypeImage } from "@/enums/momment";
+import { TypeText, TypeImage } from "@/enums/moment";
 import { showFailToast, showSuccessToast, showLoadingToast, closeToast } from "vant";
 import * as momentApi from "@/api/moment";
 const props = defineProps({ show: Boolean, fileList: Array, postType: String });

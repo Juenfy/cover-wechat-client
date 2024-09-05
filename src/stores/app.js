@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { Home } from "@/enums/app";
-import { UnreadDiscover, UnreadChat, UnreadApply } from "@/enums/app";
+import { UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app";
 export const useAppStore = defineStore(
   "app",
   () => {
@@ -22,6 +22,8 @@ export const useAppStore = defineStore(
       chat: 0,
       apply: 0,
       discover: 0,
+      moment: 0,
+      friend: 0
     };
     const unread = ref(defaultUnread);
 
@@ -45,12 +47,15 @@ export const useAppStore = defineStore(
         case UnreadChat:
           unread.value.chat += incr;
           break;
-        case UnreadDiscover:
+        case UnreadMoment:
+          unread.value.moment += incr;
           unread.value.discover += incr;
           break;
         case UnreadApply:
           unread.value.apply += incr;
+          unread.value.friend += incr;
           break;
+
       }
     };
 
@@ -60,13 +65,17 @@ export const useAppStore = defineStore(
           unread.value.chat -= decr;
           if (unread.value.chat < 0) unread.value.chat = 0;
           break;
-        case UnreadDiscover:
+        case UnreadMoment:
+          unread.value.moment -= decr;
+          if (unread.value.moment < 0) unread.value.moment = 0;
           unread.value.discover -= decr;
           if (unread.value.discover < 0) unread.value.discover = 0;
           break;
         case UnreadApply:
           unread.value.apply -= decr;
           if (unread.value.apply < 0) unread.value.apply = 0;
+          unread.value.friend -= decr;
+          if (unread.value.friend < 0) unread.value.friend = 0;
           break;
       }
     };

@@ -1,12 +1,15 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { TypeText, TypeImage, TypeVideo } from "@/enums/momment";
+import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
 import PostMoment from "@/components/discover/postMoment.vue";
 import CommonCamera from "@/components/common/camera.vue";
 import * as momentApi from "@/api/moment";
+import { timestampFormat } from "@/utils/helper";
+import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
+const userStore = useUserStore();
 const showPostMomentMenu = ref(false);
 const showPostMoment = ref(false);
 const showCommonCamera = ref(false);
@@ -14,6 +17,8 @@ const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
 const momentList = ref([]);
+const commentData = ref({});
+const momentId = ref(null);
 const list = ref([]);
 const loading = ref(false);
 const finished = ref(false);
@@ -21,7 +26,7 @@ const refreshing = ref(false);
 const navBar = ref(null);
 const navTitle = ref("");
 const page = ref(1);
-const limit = ref(5);
+const limit = ref(10);
 const onClickBgHeader = () => {
   bgHeader.value.animate({ height: "30rem" }, { duration: 300 });
 };
@@ -44,7 +49,7 @@ const hidePostMoment = () => {
   fileList.value = [];
   showPostMoment.value = false;
 };
-
+// 监听滚动
 const onScroll = (e) => {
 
   if (e.target.scrollTop > bgHeader.value.clientHeight - 46) {
@@ -64,6 +69,7 @@ const onScroll = (e) => {
   }
 };
 
+//加载朋友圈列表
 const onLoadMomentList = () => {
   setTimeout(() => {
     if (refreshing.value) {
@@ -74,6 +80,19 @@ const onLoadMomentList = () => {
 
     momentApi.getList(page.value, limit.value).then((res) => {
       res.data.forEach(element => {
+        element.showActionPopover = false;
+        let t = '赞', v = 'like', i = 'like-o';
+        element.likes.forEach(item => {
+          if (item.user_id == userStore.info.id) {
+            t = '取消';
+            v = 'unlike';
+            i = 'like';
+          }
+        });
+        element.actions = [
+          { text: t, value: v, icon: i },
+          { text: "评论", value: 'comment', icon: 'comment-o' },
+        ];
         momentList.value.push(element);
       });
       ++page.value;
@@ -82,23 +101,82 @@ const onLoadMomentList = () => {
         finished.value = true;
       }
     });
-  }, 1000);
+  }, 500);
 };
-
+//下拉刷新朋友圈列表
 const onRefreshMomentList = () => {
-  // 清空列表数据
+  //清空列表数据
   finished.value = false;
 
-  // 重新加载数据
-  // 将 loading 设置为 true，表示处于加载状态
+  //重新加载数据
+  //将 loading 设置为 true，表示处于加载状态
   loading.value = true;
   onLoadMomentList();
 };
 
+//点赞、评论气泡弹出框
+const onOpenActionPopover = (id) => {
+  momentId.value = id;
+};
+const onSelectAction = (action) => {
+  console.log(action, momentId.value);
+  switch (action.value) {
+    //赞
+    case "like":
+      momentApi.like(momentId.value).then((res) => {
+        if (res.code == 200001) {
+          momentList.value.forEach((item, index) => {
+            if (item.id == momentId.value) {
+              momentList.value[index].likes.push(res.data);
+              momentList.value[index].actions = [
+                { text: '取消', value: 'unlike', icon: 'like' },
+                { text: "评论", value: 'comment', icon: 'comment-o' },
+              ];
+            }
+          });
+        }
+      });
+      break;
+    //取消赞
+    case "unlike":
+      momentApi.unlike(momentId.value).then((res) => {
+        if (res.code == 200001) {
+          momentList.value.forEach((item, i) => {
+            if (item.id == momentId.value) {
+              momentList.value[i].likes.forEach((like, j) => {
+                if (like.id == res.data.like_id) {
+                  momentList.value[i].likes.splice(j, 1);
+                  momentList.value[i].actions = [
+                    { text: '赞', value: 'like', icon: 'like-0' },
+                    { text: "评论", value: 'comment', icon: 'comment-o' },
+                  ];
+                }
+              })
+            }
+          })
+        }
+      })
+      break;
+    case "comment":
+      break;
+  }
+}
+
+//发布朋友圈的回调
 const postSuccessCb = async (data) => {
   onLoadMomentList();
   showPostMoment.value = false;
 };
+
+const gotoFriendInfo = (keywords) => {
+  router.push({
+    name: "friend-info",
+    query: {
+      keywords: keywords,
+    },
+  });
+}
+
 </script>
 <template>
   <div class="discover-moment">
@@ -117,13 +195,44 @@ const postSuccessCb = async (data) => {
           <div class="bg-header" @click="onClickBgHeader" ref="bgHeader"></div>
           <div class="moment-item" v-for="item in momentList" :key="item.id">
             <div class="moment-item-left">
-              <van-image width="3rem" height="3rem" fit="contain" :src="item.user.avatar" />
+              <van-image width="3rem" height="3rem" fit="contain" :src="item.user.avatar"
+                @click="gotoFriendInfo(item.user.wechat)" />
             </div>
             <div class="moment-item-right">
-              <van-text-ellipsis :content="item.user.nickname" class="nickname" />
-              <van-text-ellipsis :content="item.content" class="content" />
-              <van-uploader v-model="item.files" multiple :max-count="item.files.length" v-if="item.files.length > 0"
+              <van-text-ellipsis :content="item.user.nickname" class="nickname"
+                @click="gotoFriendInfo(item.user.wechat)" />
+              <van-text-ellipsis :content="item.content" class="content" rows="6" expand-text="展开" collapse-text="收起" />
+              <van-uploader v-model="item.files" :max-count="item.files.length" v-if="item.files.length > 0"
                 :deletable="false" />
+              <van-cell-group :border="false" style="background: transparent;">
+                <van-cell value="内容" style="padding: 0;background: transparent;">
+                  <template #title>
+                    <span style="color: var(--theme-gray-70);">{{ timestampFormat(item.created_at) }}</span>
+                  </template>
+                  <template #value>
+                    <van-popover v-model:show="item.showActionPopover" theme="dark" :actions="item.actions"
+                      @select="onSelectAction" actions-direction="horizontal" placement="left-end"
+                      @open="onOpenActionPopover(item.id)">
+                      <template #reference>
+                        <van-button color="var(--black20-whitef7-color)" icon="ellipsis"
+                          style="height: 16px;width: 20px;color: var(--theme-blue-1970)!important;cursor: pointer;" />
+                      </template>
+                    </van-popover>
+                  </template>
+                </van-cell>
+              </van-cell-group>
+              <van-cell-group :border="false" style="background: var(--black20-whitef7-color);margin-top: 8px;">
+                <van-cell style="padding: 0 6px;background: var(--black20-whitef7-color);">
+                  <template #title>
+                    <div style="color: var(--theme-blue-1970);" v-if="item.likes.length > 0">
+                      <van-icon name="like-o"></van-icon>
+                      <span style="margin-left: 4px;" v-for="(like, index) in item.likes" :key="like.id"
+                        @click="gotoFriendInfo(item.user.wechat)">{{
+                          like.user.nickname + (index + 1 == item.likes.length ? '' : ',') }}</span>
+                    </div>
+                  </template>
+                </van-cell>
+              </van-cell-group>
             </div>
           </div>
         </van-list>
@@ -159,6 +268,7 @@ const postSuccessCb = async (data) => {
 
     .moment-list {
       box-sizing: border-box;
+      background: var(--black19-white-color) !important;
 
       .bg-header {
         height: 20rem;
@@ -220,5 +330,13 @@ const postSuccessCb = async (data) => {
 .post-moment-menu .van-cell__title {
   text-align: center;
   line-height: 2rem;
+}
+
+.van-icon-like {
+  color: var(--theme-danger-color);
+}
+
+.van-text-ellipsis__action {
+  color: var(--theme-gray-70) !important;
 }
 </style>

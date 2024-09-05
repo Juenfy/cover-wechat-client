@@ -43,52 +43,21 @@ onMounted(async () => {
 <template>
   <div class="friend-list">
     <van-index-bar :index-list="indexList">
-      <van-cell
-        title="新的朋友"
-        icon="/new-friend.png"
-        size="large"
-        :center="true"
-        clickable
-        @click="showFriendNew = true"
-      >
-        <template #right-icon>
-          <div v-if="appStore.unread.apply > 0">
-            <van-badge :content="appStore.unread.apply" max="99" />
-          </div>
+      <van-cell title="新的朋友" icon="/new-friend.png" size="large" :center="true" clickable @click="showFriendNew = true">
+        <template #value>
+          <van-badge v-if="appStore.unread.apply > 0" :content="appStore.unread.apply" max="99"
+            class="van-badge--center" />
         </template>
       </van-cell>
-      <van-cell
-        title="仅聊天的朋友"
-        icon="/friend-only-chat.png"
-        size="large"
-        :center="true"
-        @click="() => {}"
-      />
-      <van-cell
-        title="群聊"
-        icon="/group-chat.png"
-        size="large"
-        :center="true"
-        @click="showGroupList = true"
-      />
+      <van-cell title="仅聊天的朋友" icon="/friend-only-chat.png" size="large" :center="true" @click="() => { }" />
+      <van-cell title="群聊" icon="/group-chat.png" size="large" :center="true" @click="showGroupList = true" />
       <div v-for="val in indexList" :key="val">
         <van-index-anchor :index="val" />
         <van-swipe-cell v-for="item in friendList[val]" :key="item.friend">
-          <van-cell
-            :title="item.nickname"
-            :icon="item.avatar"
-            size="large"
-            :center="true"
-            @click="handleHomeClick(item)"
-          />
+          <van-cell :title="item.nickname" :icon="item.avatar" size="large" :center="true"
+            @click="handleHomeClick(item)" />
           <template #right>
-            <van-button
-              square
-              type="primary"
-              text="备注"
-              style="height: inherit"
-              @click="showFriendRemark = true"
-            />
+            <van-button square type="primary" text="备注" style="height: inherit" @click="showFriendRemark = true" />
           </template>
         </van-swipe-cell>
       </div>
@@ -107,6 +76,7 @@ onMounted(async () => {
   margin-right: 1rem;
   border-radius: 0.2rem;
 }
+
 .friend-list .van-cell__left-icon img {
   border-radius: 0.2rem;
 }

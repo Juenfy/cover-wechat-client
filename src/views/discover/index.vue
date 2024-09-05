@@ -20,6 +20,9 @@ onMounted(() => {
             <span></span>
           </div>
         </template>
+        <template #value>
+          <van-badge v-if="appStore.unread.apply > 0" :content="appStore.unread.moment" max="99" />
+        </template>
       </van-cell>
       <van-cell :center="true" is-link to="/me/qrcode/scan">
         <template #title>

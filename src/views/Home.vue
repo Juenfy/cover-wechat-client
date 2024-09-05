@@ -118,7 +118,7 @@ onMounted(() => {
           <van-tabbar-item
             :icon="tabBarActive == 1 ? 'friends' : 'friends-o'"
             :badge-props="{
-              content: appStore.unread.apply > 0 ? appStore.unread.apply : '',
+              content: appStore.unread.friend > 0 ? appStore.unread.friend : '',
               max: 99,
             }"
             to="/friend"

@@ -14,3 +14,15 @@ export const publish = async (data, onUploadProgress) => {
 export const getList = async (page, limit) => {
     return await request.get(`/api/moment/list?page=${page}&limit=${limit}`);
 };
+//点赞朋友圈
+export const like = async (id) => {
+    return await request.post("/api/moment/like", { id: id });
+};
+//取消点赞
+export const unlike = async (id) => {
+    return await request.delete(`/api/moment/unlike?id=${id}`);
+};
+//删除朋友圈
+export const del = async (id) => {
+    return await request.delete(`/api/moment/delete?id=${id}`);
+};

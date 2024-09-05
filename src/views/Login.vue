@@ -56,7 +56,10 @@ onMounted(() => {
     WebSocketClient.stop();
     userStore.handleLogout();
     appStore.clear();
-    return showFailToast("账户信息已失效，请重新登录");
+    showFailToast("账户信息已失效，请重新登录");
+    setTimeout(() => {
+      router.push("/login");
+    }, 200);
   }
 });
 </script>
@@ -66,40 +69,19 @@ onMounted(() => {
     <h3 style="color: var(--black-white-color)">手机号登录</h3>
     <van-form @submit="getCode">
       <van-cell-group inset>
-        <van-field
-          v-model="formData.mobile"
-          name="手机号"
-          label="手机号"
-          placeholder="手机号"
-        />
-        <van-field
-          v-model="formData.password"
-          type="password"
-          name="密码"
-          label="密码"
-          placeholder="密码"
-        />
+        <van-field v-model="formData.mobile" name="手机号" label="手机号" placeholder="手机号" />
+        <van-field v-model="formData.password" type="password" name="密码" label="密码" placeholder="密码" />
       </van-cell-group>
       <div style="margin: 1rem">
         <van-button block type="primary" native-type="submit">
           登录
         </van-button>
-        <van-button
-          block
-          type="primary"
-          to="/register"
-          style="margin-top: 1rem"
-        >
+        <van-button block type="primary" to="/register" style="margin-top: 1rem">
           没有账号？注册
         </van-button>
       </div>
     </van-form>
-    <Verify
-      ref="verify"
-      :captchaType="captchaType"
-      :imgSize="{ width: '400px', height: '200px' }"
-      mode="pop"
-      @success="onSubmit"
-    />
+    <Verify ref="verify" :captchaType="captchaType" :imgSize="{ width: '400px', height: '200px' }" mode="pop"
+      @success="onSubmit" />
   </section>
 </template>
