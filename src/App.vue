@@ -129,10 +129,12 @@ onMounted(() => {
   if (userStore.isLogin) {
     startWebSocket(WebSocketClient, userStore.info.id);
   }
+  console.log("emitter on onMessage");
   emitter.on("onMessage", onMessage);
 });
 
 onUnmounted(() => {
+  console.log("emitter off onMessage");
   emitter.off("onMessage", onMessage);
 });
 </script>

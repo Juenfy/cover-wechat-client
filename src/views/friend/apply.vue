@@ -4,6 +4,10 @@ import { useRouter, useRoute } from "vue-router";
 import * as friendApi from "@/api/friend";
 import { Apply } from "@/enums/friend";
 import { handleResponse } from "@/utils/helper";
+import { useAppStore } from "@/stores/app";
+import { UnreadChat, UnreadApply } from "@/enums/app";
+
+const appStore = useAppStore();
 const router = useRouter();
 const route = useRoute();
 const dataLoaded = ref(false);
@@ -63,7 +67,10 @@ const onSubmit = () => {
         handleResponse(
           res,
           () => {
-            router.push({ name: "chat", query: { verify: 1 } });
+            //通过好友验证消息未读数计算
+            appStore.unreadIncrBy(UnreadChat);
+            appStore.unreadDecrBy(UnreadApply, appStore.unread.apply);
+            router.push("/chat");
           },
           router,
           true

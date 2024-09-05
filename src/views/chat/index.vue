@@ -5,7 +5,6 @@ import { ref, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
 import { useRoute } from "vue-router";
 import { chatList, getChatList, sortChatList } from "@/utils/websocket";
-import { UnreadChat, UnreadApply } from "@/enums/app";
 const appStore = useAppStore();
 const route = useRoute();
 const loading = ref(false);
@@ -34,18 +33,9 @@ const handleAction = (type, data) => {
   chatList.value = sortChatList(chatList.value);
 };
 
-const computeUnread = () => {
-  //通过好友验证消息未读数计算
-  if (route.query.verify) {
-    appStore.unreadIncrBy(UnreadChat);
-    appStore.unreadDecrBy(UnreadApply, appStore.unread.apply);
-  }
-};
-
 onMounted(() => {
   appStore.initHeader({ title: "微信", navbar: true, search: true });
   getChatList();
-  computeUnread();
 });
 </script>
 <template>
