@@ -11,6 +11,6 @@ export const publish = async (data, onUploadProgress) => {
     });
 };
 //获取朋友圈列表
-export const getList = async () => {
-    return await request.get("/api/moment/list");
+export const getList = async (page, limit) => {
+    return await request.get(`/api/moment/list?page=${page}&limit=${limit}`);
 };

@@ -14,8 +14,14 @@ const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
 const momentList = ref([]);
+const list = ref([]);
+const loading = ref(false);
+const finished = ref(false);
+const refreshing = ref(false);
 const navBar = ref(null);
 const navTitle = ref("");
+const page = ref(1);
+const limit = ref(5);
 const onClickBgHeader = () => {
   bgHeader.value.animate({ height: "30rem" }, { duration: 300 });
 };
@@ -39,12 +45,6 @@ const hidePostMoment = () => {
   showPostMoment.value = false;
 };
 
-const getMomentList = async () => {
-  momentApi.getList().then((res) => {
-    momentList.value = res.data;
-  });
-};
-
 const onScroll = (e) => {
 
   if (e.target.scrollTop > bgHeader.value.clientHeight - 46) {
@@ -64,14 +64,41 @@ const onScroll = (e) => {
   }
 };
 
-const postSuccessCb = async (data) => {
-  await getMomentList();
-  showPostMoment.value = false;
+const onLoadMomentList = () => {
+  setTimeout(() => {
+    if (refreshing.value) {
+      momentList.value = [];
+      refreshing.value = false;
+      page.value = 1;
+    }
+
+    momentApi.getList(page.value, limit.value).then((res) => {
+      res.data.forEach(element => {
+        momentList.value.push(element);
+      });
+      ++page.value;
+      loading.value = false;
+      if (res.page_info.total_page < page.value) {
+        finished.value = true;
+      }
+    });
+  }, 1000);
 };
 
-onMounted(async () => {
-  await getMomentList();
-});
+const onRefreshMomentList = () => {
+  // 清空列表数据
+  finished.value = false;
+
+  // 重新加载数据
+  // 将 loading 设置为 true，表示处于加载状态
+  loading.value = true;
+  onLoadMomentList();
+};
+
+const postSuccessCb = async (data) => {
+  onLoadMomentList();
+  showPostMoment.value = false;
+};
 </script>
 <template>
   <div class="discover-moment">
@@ -84,22 +111,23 @@ onMounted(async () => {
       </van-nav-bar>
     </header>
     <section>
-      <div class="container moment-list" @scroll.passive="onScroll" style="background: var(--black20-white-color);">
-        <div class="bg-header" @click="onClickBgHeader" ref="bgHeader">
-
-        </div>
-        <div class="moment-item" v-for="item in momentList" :key="item.id">
-          <div class="moment-item-left">
-            <van-image width="3rem" height="3rem" fit="contain" :src="item.user.avatar" />
+      <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-list"
+        @scroll.passive="onScroll" style="background: var(--black20-white-color);">
+        <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMomentList">
+          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader"></div>
+          <div class="moment-item" v-for="item in momentList" :key="item.id">
+            <div class="moment-item-left">
+              <van-image width="3rem" height="3rem" fit="contain" :src="item.user.avatar" />
+            </div>
+            <div class="moment-item-right">
+              <van-text-ellipsis :content="item.user.nickname" class="nickname" />
+              <van-text-ellipsis :content="item.content" class="content" />
+              <van-uploader v-model="item.files" multiple :max-count="item.files.length" v-if="item.files.length > 0"
+                :deletable="false" />
+            </div>
           </div>
-          <div class="moment-item-right">
-            <van-text-ellipsis :content="item.user.nickname" class="nickname" />
-            <van-text-ellipsis :content="item.content" class="content" />
-            <van-uploader v-model="item.files" multiple :max-count="item.files.length" v-if="item.files.length > 0"
-              :deletable="false" />
-          </div>
-        </div>
-      </div>
+        </van-list>
+      </van-pull-refresh>
     </section>
   </div>
   <van-popup v-model:show="showPostMomentMenu" round position="bottom" class="post-moment-menu">
