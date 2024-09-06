@@ -5,7 +5,7 @@ import { onMounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { SearchChatRecord } from "@/enums/app";
-import ChatBackground from "@/components/chat/background.vue";
+import ChatBackground from "@/components/common/background.vue";
 import * as chatApi from "@/api/chat";
 import { showDialog } from 'vant';
 import GroupUpdate from "@/components/chat/group/update.vue";
@@ -145,7 +145,8 @@ onMounted(() => { });
       </div>
     </section>
   </van-popup>
-  <chat-background :show="showChatBackground" @hide="showChatBackground = false" :chatInfo="chatInfo" />
+  <chat-background :show="showChatBackground" @hide="showChatBackground = false" :info="chatInfo" type="chat"
+    title="聊天背景" />
   <chat-group-action :show="showChatGroupInvite" @hide="showChatGroupInvite = false" action="invite"
     :users="chatInfo.users" :groupId="chatInfo.to_user" />
   <group-update :show="showChatGroupUpdate" @hide="showChatGroupUpdate = false" :chatInfo="chatInfo"

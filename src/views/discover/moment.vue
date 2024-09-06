@@ -7,18 +7,23 @@ import CommonCamera from "@/components/common/camera.vue";
 import * as momentApi from "@/api/moment";
 import { timestampFormat } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
+import MomentBackground from "@/components/common/background.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
+const showDom = ref(true);
 const showPostMomentMenu = ref(false);
 const showPostMoment = ref(false);
 const showCommonCamera = ref(false);
+const showMomentBackground = ref(false);
+const bgPath = ref(userStore.info.moment_bg_file_path ? userStore.info.moment_bg_file_path : "./../../assets/bg.png");
 const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
 const momentList = ref([]);
 const commentData = ref({});
-const momentId = ref(null);
+const momentId = ref(0);
+const toUser = ref(0);
 const list = ref([]);
 const loading = ref(false);
 const finished = ref(false);
@@ -27,9 +32,22 @@ const navBar = ref(null);
 const navTitle = ref("");
 const page = ref(1);
 const limit = ref(10);
-const onClickBgHeader = () => {
-  bgHeader.value.animate({ height: "30rem" }, { duration: 300 });
+
+const onClickDiscoverMoment = () => {
+  bgHeader.value.classList.add("bg-header-back");
+  setTimeout(() => {
+    showDom.value = true;
+    bgHeader.value.classList.remove("bg-header-go");
+  }, 300);
 };
+const onClickBgHeader = () => {
+  bgHeader.value.classList.add("bg-header-go");
+  setTimeout(() => {
+    showDom.value = false;
+    bgHeader.value.classList.remove("bg-header-back");
+  }, 300);
+};
+
 const handlePostMomentMenu = (type) => {
   postType.value = type;
   showPostMoment.value = true;
@@ -51,21 +69,22 @@ const hidePostMoment = () => {
 };
 // 监听滚动
 const onScroll = (e) => {
-
-  if (e.target.scrollTop > bgHeader.value.clientHeight - 46) {
-    navTitle.value = '朋友圈';
-    navBar.value.classList.add('header-bg');
-    document.getElementsByClassName('van-icon-arrow-left')[0].style.color =
-      'var(--black-white-color)';
-    document.getElementsByClassName('van-icon-photo-o')[0].style.color =
-      'var(--black-white-color)';
-  } else {
-    navTitle.value = '';
-    navBar.value.classList.remove('header-bg');
-    document.getElementsByClassName('van-icon-arrow-left')[0].style.color =
-      '#fff';
-    document.getElementsByClassName('van-icon-photo-o')[0].style.color =
-      '#fff';
+  if (showDom.value) {
+    if (e.target.scrollTop > bgHeader.value.clientHeight - 46) {
+      navTitle.value = '朋友圈';
+      navBar.value.classList.add('header-bg');
+      document.getElementsByClassName('van-icon-arrow-left')[0].style.color =
+        'var(--black-white-color)';
+      document.getElementsByClassName('van-icon-photo-o')[0].style.color =
+        'var(--black-white-color)';
+    } else {
+      navTitle.value = '';
+      navBar.value.classList.remove('header-bg');
+      document.getElementsByClassName('van-icon-arrow-left')[0].style.color =
+        '#fff';
+      document.getElementsByClassName('van-icon-photo-o')[0].style.color =
+        '#fff';
+    }
   }
 };
 
@@ -180,10 +199,12 @@ const gotoFriendInfo = (keywords) => {
 
 </script>
 <template>
+  <div class="overly" style="position: fixed;top: 0;left: 0;width: 100%;height: 100vh;z-index: 10;" v-show="!showDom"
+    @click="onClickDiscoverMoment"></div>
   <div class="discover-moment">
     <header ref="navBar">
       <van-nav-bar left-arrow @click-left="router.go(-1)" @click-right="showPostMomentMenu = true" :border="false"
-        :title="navTitle" style="background: transparent;">
+        :title="navTitle" style="background: transparent;" v-if="showDom">
         <template #right>
           <van-icon name="photo-o"></van-icon>
         </template>
@@ -193,7 +214,19 @@ const gotoFriendInfo = (keywords) => {
       <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-list"
         @scroll.passive="onScroll" style="background: var(--black20-white-color);">
         <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMomentList">
-          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader"></div>
+          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="`background-image: url(${bgPath}) ;`">
+            <div class="user" v-if="showDom">
+              <span @click="gotoFriendInfo(userStore.info.wechat)">{{ userStore.info.nickname }}</span>
+              <van-image radius="8px" width="4rem" height="4rem" :src="userStore.info.avatar"
+                @click="gotoFriendInfo(userStore.info.wechat)" />
+            </div>
+            <div class="change-bg" v-else>
+              <van-grid :column-num="1" :border="false">
+                <van-grid-item icon="photo" text="换封面" icon-color="var(--theme-white)"
+                  @click="showMomentBackground = true" />
+              </van-grid>
+            </div>
+          </div>
           <div class="moment-item" v-for="item in momentList" :key="item.id">
             <div class="moment-item-left">
               <van-image width="3rem" height="3rem" fit="contain" :src="item.user.avatar"
@@ -245,7 +278,7 @@ const gotoFriendInfo = (keywords) => {
       <van-cell title="拍摄" clickable size="large" @click="showCommonCamera = true" />
       <van-cell title="从手机相册选择" clickable size="large">
         <template #title>
-          <van-uploader :after-read="afterRead" max-count="8" accept="image/*" multiple>从手机相册选择</van-uploader>
+          <van-uploader :after-read="afterRead" max-count="9" accept="image/*" multiple>从手机相册选择</van-uploader>
         </template>
       </van-cell>
       <van-cell title="纯文案" clickable size="large" @click="handlePostMomentMenu(TypeText)" />
@@ -257,6 +290,8 @@ const gotoFriendInfo = (keywords) => {
   <post-moment :show="showPostMoment" :fileList="fileList" :postType="postType" @hide="hidePostMoment"
     @postSuccessCb="postSuccessCb" />
   <common-camera :show="showCommonCamera" @hide="showCommonCamera = false" @takePhotoCb="takePhotoCb" />
+  <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"
+    title="更换相册封面" />
 </template>
 <style scoped lang="less">
 .discover-moment {
@@ -272,12 +307,64 @@ const gotoFriendInfo = (keywords) => {
       background: var(--black19-white-color) !important;
 
       .bg-header {
-        height: 20rem;
-        background-image: url("./../../assets/bg.png");
+        position: relative;
+        height: 40vh;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         cursor: pointer;
+
+        .change-bg {
+          position: absolute;
+          bottom: 0;
+          right: 1rem;
+          z-index: 20;
+        }
+
+        .user {
+          position: absolute;
+          bottom: -1.5rem;
+          right: 0.7rem;
+          display: flex;
+          flex-direction: row;
+
+          span {
+            margin: 8px 6px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--theme-white);
+          }
+        }
+      }
+
+      .bg-header-go {
+        height: 80vh;
+        animation: bg-header-go 0.3s ease-in-out;
+      }
+
+      .bg-header-back {
+        height: 40vh;
+        animation: bg-header-back 0.3s ease-in-out;
+      }
+
+      @keyframes bg-header-go {
+        0% {
+          height: 40vh;
+        }
+
+        100% {
+          height: 80vh;
+        }
+      }
+
+      @keyframes bg-header-back {
+        0% {
+          height: 100vh;
+        }
+
+        100% {
+          height: 40vh;
+        }
       }
 
       .moment-item:first-child {
@@ -339,5 +426,9 @@ const gotoFriendInfo = (keywords) => {
 
 .van-text-ellipsis__action {
   color: var(--theme-gray-70) !important;
+}
+
+.change-bg .van-grid-item__text {
+  color: var(--theme-white);
 }
 </style>

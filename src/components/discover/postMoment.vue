@@ -1,15 +1,20 @@
 <script setup>
-import { watch, ref } from "vue";
+import { watch, ref, onMounted } from "vue";
 import { TypeText, TypeImage } from "@/enums/moment";
 import { showFailToast, showSuccessToast, showLoadingToast, closeToast } from "vant";
 import * as momentApi from "@/api/moment";
+import "emoji-picker-element";
+import { useAppStore } from "@/stores/app";
+
 const props = defineProps({ show: Boolean, fileList: Array, postType: String });
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide", "postSuccessCb"]);
 const title = ref("");
 const fileList = ref([]);
 const content = ref("");
-
+const textareaRef = ref(null);
+const appStore = useAppStore();
+const showEmoji = ref(false);
 watch(
     () => props.show,
     (show) => {
@@ -45,6 +50,11 @@ const onSubmit = () => {
     });
 };
 
+const onSelectEmoji = (emoji) => {
+    content.value += emoji.detail.unicode;
+    textareaRef.value.focus();
+};
+
 //消息输入框重置高度
 const autoResizeTextarea = (e) => {
     const textarea = e.target;
@@ -56,7 +66,7 @@ const autoResizeTextarea = (e) => {
     <van-popup v-model:show="props.show" position="right" :style="{ height: '100%', width: '100%' }" duration="0.2">
         <header>
             <van-nav-bar :title="title" left-text="取消" @click-left="$emit('hide')" @click-right="onSubmit"
-                :border="false" class="bg-white">
+                :border="false">
                 <template #right>
                     <van-button type="primary" size="small">发表</van-button>
                 </template>
@@ -65,17 +75,21 @@ const autoResizeTextarea = (e) => {
         <section>
             <div class="header"></div>
             <div class="container post-menu-container bg-white">
-                <textarea type="text" v-model="content" @input="autoResizeTextarea"></textarea>
-                <van-uploader v-model="fileList" multiple max-count="8" v-if="props.postType != TypeText" />
+                <textarea type="text" v-model="content" @input="autoResizeTextarea" ref="textareaRef"></textarea>
+                <van-uploader v-model="fileList" multiple max-count="9" v-if="props.postType != TypeText" />
+                <van-popover v-model:show="showEmoji" actions-direction="horizontal" placement="bottom-start">
+                    <emoji-picker @emojiClick="onSelectEmoji" class="bg-white" />
+                    <template #reference>
+                        <van-icon :name="appStore.icon.emoji" />
+                    </template>
+                </van-popover>
             </div>
         </section>
     </van-popup>
 </template>
-
 <style scoped lang="less">
 .post-menu-container {
     box-sizing: border-box;
-    box-sizing: content-box;
     padding: 0 2.5rem;
 
     textarea {
@@ -87,7 +101,14 @@ const autoResizeTextarea = (e) => {
         color: var(--black-white-color);
         height: auto;
         max-height: 250px;
+
     }
 
+
+}
+
+emoji-picker {
+    --border-color: var(--van-popover-light-background);
+    --background: var(--van-popover-light-background);
 }
 </style>
