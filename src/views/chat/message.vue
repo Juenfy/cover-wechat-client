@@ -362,7 +362,7 @@ onUnmounted(async () => {
       : 'background-image: url(' + chatInfo.bg_file_path + ');'
       ">
       <div class="header"></div>
-      <div class="container" ref="msgBoxRef" :style="chatInfo.bg_file_path == '' ? '' : 'background: none;'">
+      <div class="container" ref="msgBoxRef">
         <ul class="message-list">
           <li v-for="item in messageList" :key="item.id" :class="item.is_tips == 1 ? 'li-tips-message' : ''">
             <div v-if="item.is_tips == 0" class="normal-message">

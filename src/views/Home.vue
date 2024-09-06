@@ -115,7 +115,7 @@ onMounted(() => {
   height: 100vh;
   width: 100%;
   position: relative;
-  background-image: url(/src/assets/home-bg.jpeg);
+  background-image: url(../assets/home-bg.jpeg);
   background-position: center;
   background-size: cover;
 }

@@ -16,7 +16,6 @@ const showPostMomentMenu = ref(false);
 const showPostMoment = ref(false);
 const showCommonCamera = ref(false);
 const showMomentBackground = ref(false);
-const bgPath = ref(userStore.info.moment_bg_file_path ? userStore.info.moment_bg_file_path : "/src/assets/bg.png");
 const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
@@ -214,7 +213,10 @@ const gotoFriendInfo = (keywords) => {
       <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-list"
         @scroll.passive="onScroll" style="background: var(--black20-white-color);">
         <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMomentList">
-          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="`background-image: url(${bgPath}) ;`">
+          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.info.moment_bg_file_path == ''
+            ? ''
+            : 'background-image: url(' + userStore.info.moment_bg_file_path + ');'
+            ">
             <div class="user" v-if="showDom">
               <span @click="gotoFriendInfo(userStore.info.wechat)">{{ userStore.info.nickname }}</span>
               <van-image radius="8px" width="4rem" height="4rem" :src="userStore.info.avatar"
@@ -307,6 +309,7 @@ const gotoFriendInfo = (keywords) => {
       background: var(--black19-white-color) !important;
 
       .bg-header {
+        background-image: url(../../assets/bg.png);
         position: relative;
         height: 40vh;
         background-size: cover;
