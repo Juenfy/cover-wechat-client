@@ -14,6 +14,14 @@ export const publish = async (data, onUploadProgress) => {
 export const getList = async (page, limit) => {
     return await request.get(`/api/moment/list?page=${page}&limit=${limit}`);
 };
+//获取未读消息
+export const getUnread = async () => {
+    return await request.get('/api/moment/unread');
+};
+//获取未读消息列表
+export const getUnreadList = async () => {
+    return await request.get('/api/moment/unread-list');
+};
 //点赞朋友圈
 export const like = async (id) => {
     return await request.post("/api/moment/like", { id: id });

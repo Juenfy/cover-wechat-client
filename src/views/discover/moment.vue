@@ -19,6 +19,7 @@ const showMomentBackground = ref(false);
 const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
+const unreadData = ref({});
 const momentList = ref([]);
 const commentData = ref({});
 const momentId = ref(0);
@@ -86,6 +87,12 @@ const onScroll = (e) => {
     }
   }
 };
+//未读信息
+const getUnread = () => {
+  momentApi.getUnread().then(res => {
+    unreadData.value = res.data;
+  })
+}
 
 //加载朋友圈列表
 const onLoadMomentList = () => {
@@ -195,7 +202,9 @@ const gotoFriendInfo = (keywords) => {
     },
   });
 }
-
+onMounted(() => {
+  getUnread();
+});
 </script>
 <template>
   <div class="overly" style="position: fixed;top: 0;left: 0;width: 100%;height: 100vh;z-index: 10;" v-show="!showDom"
@@ -228,6 +237,10 @@ const gotoFriendInfo = (keywords) => {
                   @click="showMomentBackground = true" />
               </van-grid>
             </div>
+          </div>
+          <div class="unread" v-if="unreadData.cnt > 0">
+            <van-button :icon="unreadData.user.avatar">&nbsp;{{
+              unreadData.cnt }}条未读</van-button>
           </div>
           <div class="moment-item" v-for="item in momentList" :key="item.id">
             <div class="moment-item-left">
@@ -370,6 +383,20 @@ const gotoFriendInfo = (keywords) => {
         }
       }
 
+      .unread {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+
+        button {
+          border: none;
+          color: var(--theme-blue-1970);
+          background: var(--black20-whitef7-color);
+          font-size: 16px;
+        }
+      }
+
       .moment-item:first-child {
         margin-top: 1rem;
       }
@@ -433,5 +460,10 @@ const gotoFriendInfo = (keywords) => {
 
 .change-bg .van-grid-item__text {
   color: var(--theme-white);
+}
+
+.unread .van-icon__image {
+  width: 2rem;
+  height: 2rem;
 }
 </style>
