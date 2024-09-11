@@ -14,7 +14,7 @@ git clone https://github.com/Juenfy/cover-wechat-client.git
 ```
 
 ```shell
-cd cover-wechat-front
+cd cover-wechat-client
 ```
 
 ```shell
@@ -24,9 +24,17 @@ cp .env.example .env
 ```shell
 npm install
 ```
-
+浏览器访问：
 ```shell
 npm run dev
+```
+桌面端：
+```shell
+npm run tauri dev
+```
+桌面端打包：
+```shell
+npm run tauri build
 ```
 
 

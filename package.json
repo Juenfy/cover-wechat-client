@@ -4,11 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "tauri": "tauri",
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tauri-apps/cli": "^1.6.1",
     "@vitejs/plugin-basic-ssl": "^1.1.0",
     "axios": "^1.6.8",
     "crypto-js": "^4.2.0",
