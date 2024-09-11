@@ -58,7 +58,7 @@ watch(
 //全局消息监听
 const onMessage = async (data) => {
   console.log("App:onMessage", data);
-  if (data.hasOwnProperty("action")) {
+  if (data?.action) {
     switch (data.action) {
       case ActionSend:
         let isGroup = data.data.is_group;

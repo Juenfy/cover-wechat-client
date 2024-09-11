@@ -410,8 +410,8 @@ onUnmounted(async () => {
           </div>
           <van-button v-if="isAudioRecord" type="primary" @touchstart="startRecording" @touchend="stopRecording"
             @touchmove="handleTouchMove">按住 说话</van-button>
-          <textarea v-else type="text" v-model="content" @input="autoResizeTextarea" @keyup.enter="sendMessage('text')"
-            ref="textareaRef"></textarea>
+          <textarea v-else type="text" v-model="content" @input="autoResizeTextarea"
+            @keyup.ctrl.enter="sendMessage('text')" ref="textareaRef"></textarea>
           <div class="right">
             <van-icon :name="appStore.icon.emoji" @click="handleRightFirstIconClick" />
             <van-icon :name="appStore.icon.more" @click="handleRightSecondIconClick" />

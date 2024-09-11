@@ -26,6 +26,10 @@ watch(
         }
     }
 );
+const onCancel = () => {
+    showEmoji.value = false;
+    emit("hide");
+};
 const onSubmit = () => {
     const formData = new FormData();
     formData.append("type", props.postType);
@@ -43,9 +47,10 @@ const onSubmit = () => {
             showSuccessToast("发布成功");
             emit("postSuccessCb", res.data);
         } else {
-            return showSuccessToast("发布成功");
+            return showFailToast(res.msg);
         }
     }).finally(() => {
+        showEmoji.value = false;
         closeToast(true);
     });
 };
@@ -65,8 +70,7 @@ const autoResizeTextarea = (e) => {
 <template>
     <van-popup v-model:show="props.show" position="right" :style="{ height: '100%', width: '100%' }" duration="0.2">
         <header>
-            <van-nav-bar :title="title" left-text="取消" @click-left="$emit('hide')" @click-right="onSubmit"
-                :border="false">
+            <van-nav-bar :title="title" left-text="取消" @click-left="onCancel" @click-right="onSubmit" :border="false">
                 <template #right>
                     <van-button type="primary" size="small">发表</van-button>
                 </template>

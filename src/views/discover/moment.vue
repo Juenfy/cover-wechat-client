@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
 import PostMoment from "@/components/discover/postMoment.vue";
 import CommonCamera from "@/components/common/camera.vue";
+import CommonComment from "@/components/common/comment.vue";
 import * as momentApi from "@/api/moment";
 import { timestampFormat } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
@@ -16,6 +17,7 @@ const showPostMomentMenu = ref(false);
 const showPostMoment = ref(false);
 const showCommonCamera = ref(false);
 const showMomentBackground = ref(false);
+const showCommonComment = ref(false);
 const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
@@ -55,7 +57,7 @@ const handlePostMomentMenu = (type) => {
 };
 const afterRead = async (file) => {
   console.log(file);
-  fileList.value = file.hasOwnProperty("length") ? file : [file];
+  fileList.value = file?.length > 0 ? file : [file];
   handlePostMomentMenu(TypeImage);
 };
 
@@ -183,6 +185,7 @@ const onSelectAction = (action) => {
       })
       break;
     case "comment":
+      showCommonComment.value = true;
       break;
   }
 }
@@ -307,6 +310,7 @@ onMounted(() => {
   <common-camera :show="showCommonCamera" @hide="showCommonCamera = false" @takePhotoCb="takePhotoCb" />
   <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"
     title="更换相册封面" />
+  <common-comment :show="showCommonComment" :momentId="momentId" :toUser="toUser" @hide="showCommonComment = false" />
 </template>
 <style scoped lang="less">
 .discover-moment {
