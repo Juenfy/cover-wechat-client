@@ -26,7 +26,7 @@ const onSelectEmoji = (emoji) => {
         :autofocus="true" duration="0.2" closeable @click-close-icon="$emit('hide')">
         <div class="comment">
             <div class="textarea">
-                <textarea type="text" v-model="content" @keyup.ctrl.enter="submitComment" ref="textareaRef"></textarea>
+                <textarea type="text" v-model="content" @keyup.enter="submitComment" ref="textareaRef"></textarea>
                 <div class="emoji">
                     <van-icon :name="appStore.icon.emoji" @click="popupEmojiBottom = !popupEmojiBottom" />
                 </div>
