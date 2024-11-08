@@ -119,7 +119,7 @@ onMounted(() => {
               />
               <span style="font-weight: bold">搜索：</span
               ><span
-                style="color: var(--theme-main-color); font-weight: bold"
+                style="color: var(--theme-primary-color); font-weight: bold"
                 >{{ keywords }}</span
               >
             </template>

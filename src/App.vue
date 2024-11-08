@@ -9,13 +9,16 @@ import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend, UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app";
 import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
-import { ActionLike } from "@/enums/moment";
+import { ActionLike,ActionUnlike,ActionComment } from "@/enums/moment";
 import { showDialog } from "vant";
 import {
   startWebSocket,
   getChatList,
   messageList,
   imagePreviewList,
+  likeMoment,
+  unlikeMoment,
+  commentMoment
 } from "@/utils/websocket";
 import { File, Image, Video, Content } from "@/enums/file";
 import { Text } from "@/enums/message";
@@ -117,7 +120,15 @@ const onMessage = async (data) => {
         break;
       case ActionLike:
         appStore.unreadIncrBy(UnreadMoment);
+        likeMoment(data.data);
         break;
+      case ActionUnlike:
+        appStore.unreadDecrBy(UnreadMoment);
+        unlikeMoment(data.data);
+        break;
+      case  ActionComment:
+        appStore.unreadIncrBy(UnreadMoment);
+        commentMoment(data.data);
     }
   }
 

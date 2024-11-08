@@ -41,7 +41,6 @@ const content = ref("");
 const contentRef = ref(null);
 const textareaRef = ref(null);
 const msgBoxRef = ref(null);
-const footerRef = ref(null);
 const queryData = reactive({
   to_user: route.params.to_user,
   is_group: route.params.is_group,
@@ -153,10 +152,10 @@ watch(content, (newVal, oldVal) => {
 
 //消息输入框重置高度
 const autoResizeTextarea = (e) => {
-  const textarea = e.target;
-  console.log(textarea.scrollHeight);
-  console.log(textarea.scrollWidth);
-  textarea.style.height = `${textarea.scrollHeight}px`;
+  // const textarea = e.target;
+  // console.log(textarea.scrollHeight);
+  // console.log(textarea.scrollWidth);
+  // textarea.style.height = `${textarea.scrollHeight}px`;
 };
 
 //发送信息
@@ -349,9 +348,9 @@ onUnmounted(async () => {
 </script>
 <template>
   <div class="message-box">
-    <header>
+    <header class="header-bottom-border">
       <van-nav-bar :title="chatInfo.nickname" left-arrow @click-left="router.go(-1)" @click-right="showChatInfo = true"
-        :border="false" style="opacity: 0.8">
+        :border="false" style="opacity: 0.9">
         <template #right>
           <van-icon name="ellipsis" size="20" />
         </template>
@@ -362,7 +361,7 @@ onUnmounted(async () => {
       : 'background-image: url(' + chatInfo.bg_file_path + ');'
       ">
       <div class="header"></div>
-      <div class="container" ref="msgBoxRef">
+      <div class="container" ref="msgBoxRef" style="background: transparent">
         <ul class="message-list">
           <li v-for="item in messageList" :key="item.id" :class="item.is_tips == 1 ? 'li-tips-message' : ''">
             <div v-if="item.is_tips == 0" class="normal-message">
@@ -403,8 +402,8 @@ onUnmounted(async () => {
           </li>
         </ul>
       </div>
-      <div class="footer" ref="footerRef">
-        <div class="msg-box-top">
+      <div class="footer message-input-box">
+        <div class="top">
           <div class="left">
             <van-icon :name="leftIcon" @click="handleLeftIconClick" />
           </div>
@@ -523,7 +522,7 @@ onUnmounted(async () => {
   height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 10px solid var(--theme-main-color);
+  border-top: 10px solid var(--theme-primary-color);
 }
 
 .bubble-cancel {

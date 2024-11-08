@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import {onMounted, ref} from "vue";
 import { useRouter } from "vue-router";
 import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
 import PostMoment from "@/components/discover/postMoment.vue";
@@ -9,7 +9,16 @@ import * as momentApi from "@/api/moment";
 import { timestampFormat } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
 import MomentBackground from "@/components/common/background.vue";
+import "emoji-picker-element";
+import { useAppStore } from "@/stores/app";
+import {
+  momentList,
+  likeMoment,
+  unlikeMoment,
+  commentMoment
+} from "@/utils/websocket";
 
+const appStore = useAppStore();
 const router = useRouter();
 const userStore = useUserStore();
 const showDom = ref(true);
@@ -22,10 +31,9 @@ const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
 const unreadData = ref({});
-const momentList = ref([]);
-const commentData = ref({});
 const momentId = ref(0);
 const toUser = ref(0);
+const placeholder = ref("评论");
 const list = ref([]);
 const loading = ref(false);
 const finished = ref(false);
@@ -63,12 +71,19 @@ const afterRead = async (file) => {
 
 const takePhotoCb = async (data) => {
   showCommonCamera.value = false;
-  alert(photo);
+  alert(data);
 };
 const hidePostMoment = () => {
   fileList.value = [];
   showPostMoment.value = false;
 };
+
+const hideCommonComment = () => {
+  showCommonComment.value = false;
+  toUser.value = 0;
+  placeholder.value = "评论";
+}
+
 // 监听滚动
 const onScroll = (e) => {
   if (showDom.value) {
@@ -100,11 +115,12 @@ const getUnread = () => {
 const onLoadMomentList = () => {
   setTimeout(() => {
     if (refreshing.value) {
-      momentList.value = [];
       refreshing.value = false;
       page.value = 1;
     }
-
+    if (page.value === 1) {
+      momentList.value = [];
+    }
     momentApi.getList(page.value, limit.value).then((res) => {
       res.data.forEach(element => {
         element.showActionPopover = false;
@@ -145,22 +161,24 @@ const onRefreshMomentList = () => {
 const onOpenActionPopover = (id) => {
   momentId.value = id;
 };
+
+//回复评论
+const replySomeOne = (id, to, ph) => {
+  momentId.value = id;
+  toUser.value = to;
+  placeholder.value = ph;
+  onSelectAction(ref('comment'));
+}
+
+//监听点赞、评论按钮
 const onSelectAction = (action) => {
-  console.log(action, momentId.value);
+  console.log(action, momentId.value, toUser.value);
   switch (action.value) {
     //赞
     case "like":
       momentApi.like(momentId.value).then((res) => {
         if (res.code == 200001) {
-          momentList.value.forEach((item, index) => {
-            if (item.id == momentId.value) {
-              momentList.value[index].likes.push(res.data);
-              momentList.value[index].actions = [
-                { text: '取消', value: 'unlike', icon: 'like' },
-                { text: "评论", value: 'comment', icon: 'comment-o' },
-              ];
-            }
-          });
+          likeMoment(res.data);
         }
       });
       break;
@@ -168,19 +186,7 @@ const onSelectAction = (action) => {
     case "unlike":
       momentApi.unlike(momentId.value).then((res) => {
         if (res.code == 200001) {
-          momentList.value.forEach((item, i) => {
-            if (item.id == momentId.value) {
-              momentList.value[i].likes.forEach((like, j) => {
-                if (like.id == res.data.like_id) {
-                  momentList.value[i].likes.splice(j, 1);
-                  momentList.value[i].actions = [
-                    { text: '赞', value: 'like', icon: 'like-0' },
-                    { text: "评论", value: 'comment', icon: 'comment-o' },
-                  ];
-                }
-              })
-            }
-          })
+          unlikeMoment(res.data);
         }
       })
       break;
@@ -197,6 +203,12 @@ const postSuccessCb = async (data) => {
   onRefreshMomentList();
 };
 
+//评论朋友圈的回调
+const commentSuccessCb = async (data) => {
+  commentMoment(data);
+}
+
+//前往好友主页
 const gotoFriendInfo = (keywords) => {
   router.push({
     name: "friend-info",
@@ -205,6 +217,7 @@ const gotoFriendInfo = (keywords) => {
     },
   });
 }
+
 onMounted(() => {
   getUnread();
 });
@@ -273,14 +286,22 @@ onMounted(() => {
                   </template>
                 </van-cell>
               </van-cell-group>
-              <van-cell-group :border="false" style="background: var(--black20-whitef7-color);margin-top: 8px;">
-                <van-cell style="padding: 0 6px;background: var(--black20-whitef7-color);">
+              <van-cell-group style="background: var(--black20-whitef7-color);margin-top: 8px;" v-if="item.likes.length > 0 || item.comments.length > 0" class="like-comment-box">
+                <van-cell style="padding: 0 6px;background: var(--black20-whitef7-color);" v-if="item.likes.length > 0">
                   <template #title>
-                    <div style="color: var(--theme-blue-1970);" v-if="item.likes.length > 0">
+                    <div>
                       <van-icon name="like-o"></van-icon>
                       <span style="margin-left: 4px;" v-for="(like, index) in item.likes" :key="like.id"
                         @click="gotoFriendInfo(like.user.wechat)">{{
                           like.user.nickname + (index + 1 == item.likes.length ? '' : ',') }}</span>
+                    </div>
+                  </template>
+                </van-cell>
+                <van-cell v-if="item.comments.length > 0">
+                  <template #title>
+                    <div v-for="(comment) in item.comments" :key="comment.id" @click="replySomeOne(item.id,comment.from_user,('回复'+comment.from.nickname))">
+                      <span @click="gotoFriendInfo(comment.from.wechat)">{{ comment.from.nickname}}</span><span v-if="comment.to_user > 0" @click="gotoFriendInfo(comment.to.wechat)"><b>回复</b>{{ comment.to.nickname }}</span>
+                      <b>：{{ comment.content }}</b>
                     </div>
                   </template>
                 </van-cell>
@@ -310,7 +331,7 @@ onMounted(() => {
   <common-camera :show="showCommonCamera" @hide="showCommonCamera = false" @takePhotoCb="takePhotoCb" />
   <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"
     title="更换相册封面" />
-  <common-comment :show="showCommonComment" :momentId="momentId" :toUser="toUser" @hide="showCommonComment = false" />
+  <common-comment :show="showCommonComment" :momentId="momentId" :toUser="toUser" :placeholder="placeholder" @hide="hideCommonComment" @commentSuccessCb="commentMoment"/>
 </template>
 <style scoped lang="less">
 .discover-moment {
@@ -419,7 +440,20 @@ onMounted(() => {
 
         .moment-item-right {
           flex-grow: 1;
-
+          .like-comment-box {
+            background: var(--black20-whitef7-color);
+            margin-top: 8px;
+            .van-cell{
+              padding: 0px 6px;
+              background: var(--black20-whitef7-color); font-weight: 600;
+              .van-cell__title>div{
+                color: var(--theme-blue-1970);
+                b{
+                  color: var(--black4c-whitebc-color);
+                }
+              }
+            }
+          }
           .nickname {
             color: var(--theme-blue-1970);
             font-size: 18px;

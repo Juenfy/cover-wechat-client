@@ -24,11 +24,15 @@ export const getUnreadList = async () => {
 };
 //点赞朋友圈
 export const like = async (id) => {
-    return await request.post("/api/moment/like", { id: id });
+    return await request.post('/api/moment/like', { id: id });
 };
 //取消点赞
 export const unlike = async (id) => {
     return await request.delete(`/api/moment/unlike?id=${id}`);
+};
+//评论
+export const comment = async (data) => {
+    return await request.post('/api/moment/comment', data);
 };
 //删除朋友圈
 export const del = async (id) => {

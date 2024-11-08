@@ -31,6 +31,9 @@
 
 /* 普通主题 */
 .van-theme-light {
+  .header-bottom-border{
+    border-bottom: 1px solid var(--theme-white-de);
+  }
   .container {
     background: var(--theme-white-ed);
   }
@@ -64,6 +67,9 @@
 
 /* 暗黑主题 */
 .van-theme-dark {
+  .header-bottom-border{
+    border-bottom: 1px solid var(--theme-black);
+  }
   .container,
   .bg-white {
     background: var(--theme-black-11);
