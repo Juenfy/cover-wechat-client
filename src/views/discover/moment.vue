@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import { useRouter } from "vue-router";
 import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
 import PostMoment from "@/components/discover/postMoment.vue";
@@ -30,7 +30,6 @@ const showCommonComment = ref(false);
 const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
-const unreadData = ref({});
 const momentId = ref(0);
 const toUser = ref(0);
 const placeholder = ref("评论");
@@ -104,22 +103,14 @@ const onScroll = (e) => {
     }
   }
 };
-//未读信息
-const getUnread = () => {
-  momentApi.getUnread().then(res => {
-    unreadData.value = res.data;
-  })
-}
 
 //加载朋友圈列表
 const onLoadMomentList = () => {
   setTimeout(() => {
     if (refreshing.value) {
+      momentList.value = [];
       refreshing.value = false;
       page.value = 1;
-    }
-    if (page.value === 1) {
-      momentList.value = [];
     }
     momentApi.getList(page.value, limit.value).then((res) => {
       res.data.forEach(element => {
@@ -217,10 +208,6 @@ const gotoFriendInfo = (keywords) => {
     },
   });
 }
-
-onMounted(() => {
-  getUnread();
-});
 </script>
 <template>
   <div class="overly" style="position: fixed;top: 0;left: 0;width: 100%;height: 100vh;z-index: 10;" v-show="!showDom"
@@ -254,9 +241,9 @@ onMounted(() => {
               </van-grid>
             </div>
           </div>
-          <div class="unread" v-if="unreadData.cnt > 0">
-            <van-button :icon="unreadData.user.avatar">&nbsp;{{
-              unreadData.cnt }}条未读</van-button>
+          <div class="unread" v-if="appStore.unread.moment.num > 0">
+            <van-button :icon="appStore.unread.moment.from.avatar">&nbsp;{{
+                appStore.unread.moment.num }}条未读</van-button>
           </div>
           <div class="moment-item" v-for="item in momentList" :key="item.id">
             <div class="moment-item-left">

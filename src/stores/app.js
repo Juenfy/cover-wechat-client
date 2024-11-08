@@ -22,7 +22,10 @@ export const useAppStore = defineStore(
       chat: 0,
       apply: 0,
       discover: 0,
-      moment: 0,
+      moment: {
+          num: 0,
+          from: {}
+      },
       friend: 0
     };
     const unread = ref(defaultUnread);
@@ -42,13 +45,14 @@ export const useAppStore = defineStore(
       showCommonSearch.value = show;
     };
 
-    const unreadIncrBy = (unreadType = 1, incr = 1) => {
+    const unreadIncrBy = (unreadType, incr = 1, from = {}) => {
       switch (unreadType) {
         case UnreadChat:
           unread.value.chat += incr;
           break;
         case UnreadMoment:
-          unread.value.moment += incr;
+          unread.value.moment.num += incr;
+          unread.value.moment.from = from;
           unread.value.discover += incr;
           break;
         case UnreadApply:
@@ -64,12 +68,6 @@ export const useAppStore = defineStore(
         case UnreadChat:
           unread.value.chat -= decr;
           if (unread.value.chat < 0) unread.value.chat = 0;
-          break;
-        case UnreadMoment:
-          unread.value.moment -= decr;
-          if (unread.value.moment < 0) unread.value.moment = 0;
-          unread.value.discover -= decr;
-          if (unread.value.discover < 0) unread.value.discover = 0;
           break;
         case UnreadApply:
           unread.value.apply -= decr;
@@ -96,7 +94,7 @@ export const useAppStore = defineStore(
 
     const setTheme = (t) => {
       theme.value = t;
-      if (t == "dark") {
+      if (t === "dark") {
         icon.value.emoji = "/emoji-white.png";
         icon.value.audio = "/audio-white.png";
         icon.value.more = "/more-white.png";

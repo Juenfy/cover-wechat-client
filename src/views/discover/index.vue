@@ -21,7 +21,7 @@ onMounted(() => {
           </div>
         </template>
         <template #value>
-          <van-badge v-if="appStore.unread.moment > 0" :content="appStore.unread.moment" max="99"
+          <van-badge v-if="appStore.unread.moment.num > 0" :content="appStore.unread.moment.num" max="99"
             class="van-badge--center" />
         </template>
       </van-cell>

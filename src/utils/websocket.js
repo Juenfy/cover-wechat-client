@@ -76,7 +76,7 @@ export const getMessageList = async (params, cb) => {
       imagePreviewList.value = [];
       messageList.value = res.data;
       messageList.value.forEach((item) => {
-        if (item.type == Image) imagePreviewList.value.push(item.content);
+        if (item.type === Image) imagePreviewList.value.push(item.content);
       });
       cb(res);
     }
@@ -105,7 +105,7 @@ export const getChatList = async () => {
 //聊天列表排序
 export const sortChatList = (list) => {
   list.sort((a, b) => {
-    if (a.top != b.top) {
+    if (a.top !== b.top) {
       return b.top - a.top;
     }
     return b.time - a.time;

@@ -65,21 +65,21 @@ const onMessage = async (data) => {
     switch (data.action) {
       case ActionSend:
         let isGroup = data.data.is_group;
-        let toUser = isGroup == 1 ? data.data.to_user : data.data.from.id;
+        let toUser = isGroup === 1 ? data.data.to_user : data.data.from.id;
         let currentPath = "/chat/message/" + toUser + "/" + isGroup;
         console.log(route.fullPath, currentPath);
         //在消息列表页面就刷新列表
-        if (route.fullPath == "/chat" || route.fullPath == "/chat?verify=1") {
+        if (route.fullPath === "/chat" || route.fullPath === "/chat?verify=1") {
           await getChatList();
         }
 
         //不在聊天窗口或者消息列表页面就弹出消息气泡
         if (
-          route.fullPath != "/chat" &&
-          route.fullPath != "/chat?verify=1" &&
-          route.fullPath != currentPath
+          route.fullPath !== "/chat" &&
+          route.fullPath !== "/chat?verify=1" &&
+          route.fullPath !== currentPath
         ) {
-          if (data.data.type != Text)
+          if (data.data.type !== Text)
             data.data.content = Content[data.data.type] ?? Content[File];
           message.value = data.data;
           showMessagePopup.value = true;
@@ -87,17 +87,17 @@ const onMessage = async (data) => {
         }
 
         // 当前聊天窗口，推进消息
-        if (route.fullPath == currentPath) {
+        if (route.fullPath === currentPath) {
           messageList.value.push(data.data);
-          if (data.data.type == Image)
+          if (data.data.type === Image)
             imagePreviewList.value.push(data.data.content);
           //立刻标记已读
-          messageApi.read({ to_user: toUser, is_group: isGroup });
+          await messageApi.read({to_user: toUser, is_group: isGroup});
         } else {
           //消息未读数加1
           appStore.unreadIncrBy(UnreadChat);
           //播放消息通知音
-          noticeAudio.play();
+          await noticeAudio.play();
         }
 
         break;
@@ -119,15 +119,14 @@ const onMessage = async (data) => {
         showMessagePopup.value = true;
         break;
       case ActionLike:
-        appStore.unreadIncrBy(UnreadMoment);
+        appStore.unreadIncrBy(UnreadMoment, 1, data.data.user);
         likeMoment(data.data);
         break;
       case ActionUnlike:
-        appStore.unreadDecrBy(UnreadMoment);
         unlikeMoment(data.data);
         break;
       case  ActionComment:
-        appStore.unreadIncrBy(UnreadMoment);
+        appStore.unreadIncrBy(UnreadMoment, 1, data.data.from);
         commentMoment(data.data);
     }
   }

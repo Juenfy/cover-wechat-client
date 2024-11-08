@@ -3,10 +3,8 @@
 import ChatList from "@/components/chat/list.vue";
 import { ref, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
-import { useRoute } from "vue-router";
 import { chatList, getChatList, sortChatList } from "@/utils/websocket";
 const appStore = useAppStore();
-const route = useRoute();
 const loading = ref(false);
 const finished = ref(false);
 
@@ -16,7 +14,7 @@ const handleAction = (type, data) => {
   chatList.value.forEach((item, index) => {
     let key = item.is_group + ":" + data.from_user + "-" + item.to_user;
     console.log(key);
-    if (key == uk) {
+    if (key === uk) {
       switch (type) {
         case "top":
           chatList.value[index].top = data.top;
@@ -26,7 +24,7 @@ const handleAction = (type, data) => {
           chatList.value.splice(index, 1);
           break;
       }
-      return;
+      return 1;
     }
   });
   console.log(chatList);
