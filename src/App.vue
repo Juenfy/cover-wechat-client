@@ -65,7 +65,7 @@ const onMessage = async (data) => {
     switch (data.action) {
       case ActionSend:
         let isGroup = data.data.is_group;
-        let toUser = isGroup === 1 ? data.data.to_user : data.data.from.id;
+        let toUser = isGroup == 1 ? data.data.to_user : data.data.from.id;
         let currentPath = "/chat/message/" + toUser + "/" + isGroup;
         console.log(route.fullPath, currentPath);
         //在消息列表页面就刷新列表
