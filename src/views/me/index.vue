@@ -1,5 +1,6 @@
 <script setup>
 import MeInfo from "@/components/me/info.vue";
+import MeSetting from "@/components/me/setting.vue";
 import { showConfirmDialog } from "vant";
 import { onMounted, inject, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -11,6 +12,7 @@ const appStore = useAppStore();
 const userStore = useUserStore();
 const WebSocketClient = inject("WebSocketClient");
 const showMeInfo = ref(false);
+const showMeSetting = ref(false);
 const darkMode = ref(false);
 const onLogout = () => {
   showConfirmDialog({
@@ -72,14 +74,6 @@ onMounted(() => {
         </template>
       </van-cell>
     </van-cell-group>
-    <van-cell-group :border="false">
-      <van-cell is-link to="index" size="large" :center="true">
-        <template #title>
-          <span>朋友圈</span>
-          <van-image src="https://img.yzcdn.cn/vant/cat.jpeg" style="width: 3rem; height: 3rem; margin-left: 1rem" />
-        </template>
-      </van-cell>
-    </van-cell-group>
     <van-cell-group>
       <van-cell title="深夜模式" :center="true" size="large">
         <template #title>
@@ -95,7 +89,7 @@ onMounted(() => {
       </van-cell>
     </van-cell-group>
     <van-cell-group :border="false">
-      <van-cell :center="true" is-link to="/me/setting">
+      <van-cell :center="true" is-link clickable @click="showMeSetting = true">
         <template #title>
           <van-image height="1.5rem" width="1.5rem" src="/setting.png" />
           <div class="left-box" style="">
@@ -111,6 +105,7 @@ onMounted(() => {
       @click="onLogout">退出登录</van-button>
   </div>
   <me-info :show="showMeInfo" @hide="showMeInfo = false" />
+  <me-setting :show="showMeSetting" @hide="showMeSetting = false" />
 </template>
 
 <style scoped lang="less">

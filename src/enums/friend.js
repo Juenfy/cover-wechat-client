@@ -17,7 +17,7 @@ export const RelationShip = {
 
 export const Setting = {
   FriendPerm: {
-    MomentAndStatus: { DontSeeHim: 0, DontLetHimSeeIt: 0 },
+    MomentAndStatus: { DontSeeHim: "0", DontLetHimSeeIt: "0" },
     SettingFriendPerm: "ALLOW_ALL",
   },
 };
