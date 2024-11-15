@@ -180,9 +180,6 @@ const handleClickOutside = (e) => {
     if (commentRef.value && !commentRef.value.contains(e.target)) {
         popupEmojiBottom.value = false;
         popupMoreBottom.value = false;
-        input.value.file = null;
-        input.value.type = 'text';
-        input.value.content = '';
         if (props.show && !isFirstClick.value) {
             emit('hide');
         }
@@ -191,6 +188,10 @@ const handleClickOutside = (e) => {
 
 watch(() => props.show, (newVal) => {
     if (newVal) {
+        input.value.file = null;
+        input.value.type = 'text';
+        input.value.content = '';
+        input.value.action = '';
         document.addEventListener('click', handleClickOutside);
         setTimeout(() => {
             isFirstClick.value = false;
