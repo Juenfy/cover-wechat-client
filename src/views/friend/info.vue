@@ -45,6 +45,7 @@ const onButtonClick = () => {
 const getHomeInfo = () => {
   userApi.getHomeInfo(route.query.keywords).then((res) => {
     homeInfo.value = res.data;
+    userStore.setHomeInfo(res.data);
   });
 };
 
@@ -102,11 +103,11 @@ onMounted(() => {
             v-if="homeInfo.relationship == RelationShip.Friend" />
         </van-cell-group>
         <van-cell-group :border="false">
-          <van-cell is-link to="index" size="large" :center="true">
+          <van-cell is-link :to="homeInfo.id + '/moment'" size="large" :center="true">
             <template #title>
               <span>朋友圈</span>
-              <van-image src="https://img.yzcdn.cn/vant/cat.jpeg"
-                style="width: 3rem; height: 3rem; margin-left: 1rem" />
+              <van-image :src="v" style="width: 3rem; height: 3rem; margin-left: 1rem" v-for="(v, i) in homeInfo.moment"
+                :key="i" />
             </template>
           </van-cell>
         </van-cell-group>

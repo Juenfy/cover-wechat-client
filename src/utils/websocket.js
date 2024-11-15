@@ -61,13 +61,17 @@ export const startWebSocket = async (WebSocketClient, uid) => {
 import { ref } from "vue";
 import * as chatApi from "@/api/chat";
 import * as messageApi from "@/api/message";
-import { Image } from "@/enums/file";
+import { TypeImage } from "@/enums/file";
+import { CallAudio, CallVideo, StatusIncalling, StatusInwaiting, StatusIncoming } from "@/enums/call";
 export const chatInfo = ref({});
 export const chatList = ref([]);
 export const messageList = ref([]);
 export const imagePreviewList = ref([]);
 export const momentList = ref([]);
-
+export const showCommonCall = ref(false);
+export const commonCallType = ref(CallVideo);
+export const commonCallStatus = ref(StatusInwaiting);
+export const callUser = ref({});
 //获取聊天记录
 export const getMessageList = async (params, cb) => {
   messageApi.getList(params.to_user, params.is_group).then((res) => {
@@ -76,7 +80,7 @@ export const getMessageList = async (params, cb) => {
       imagePreviewList.value = [];
       messageList.value = res.data;
       messageList.value.forEach((item) => {
-        if (item.type === Image) imagePreviewList.value.push(item.content);
+        if (item.type === TypeImage) imagePreviewList.value.push(item.content);
       });
       cb(res);
     }

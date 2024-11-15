@@ -1,39 +1,29 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
-import PostMoment from "@/components/discover/moment/post.vue";
-import CommonCamera from "@/components/common/camera.vue";
-import CommonComment from "@/components/common/comment.vue";
-import * as momentApi from "@/api/moment";
+import * as userApi from "@/api/user";
 import { timestampFormat } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
-import MomentBackground from "@/components/common/background.vue";
-import "emoji-picker-element";
 import { useAppStore } from "@/stores/app";
-import {
-  momentList,
-  likeMoment,
-  unlikeMoment,
-  commentMoment
-} from "@/utils/websocket";
+import MomentMessage from "@/components/discover/moment/message.vue";
 
+const isOwner = ref(false);
+const momentList = ref([]);
 const appStore = useAppStore();
 const router = useRouter();
+const route = useRoute();
 const userStore = useUserStore();
 const showDom = ref(true);
-const showPostMomentMenu = ref(false);
-const showPostMoment = ref(false);
-const showCommonCamera = ref(false);
-const showMomentBackground = ref(false);
-const showCommonComment = ref(false);
-const content = ref("");
+const showMomentMessageMenu = ref(false);
+const showMomentMessage = ref(false);
 const bgHeader = ref(null);
 const postType = ref("text");
 const fileList = ref([]);
 const momentId = ref(0);
 const toUser = ref(0);
 const placeholder = ref("评论");
+const list = ref([]);
 const loading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
@@ -41,11 +31,6 @@ const navBar = ref(null);
 const navTitle = ref("");
 const page = ref(1);
 const limit = ref(10);
-
-const handleInput = (data) => {
-  // console.log("handleInput", data.value);
-  content.value = data.value.content;
-};
 
 const onClickDiscoverMoment = () => {
   bgHeader.value.classList.add("bg-header-back");
@@ -62,31 +47,9 @@ const onClickBgHeader = () => {
   }, 300);
 };
 
-const handlePostMomentMenu = (type) => {
-  postType.value = type;
-  showPostMoment.value = true;
-  showPostMomentMenu.value = false;
-};
-const afterRead = async (file) => {
-  console.log(file);
-  fileList.value = file?.length > 0 ? file : [file];
-  handlePostMomentMenu(TypeImage);
-};
-
-const takePhotoCb = async (data) => {
-  showCommonCamera.value = false;
-  alert(data);
-};
-const hidePostMoment = () => {
-  fileList.value = [];
-  showPostMoment.value = false;
-};
-
-const hideCommonComment = () => {
-  showCommonComment.value = false;
-  momentId.value = 0;
-  toUser.value = 0;
-  placeholder.value = "评论";
+const handleMomentMessageMenu = () => {
+  showMomentMessage.value = true;
+  showMomentMessageMenu.value = false;
 };
 
 // 监听滚动
@@ -118,21 +81,9 @@ const onLoadMomentList = () => {
       refreshing.value = false;
       page.value = 1;
     }
-    momentApi.getList(page.value, limit.value).then((res) => {
+    userApi.getMomentList(route.params.id, page.value, limit.value).then((res) => {
+      console.log(res);
       res.data.forEach(element => {
-        element.showActionPopover = false;
-        let t = '赞', v = 'like', i = 'like-o';
-        element.likes.forEach(item => {
-          if (item.user_id == userStore.info.id) {
-            t = '取消';
-            v = 'unlike';
-            i = 'like';
-          }
-        });
-        element.actions = [
-          { text: t, value: v, icon: i },
-          { text: "评论", value: 'comment', icon: 'comment-o' },
-        ];
         momentList.value.push(element);
       });
       ++page.value;
@@ -165,7 +116,7 @@ const replySomeOne = (id, to, ph) => {
   toUser.value = to;
   placeholder.value = ph;
   onSelectAction(ref('comment'));
-};
+}
 
 //监听点赞、评论按钮
 const onSelectAction = (action) => {
@@ -191,7 +142,7 @@ const onSelectAction = (action) => {
       showCommonComment.value = true;
       break;
   }
-};
+}
 
 //发布朋友圈的回调
 const postSuccessCb = async (data) => {
@@ -201,22 +152,10 @@ const postSuccessCb = async (data) => {
 };
 
 //评论朋友圈的回调
-const onCommentCb = async (data) => {
-  if (content.value) {
-    momentApi.comment({
-      id: momentId.value,
-      to_user: toUser.value,
-      content: content.value,
-    }).then(res => {
-      if (res.code == 200001) {
-        commentMoment(res.data);
-        showCommonComment.value = false
-        content.value = "";
-      }
-    })
-  }
+const commentSuccessCb = async (data) => {
+  commentMoment(data);
+}
 
-};
 
 //前往好友主页
 const gotoFriendInfo = (keywords) => {
@@ -229,18 +168,19 @@ const gotoFriendInfo = (keywords) => {
 }
 
 onMounted(() => {
+  isOwner.value = route.params.id == userStore.homeInfo.id;
   momentList.value = [];
-});
+})
 </script>
 <template>
   <div class="overly" style="position: fixed;top: 0;left: 0;width: 100%;height: 100vh;z-index: 10;" v-show="!showDom"
     @click="onClickDiscoverMoment"></div>
   <div class="discover-moment">
     <header ref="navBar">
-      <van-nav-bar left-arrow @click-left="router.go(-1)" @click-right="showPostMomentMenu = true" :border="false"
+      <van-nav-bar left-arrow @click-left="router.go(-1)" @click-right="showMomentMessageMenu = true" :border="false"
         :title="navTitle" style="background: transparent;" v-if="showDom">
-        <template #right>
-          <van-icon name="photo-o" />
+        <template #right v-if="isOwner">
+          <van-icon name="ellipsis" />
         </template>
       </van-nav-bar>
     </header>
@@ -248,105 +188,49 @@ onMounted(() => {
       <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-list"
         @scroll.passive="onScroll" style="background: var(--black20-white-color);">
         <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMomentList">
-          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.info.moment_bg_file_path == ''
+          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.homeInfo.moment_bg_file_path == ''
             ? ''
-            : 'background-image: url(' + userStore.info.moment_bg_file_path + ');'
+            : 'background-image: url(' + userStore.homeInfo.moment_bg_file_path + ');'
             ">
             <div class="user" v-if="showDom">
-              <span @click="gotoFriendInfo(userStore.info.wechat)">{{ userStore.info.nickname }}</span>
-              <van-image radius="8px" width="4rem" height="4rem" :src="userStore.info.avatar"
-                @click="gotoFriendInfo(userStore.info.wechat)" />
+              <div class="user-info">
+                <span @click="gotoFriendInfo(userStore.homeInfo.wechat)">{{ userStore.homeInfo.display_nickname
+                  ? userStore.homeInfo.display_nickname :
+                  userStore.homeInfo.nickname }}</span>
+                <van-image radius="8px" width="4rem" height="4rem" :src="userStore.homeInfo.avatar"
+                  @click="gotoFriendInfo(userStore.homeInfo.wechat)" />
+              </div>
+              <div class="user-info user-sign">
+                <span>{{ userStore.homeInfo.sign }}</span>
+              </div>
             </div>
-            <div class="change-bg" v-else>
+            <div class="change-bg" v-if="isOwner && !showDom">
               <van-grid :column-num="1" :border="false">
                 <van-grid-item icon="photo" text="换封面" icon-color="var(--theme-white)"
                   @click="showMomentBackground = true" />
               </van-grid>
             </div>
           </div>
-          <div class="unread" v-if="appStore.unread.moment.num > 0">
-            <van-button :icon="appStore.unread.moment.from.avatar">&nbsp;{{
-              appStore.unread.moment.num }}条未读</van-button>
-          </div>
           <div class="moment-item" v-for="item in momentList" :key="item.id">
             <div class="moment-item-left">
-              <van-image width="3rem" height="3rem" fit="contain" :src="item.user.avatar"
-                @click="gotoFriendInfo(item.user.wechat)" />
+
             </div>
             <div class="moment-item-right">
-              <van-text-ellipsis :content="item.user.nickname" class="nickname"
-                @click="gotoFriendInfo(item.user.wechat)" />
-              <van-text-ellipsis :content="item.content" class="content" rows="6" expand-text="展开" collapse-text="收起" />
-              <van-uploader v-model="item.files" :max-count="item.files.length" v-if="item.files.length > 0"
-                :deletable="false" />
-              <van-cell-group :border="false" style="background: transparent;">
-                <van-cell value="内容" style="padding: 0;background: transparent;">
-                  <template #title>
-                    <span style="color: var(--theme-gray-70);">{{ timestampFormat(item.created_at) }}</span>
-                  </template>
-                  <template #value>
-                    <van-popover v-model:show="item.showActionPopover" theme="dark" :actions="item.actions"
-                      @select="onSelectAction" actions-direction="horizontal" placement="left-end"
-                      @open="onOpenActionPopover(item.id)">
-                      <template #reference>
-                        <van-button color="var(--black20-whitef7-color)" icon="ellipsis"
-                          style="height: 16px;width: 20px;color: var(--theme-blue-1970)!important;cursor: pointer;" />
-                      </template>
-                    </van-popover>
-                  </template>
-                </van-cell>
-              </van-cell-group>
-              <van-cell-group style="background: var(--black20-whitef7-color);margin-top: 8px;"
-                v-if="item.likes.length > 0 || item.comments.length > 0" class="like-comment-box">
-                <van-cell style="padding: 0 6px;background: var(--black20-whitef7-color);" v-if="item.likes.length > 0">
-                  <template #title>
-                    <div>
-                      <van-icon name="like-o" />
-                      <span style="margin-left: 4px;" v-for="(like, index) in item.likes" :key="like.id"
-                        @click="gotoFriendInfo(like.user.wechat)">{{
-                          like.user.nickname + (index + 1 == item.likes.length ? '' : ',') }}</span>
-                    </div>
-                  </template>
-                </van-cell>
-                <van-cell v-if="item.comments.length > 0">
-                  <template #title>
-                    <div v-for="(comment) in item.comments" :key="comment.id"
-                      @click="replySomeOne(item.id, comment.from_user, ('回复' + comment.from.nickname))">
-                      <span @click="gotoFriendInfo(comment.from.wechat)">{{ comment.from.nickname }}</span><span
-                        v-if="comment.to_user > 0" @click="gotoFriendInfo(comment.to.wechat)"><b>回复</b>{{
-                          comment.to.nickname }}</span>
-                      <b>：{{ comment.content }}</b>
-                    </div>
-                  </template>
-                </van-cell>
-              </van-cell-group>
+
             </div>
           </div>
         </van-list>
       </van-pull-refresh>
     </section>
   </div>
-  <van-popup v-model:show="showPostMomentMenu" round position="bottom" class="post-moment-menu">
+  <van-popup v-model:show="showMomentMessageMenu" round position="bottom" class="moment-message-menu">
     <van-cell-group>
-      <van-cell title="拍摄" clickable size="large" @click="showCommonCamera = true" />
-      <van-cell title="从手机相册选择" clickable size="large">
-        <template #title>
-          <van-uploader :after-read="afterRead" max-count="9" accept="image/*" multiple>从手机相册选择</van-uploader>
-        </template>
-      </van-cell>
-      <van-cell title="纯文案" clickable size="large" @click="handlePostMomentMenu(TypeText)" />
+      <van-cell title="消息列表" clickable size="large" @click="handleMomentMessageMenu" />
     </van-cell-group>
     <van-cell-group>
-      <van-cell title="取消" clickable @click="showPostMomentMenu = false" size="large" />
+      <van-cell title="取消" clickable @click="showMomentMessageMenu = false" size="large" />
     </van-cell-group>
   </van-popup>
-  <post-moment :show="showPostMoment" :fileList="fileList" :postType="postType" @hide="hidePostMoment"
-    @postSuccessCb="postSuccessCb" />
-  <common-camera :show="showCommonCamera" @hide="showCommonCamera = false" @takePhotoCb="takePhotoCb" />
-  <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"
-    title="更换相册封面" />
-  <common-comment :show="showCommonComment" :content="content" :placeholder="placeholder" position="bottom"
-    @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="hideCommonComment"></common-comment>
 </template>
 <style scoped lang="less">
 .discover-moment {
@@ -379,16 +263,33 @@ onMounted(() => {
 
         .user {
           position: absolute;
-          bottom: -1.5rem;
+          bottom: -2.8rem;
           right: 0.7rem;
           display: flex;
-          flex-direction: row;
+          flex-direction: column;
 
-          span {
-            margin: 8px 6px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--theme-white);
+          &-info {
+            width: inherit;
+            display: flex;
+            justify-content: flex-end;
+            text-align: left;
+
+            span {
+              margin: 8px 6px;
+              font-size: 20px;
+              font-weight: 700;
+              color: var(--theme-white);
+            }
+          }
+
+          &-sign {
+            height: 1.5rem;
+
+            span {
+              font-size: 12px;
+              line-height: 14px;
+              color: var(--van-cell-value-color);
+            }
           }
         }
       }
@@ -442,7 +343,7 @@ onMounted(() => {
       }
 
       .moment-item {
-        padding: 1rem 2rem;
+        padding: 2rem 2rem;
         height: auto;
         display: flex;
         position: relative;
@@ -504,7 +405,7 @@ onMounted(() => {
 }
 </style>
 <style lang="css">
-.post-moment-menu .van-cell__title {
+.moment-message-menu .van-cell__title {
   text-align: center;
   line-height: 2rem;
 }

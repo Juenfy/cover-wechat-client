@@ -1,73 +1,534 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, onUnmounted, onBeforeUnmount, ref, watch, nextTick } from 'vue';
 import { useAppStore } from "@/stores/app";
-import * as momentApi from "@/api/moment";
+import { showFailToast } from 'vant';
+import { TypeFile, TypeAudio } from "@/enums/file";
+import {
+    showCommonCall,
+    commonCallStatus,
+    commonCallType
+} from "@/utils/websocket";
 
-const props = defineProps({ show: Boolean, momentId: Number, toUser: Number, placeholder: String }); //action决定了当前是要搜索什么的意思
-const emit = defineEmits(["hide", "commentSuccessCb"]);
+const props = defineProps({
+    modules: String,
+    content: String,
+    position: String,
+    show: Boolean,
+    placeholder: String
+});
+
+const emit = defineEmits(['callback', 'input', 'hide']);
+
 const appStore = useAppStore();
+const input = ref({
+    content: '',
+    file: null,
+    type: 'text',
+    action: ''
+});
+const isFirstClick = ref(true);
 const textareaRef = ref(null);
+const uploadMaxSize = ref(30 * 1024 * 1024);
+const recordIcon = ref(appStore.icon.audio);
+const isAudioRecord = ref(false);
+const isAudioRecording = ref(false);
+const isCancelAudioRecording = ref(false);
+const mediaRecorder = ref(null);
+const audioChunks = ref([]);
+const mediaStream = ref(null);
+const startY = ref(0);
+const waveOffset = ref(0);
+const animationFrame = ref(null);
+const popupMoreBottom = ref(false);
 const popupEmojiBottom = ref(false);
-const content = ref("");
+const commentRef = ref(null);
 
-const submitComment = () => {
-    if (content.value) {
-        momentApi.comment({
-          id: props.momentId,
-          to_user: props.toUser,
-          content: content.value,
-        }).then(res => {
-          if(res.code == 200001) {
-            emit("commentSuccessCb", res.data);
-            emit("hide");
-            content.value = "";
-          }
-        })
+const handleKeyupEnter = () => {
+    input.value.action = 'input';
+    input.value.file = null;
+    input.value.type = 'text';
+    emit('callback', input);
+};
+
+const handleRecordIconClick = () => {
+    popupEmojiBottom.value = false;
+    popupMoreBottom.value = false;
+    isAudioRecord.value = !isAudioRecord.value;
+    if (isAudioRecord.value) {
+        recordIcon.value = appStore.icon.keyboard;
+    } else {
+        recordIcon.value = appStore.icon.audio;
+    }
+}
+
+const handleEmojiIconClick = () => {
+    popupMoreBottom.value = false;
+    setTimeout(() => {
+        popupEmojiBottom.value = !popupEmojiBottom.value;
+        if (popupEmojiBottom.value) {
+            isAudioRecord.value = false;
+            recordIcon.value = appStore.icon.audio;
+        }
+    }, 100);
+}
+
+const handleMoreIconClick = () => {
+    popupEmojiBottom.value = false;
+    setTimeout(() => {
+        popupMoreBottom.value = !popupMoreBottom.value;
+        if (popupMoreBottom.value) {
+            isAudioRecord.value = false;
+            recordIcon.value = appStore.icon.audio;
+        }
+    }, 200);
+}
+
+const onMoreBottomItemClick = (action) => {
+    input.value.action = action;
+}
+
+const handleInput = () => {
+    emit('input', input);
+};
+//选择表情包
+const onSelectEmoji = (emoji) => {
+    input.value.content += emoji.detail.unicode;
+    textareaRef.value.focus();
+    emit('input', input);
+};
+
+//上传
+const onOversize = (file) => {
+    showFailToast('文件大小超过30MB限制');
+};
+const beforeRead = (file) => {
+    switch (input.value.action) {
+        case 'photo':
+            if (file.type.startsWith('video/') || file.type.startsWith('image/')) {
+                return true;
+            }
+            showFailToast('请选择一个图片或视频文件');
+            return false;
+            break;
     }
 };
 
-const hideMe = () => {
-  emit("hide");
-  content.value = "";
-}
-
-const onSelectEmoji = (emoji) => {
-    content.value += emoji.detail.unicode;
-    textareaRef.value.focus();
+const afterRead = (file) => {
+    console.log('afterRead', file);
+    input.value.content = '';
+    input.value.file = file;
+    input.value.type = TypeFile;
+    emit('callback', input);
 };
+
+//录音
+const animateWave = () => {
+    waveOffset.value = (waveOffset.value + 1) % 100;
+    animationFrame.value = requestAnimationFrame(animateWave);
+};
+
+const wavePath = (n) => {
+    const amplitude = 10;
+    const frequency = 0.1;
+    let path = "M 0 15 ";
+    for (let x = 0; x <= 100; x++) {
+        const y =
+            15 + amplitude * Math.sin(frequency * (x + waveOffset.value + n * 20));
+        path += `L ${x} ${y} `;
+    }
+    return path;
+};
+const startRecording = (e) => {
+    console.log('开始录音', e);
+    input.value.action = TypeAudio;
+    startY.value = e.touches[0].clientY;
+    console.log(startY.value);
+    isAudioRecording.value = true;
+    isCancelAudioRecording.value = false;
+    audioChunks.value = [];
+    if (mediaRecorder.value) {
+        mediaRecorder.value.start();
+    }
+    animationFrame.value = requestAnimationFrame(animateWave);
+};
+
+const stopRecording = (e) => {
+    if (mediaRecorder.value && isAudioRecording.value) {
+        mediaRecorder.value.stop();
+        console.log(isCancelAudioRecording.value ? '取消录音' : '停止录音', e);
+    }
+    isAudioRecording.value = false;
+
+    cancelAnimationFrame(animationFrame.value);
+};
+
+const handleTouchMove = (e) => {
+    // console.log("touchmove", e);
+    const currentY = e.touches[0].clientY;
+    console.log(currentY);
+    if (startY.value - currentY > 100) {
+        // 上划距离超过50像素
+        isCancelAudioRecording.value = true;
+    } else {
+        isCancelAudioRecording.value = false;
+    }
+};
+
+const handleClickOutside = (e) => {
+    // console.log('handleClickOutside', e);
+    // console.log(commentRef.value);
+    if (commentRef.value && !commentRef.value.contains(e.target)) {
+        popupEmojiBottom.value = false;
+        popupMoreBottom.value = false;
+        input.value.file = null;
+        input.value.type = 'text';
+        input.value.content = '';
+        if (props.show && !isFirstClick.value) {
+            emit('hide');
+        }
+    }
+};
+
+watch(() => props.show, (newVal) => {
+    if (newVal) {
+        document.addEventListener('click', handleClickOutside);
+        setTimeout(() => {
+            isFirstClick.value = false;
+        }, 200);
+    } else {
+        document.removeEventListener('click', handleClickOutside);
+        isFirstClick.value = true;
+    }
+})
+
+watch(() => props.content, (newValue, oldValue) => {
+    // console.log('watch-new', newValue);
+    // console.log('watch-old', oldValue);
+    input.value.content = newValue;
+})
+
+onMounted(async () => {
+    nextTick(() => {
+        document.addEventListener('click', handleClickOutside);
+    });
+    if (props.modules.indexOf('record') !== -1) {
+        try {
+            mediaStream.value = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+            });
+            mediaRecorder.value = new MediaRecorder(mediaStream.value);
+
+            mediaRecorder.value.ondataavailable = (event) => {
+                audioChunks.value.push(event.data);
+            };
+
+            mediaRecorder.value.onstop = () => {
+                const audioBlob = new Blob(audioChunks.value, { type: 'audio/wav' });
+                audioChunks.value = [];
+                if (!isCancelAudioRecording.value) {
+                    // 这里可以上传录音文件或进行其他处理
+                    console.log('录音文件:', audioBlob);
+                    input.value.file = { file: audioBlob };
+                    input.value.content = '';
+                    input.value.type = TypeFile;
+                    emit("callback", input);
+                }
+            };
+        } catch (error) {
+            console.error('获取音频权限失败:', error);
+        }
+    }
+});
+
+onBeforeUnmount(() => {
+    if (animationFrame.value) {
+        cancelAnimationFrame(animationFrame.value);
+    }
+});
+
+onUnmounted(async () => {
+    if (mediaStream.value) {
+        mediaStream.value.getTracks().forEach((track) => track.stop());
+    }
+});
 </script>
 <template>
-    <van-popup v-model:show="props.show" position="bottom" style="height: 100%;width: 100%;background: transparent"
-        :autofocus="true" duration="0.2" closeable @click-close-icon="hideMe">
-        <div class="comment message-input-box">
+    <div>
+        <div :class="'common-comment common-comment-' + props.position" v-if="props.show" ref="commentRef">
             <div class="top">
-                <textarea type="text" v-model="content" @keyup.enter="submitComment" ref="textareaRef" :placeholder="placeholder" style="overflow-y: auto;font-size: 0.8rem"></textarea>
-                <div class="emoji">
-                    <van-icon :name="appStore.icon.emoji" @click="popupEmojiBottom = !popupEmojiBottom" />
+                <div class="record" v-if="props.modules.indexOf('record') !== -1">
+                    <van-icon :name="recordIcon" @click="handleRecordIconClick" />
                 </div>
+                <van-button v-if="isAudioRecord" type="primary" @touchstart="startRecording" @touchend="stopRecording"
+                    @touchmove="handleTouchMove" class="record-button">按住 说话</van-button>
+                <textarea v-else type="text" v-model="input.content" @input="handleInput"
+                    @keyup.enter="handleKeyupEnter" class="message-textarea" ref="textareaRef"
+                    :placeholder="props.placeholder"></textarea>
+                <div class="emoji" v-if="props.modules.indexOf('emoji') !== -1">
+                    <van-icon :name="appStore.icon.emoji" @click="handleEmojiIconClick" />
+                </div>
+                <div class="more" v-if="props.modules.indexOf('more') !== -1">
+                    <van-icon :name="appStore.icon.more" @click="handleMoreIconClick"
+                        v-if="props.modules.indexOf('more') !== -1" />
+                </div>
+            </div>
+
+            <div :class="popupMoreBottom ? 'more-bottom more-bottom-popup' : 'more-bottom'
+                " v-if="props.modules.indexOf('more') !== -1">
+                <van-grid :column-num="4" style="width: inherit" gutter="1rem" square center :border="false">
+                    <van-grid-item>
+                        <template #default>
+                            <van-uploader :before-read="beforeRead" :after-read="afterRead" accept="image/*, video/*"
+                                :max-size="uploadMaxSize" @oversize="onOversize" max-count="1"
+                                @click="onMoreBottomItemClick('photo')">
+                                <div class="more-bottom-item">
+                                    <div class="more-bottom-icon">
+                                        <van-icon name="photo" size="30" />
+                                    </div>
+                                    <span class="more-bottom-text">照片</span>
+                                </div>
+                            </van-uploader>
+                        </template>
+                    </van-grid-item>
+                    <van-grid-item>
+                        <template #default>
+                            <div class="more-bottom-item">
+                                <div class="more-bottom-icon">
+                                    <van-icon name="photograph" size="30" />
+                                </div>
+                                <span class="more-bottom-text">拍摄</span>
+                            </div>
+                        </template>
+                    </van-grid-item>
+                    <van-grid-item>
+                        <template #default>
+                            <van-uploader :max-size="uploadMaxSize" @oversize="onOversize"
+                                @click="onMoreBottomItemClick(TypeFile)" max-count="1">
+                                <div class="more-bottom-item">
+                                    <div class="more-bottom-icon">
+                                        <van-icon name="description" size="30" />
+                                    </div>
+                                    <span class="more-bottom-text">文件</span>
+                                </div>
+                            </van-uploader>
+                        </template>
+                    </van-grid-item>
+                    <van-grid-item>
+                        <template #default>
+                            <div class="more-bottom-item" @click="showCommonCall = true">
+                                <div class="more-bottom-icon">
+                                    <van-icon name="video" size="30" />
+                                </div>
+                                <span class="more-bottom-text">视频通话</span>
+                            </div>
+                        </template>
+                    </van-grid-item>
+                </van-grid>
             </div>
             <emoji-picker :class="popupEmojiBottom
                 ? 'emoji-bottom emoji-bottom-popup'
                 : 'emoji-bottom'
-                " @emojiClick="onSelectEmoji" />
+                " @emojiClick="onSelectEmoji" v-if="props.modules.indexOf('emoji') !== -1" />
         </div>
-    </van-popup>
+        <div class="audio-recording" v-if="isAudioRecording">
+            <div :class="isCancelAudioRecording ? 'bubble bubble-cancel' : 'bubble'">
+                <svg class="waveform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30">
+                    <path v-for="n in 5" :key="n" :d="wavePath(n)" stroke="white" stroke-width="2" fill="none"
+                        :opacity="1 - n * 0.15" />
+                </svg>
+            </div>
+            <div class="recording-text">
+                {{
+                    isCancelAudioRecording ? "松开手指，取消发送" : "正在录音... 上划取消"
+                }}
+            </div>
+        </div>
+    </div>
 </template>
+<style lang="css">
+:root:root {
+    --van-grid-item-content-background: transparent;
+}
+</style>
 <style scoped lang="less">
-.comment {
+.common-comment {
+    position: relative;
     width: 100%;
-    box-sizing: border-box;
-    height: auto;
+
+    >div,
+    emoji-picker {
+        width: inherit;
+        padding: 1rem 0;
+        background-color: var(--messge-footer-background);
+        border-top: 1px solid var(--van-nav-bar-border-color);
+        opacity: 0.9;
+    }
+
+    >.top {
+        border-top: none;
+        width: 100%;
+        padding: 0.7rem 0.7rem;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+
+        >textarea,
+        button {
+            border: none;
+            outline: none;
+            height: 40px;
+            width: 75%;
+            font-weight: bold;
+            border-radius: 0.2rem;
+            color: var(--black-white-color);
+            background: var(--messge-footer-input-background);
+            flex: 1;
+        }
+
+        >textarea {
+            box-sizing: border-box;
+            padding: 9px 5px;
+            max-height: 100px;
+            resize: none;
+            overflow-y: scroll;
+        }
+
+        .record,
+        .emoji,
+        .more {
+            width: 2rem;
+            height: inherit;
+            display: flex;
+            justify-content: flex-end;
+            font-size: 1.5rem;
+        }
+
+        .record {
+            justify-content: flex-start;
+        }
+    }
+
+
+
+    >.more-bottom,
+    >.emoji-bottom {
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease-in-out;
+
+        .more-bottom-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+            .more-bottom-icon {
+                height: 4rem;
+                width: 4rem;
+                background: var(--black20-white-color);
+                border-radius: 0.8rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                i {
+                    color: var(--black4c-whitebc-color);
+                }
+            }
+
+            .more-bottom-text {
+                margin-top: 5px;
+                font-size: 12px;
+                color: var(--theme-gray-70);
+            }
+        }
+    }
+
+    >.more-bottom-popup,
+    >.emoji-bottom-popup {
+        max-height: 18rem;
+    }
+
+    >.more-bottom-popup {
+        padding: 1rem 0;
+    }
+
+    emoji-picker {
+        width: inherit;
+        height: 18rem;
+        --background: var(--messge-footer-background);
+    }
+
+}
+
+.common-comment-bottom {
     position: fixed;
     bottom: 0;
     left: 0;
-    >.top {
-        >textarea {
-            width: 100%;
+}
+
+.common-comment-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.audio-recording {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    .bubble {
+        position: relative;
+        background-color: var(--theme-primary-color);
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .waveform {
+            width: 100px;
+            height: 30px;
         }
     }
-    >.emoji-bottom {
-        padding: 0;
+
+    .bubble::before {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid var(--theme-primary-color);
+    }
+
+    .bubble-cancel {
+        background-color: var(--theme-danger-color);
+    }
+
+    .bubble-cancel::before {
+        border-top: 10px solid var(--theme-danger-color);
+    }
+
+    .recording-text {
+        font-size: 16px;
+        font-weight: bold;
+        color: var(--theme-gray-70);
     }
 }
 </style>

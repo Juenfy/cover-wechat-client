@@ -5,6 +5,7 @@ export const useUserStore = defineStore(
   () => {
     const isLogin = ref(false);
     const info = ref({});
+    const homeInfo = ref({});
 
     const handleLogin = (user) => {
       info.value = user;
@@ -22,12 +23,18 @@ export const useUserStore = defineStore(
       info.value[key] = val;
     };
 
+    const setHomeInfo = (data) => {
+      homeInfo.value = data;
+    };
+
     return {
       handleLogin,
       handleLogout,
       updateInfo,
+      setHomeInfo,
       isLogin,
       info,
+      homeInfo
     };
   },
   { persist: true }

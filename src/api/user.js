@@ -23,3 +23,8 @@ export const getHomeInfo = async (keywords) => {
 export const putUpdate = async (data) => {
   return await request.put("/api/user/update", data);
 };
+
+//用户朋友圈
+export const getMomentList = async (id, page, limit) => {
+  return await request.get(`/api/user/moments?user_id=${id}&page=${page}&limit=${limit}`);
+};

@@ -6,6 +6,7 @@ import MeIndex from "@/views/me/index.vue";
 import Home from "@/views/Home.vue";
 import ChatMessage from "@/views/chat/message.vue";
 import FriendInfo from "@/views/friend/info.vue";
+import FriendMoment from "@/views/friend/moment.vue";
 import DiscoverMoment from "@/views/discover/moment.vue";
 import QrcodeScan from "@/views/me/qrcode/scan.vue";
 import Register from "@/views/Register.vue";
@@ -51,6 +52,11 @@ const router = createRouter({
       path: "/friend/info",
       name: "friend-info",
       component: FriendInfo,
+    },
+    {
+      path: "/friend/:id/moment",
+      name: "friend-moment",
+      component: FriendMoment,
     },
     {
       path: "/friend/apply",

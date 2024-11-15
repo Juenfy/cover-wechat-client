@@ -5,11 +5,12 @@ import { onMounted, watch, inject, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CommonSearch from "@/components/common/search.vue";
 import MessagePopup from "@/components/message/popup.vue";
+import CommonCall from "@/components/common/call.vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend, UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app";
 import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
-import { ActionLike,ActionUnlike,ActionComment } from "@/enums/moment";
+import { ActionLike, ActionUnlike, ActionComment } from "@/enums/moment";
 import { showDialog } from "vant";
 import {
   startWebSocket,
@@ -18,9 +19,13 @@ import {
   imagePreviewList,
   likeMoment,
   unlikeMoment,
-  commentMoment
+  commentMoment,
+  showCommonCall,
+  commonCallStatus,
+  commonCallType,
+  callUser
 } from "@/utils/websocket";
-import { File, Image, Video, Content } from "@/enums/file";
+import { TypeFile, TypeImage, Content } from "@/enums/file";
 import { Text } from "@/enums/message";
 
 const WebSocketClient = inject("WebSocketClient");
@@ -31,6 +36,7 @@ const appStore = useAppStore();
 const userStore = useUserStore();
 const noticeAudio = inject("NoticeAudio");
 const showMessagePopup = ref(false);
+
 const message = ref({});
 const messageAction = ref("");
 const onSearch = (action, keywords, cb) => {
@@ -80,7 +86,7 @@ const onMessage = async (data) => {
           route.fullPath !== currentPath
         ) {
           if (data.data.type !== Text)
-            data.data.content = Content[data.data.type] ?? Content[File];
+            data.data.content = Content[data.data.type] ?? Content[TypeFile];
           message.value = data.data;
           showMessagePopup.value = true;
           messageAction.value = ActionSend;
@@ -92,7 +98,7 @@ const onMessage = async (data) => {
           if (data.data.type === Image)
             imagePreviewList.value.push(data.data.content);
           //立刻标记已读
-          await messageApi.read({to_user: toUser, is_group: isGroup});
+          await messageApi.read({ to_user: toUser, is_group: isGroup });
         } else {
           //消息未读数加1
           appStore.unreadIncrBy(UnreadChat);
@@ -125,7 +131,7 @@ const onMessage = async (data) => {
       case ActionUnlike:
         unlikeMoment(data.data);
         break;
-      case  ActionComment:
+      case ActionComment:
         appStore.unreadIncrBy(UnreadMoment, 1, data.data.from);
         commentMoment(data.data);
     }
@@ -164,5 +170,7 @@ onUnmounted(() => {
       :action="appStore.commonSearchAction" :placeholder="appStore.commonSearchPlaceholder" @search="onSearch" />
     <message-popup :show="showMessagePopup" @hide="showMessagePopup = false" :message="message"
       :action="messageAction" />
+    <common-call :show="showCommonCall" :type="commonCallType" :status="commonCallStatus"
+      :to="userStore.info"></common-call>
   </van-config-provider>
 </template>
