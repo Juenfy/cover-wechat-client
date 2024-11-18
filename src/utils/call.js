@@ -76,7 +76,6 @@ export const startCall = async () => {
     }
 
     // 创建RTCPeerConnection对象
-    await getLocalStream();
     const peerConnection = new RTCPeerConnection();
     // 将本地流添加到PeerConnection
     localStream.value.getTracks().forEach(track => peerConnection.addTrack(track, localStream.value));
