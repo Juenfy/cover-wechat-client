@@ -10,7 +10,7 @@ import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend, UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app";
 import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
-import { ActionLike, ActionUnlike, ActionComment } from "@/enums/moment";
+import { ActionLike, ActionUnlike, ActionComment, ActionCall } from "@/enums/moment";
 import { showDialog } from "vant";
 import {
   startWebSocket
@@ -138,10 +138,11 @@ const onMessage = async (data) => {
         commentMoment(data.data);
         break;
       case ActionCall:
-        if (data.data?.offer) {
-          call.startIncoming(data.data?.type, data.data?.offer);
+        if (data.data?.action == 'offer') {
+          console.log(1111111);
+          call.startIncoming(data.data);
         }
-        if (data.data?.answer) {
+        if (data.data?.action == 'answer') {
           call.handleAnswer(data.data?.answer);
         }
         if (data.data?.action) {

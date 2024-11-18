@@ -1,13 +1,13 @@
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 import * as messageApi from "@/api/message";
 import * as call from "@/enums/call";
+import { showFailToast } from "vant";
 
-let WebSocketClient = null;
 const fromOffer = ref(null);
+const callId = ref(null);
 export const showCommonCall = ref(false);
 export const commonCallType = ref(call.CallVideo);
 export const commonCallStatus = ref(call.StatusInclosing);
-export const fromUser = ref({});
 export const callUser = ref({});
 export const localVideoRef = ref(null);
 export const remoteVideoRef = ref(null);
@@ -17,19 +17,6 @@ export const speakerStatus = ref("");
 export const localStream = ref(null);  // 本地视频流
 export const remoteStream = ref(null);  // 远程视频流
 
-const getLocalStream = async () => {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localStream.value = stream;
-        if (localVideoRef.value) {
-            localVideo.value.srcObject = stream;
-        }
-
-    } catch (error) {
-        console.error('获取本地视频流失败:', error);
-    }
-};
-
 // 拉起等待接听界面
 export const startWaiting = async () => {
     showCommonCall.value = true;
@@ -38,28 +25,38 @@ export const startWaiting = async () => {
 
 // 关闭通话界面
 export const endCalling = async (action) => {
-    WebSocketClient.value.send({
-        who: 'user',
-        action: 'call',
-        data: {
-            type: commonCallType.value,
-            from: fromUser.value,
-            to: callUser.value,
-            action: action
-        }
+    const arr = {
+        refuse: '已拒绝',
+        hangup: '已挂断',
+        timeout: '未接听'
+    }
+    if (!arr[action]) return;
+    messageApi.send({
+        id: callId.value,
+        to_user: callUser.value.id,
+        content: arr[action] + "，通话结束",
+        type: commonCallType.value + '_call',
+        is_group: 0,
+        action: action
+    }).then(res => {
+        if (res.code == 200001) {
+            showCommonCall.value = false;
+            commonCallStatus.value = call.StatusInclosing;
+            callUser.value = {};
+        } else
+            showFailToast(res.msg);
     });
-    showCommonCall.value = false;
-    commonCallStatus.value = call.StatusInclosing;
-    callUser.value = {};
+
 };
 
 // 拉起来电接听界面
 export const startIncoming = async (data) => {
+    callId.value = data.id;
     callUser.value = data.from;
     showCommonCall.value = true;
     commonCallStatus.value = call.StatusIncoming;
-    commonCallType.value = data.type;
-    fromOffer.value = data.offer;
+    commonCallType.value = data.type.replace('_call', '');
+    fromOffer.value = data.content;
 };
 
 export const startIncalling = async (data) => {
@@ -67,6 +64,17 @@ export const startIncalling = async (data) => {
 };
 
 export const startCall = async () => {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localStream.value = stream;
+        if (localVideoRef.value) {
+            localVideo.value.srcObject = stream;
+        }
+    } catch (error) {
+        console.error('获取本地视频流失败:', error);
+        return showFailToast('获取本地视频流失败:' + error);
+    }
+
     // 创建RTCPeerConnection对象
     await getLocalStream();
     const peerConnection = new RTCPeerConnection();
@@ -77,17 +85,7 @@ export const startCall = async () => {
     // 设置本地描述为offer
     await peerConnection.setLocalDescription(offer);
 
-    // 发起通话请求
-    WebSocketClient.send({
-        who: 'user',
-        action: 'call',
-        data: {
-            type: commonCallType.value,
-            from: fromUser.value,
-            to: callUser.value,
-            offer: offer
-        }
-    });
+
 
     // 处理接收到的answer
     peerConnection.ontrack = (event) => {
@@ -96,21 +94,27 @@ export const startCall = async () => {
         }
     };
 
-    startWaiting();
-};
+    // 发起通话请求
+    messageApi.send({
+        to_user: callUser.value.id,
+        content: 'offer',
+        type: commonCallType.value + '_call',
+        is_group: 0,
+        action: 'offer'
+    }).then(res => {
+        if (res.code == 200001)
+            startWaiting();
+        else
+            return showFailToast(res.msg);
 
-export const setWs = (ws) => {
-    WebSocketClient = ws;
-    console.log(WebSocketClient);
+    });
 };
 
 // 初始化通话对象
-export const setUser = (from, call) => {
-    fromUser.value = from;
+export const setCallUser = (user) => {
     if (commonCallStatus.value === call.StatusInclosing) {
-        callUser.value = call;
+        callUser.value = user;
     }
-
 };
 
 export const handleOffer = async () => {
@@ -128,18 +132,6 @@ export const handleOffer = async () => {
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
 
-    // 同意通话回答
-    WebSocketClient.send({
-        who: 'user',
-        action: 'call',
-        data: {
-            type: commonCallType.value,
-            from: fromUser.value,
-            to: callUser.value,
-            answer: answer
-        }
-    });
-
     // 设置远程视频流
     peerConnection.ontrack = (event) => {
         if (remoteVideoRef.value) {
@@ -147,7 +139,19 @@ export const handleOffer = async () => {
         }
     };
 
-    startIncalling();
+    // 同意通话回答
+    messageApi.send({
+        to_user: callUser.value.id,
+        content: 'answer',
+        type: commonCallType.value + '_call',
+        is_group: 0,
+        action: 'answer'
+    }).then(res => {
+        if (res.code == 200001)
+            startIncalling();
+        else
+            return showFailToast(res.msg);
+    });
 };
 
 export const handleAnswer = async (answer) => {

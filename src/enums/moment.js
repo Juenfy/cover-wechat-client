@@ -5,3 +5,4 @@ export const TypeVideo = 'video';
 export const ActionLike = 'like';
 export const ActionUnlike = 'unlike';
 export const ActionComment = 'comment';
+export const ActionCall = 'call';

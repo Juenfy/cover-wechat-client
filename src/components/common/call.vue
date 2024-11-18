@@ -31,6 +31,9 @@ import { localVideoRef, remoteVideoRef } from "@/utils/call";
                 </div>
                 <div class="operation inwaiting-incalling" v-else>
                     <div class="top">
+                        <span>已接通</span>
+                    </div>
+                    <div class="center">
                         <div :class="'microphone ' + call.microphoneStatus.value">
                             <van-button icon="close" round class="btn"></van-button>
                             <span>麦克风</span>
@@ -117,7 +120,7 @@ import { localVideoRef, remoteVideoRef } from "@/utils/call";
         }
 
         .user {
-            height: 70%;
+            height: 65%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -139,7 +142,10 @@ import { localVideoRef, remoteVideoRef } from "@/utils/call";
         }
 
         .operation {
-            height: 30%;
+            height: 35%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
         }
 
         .incomming {
@@ -154,35 +160,47 @@ import { localVideoRef, remoteVideoRef } from "@/utils/call";
             align-items: center;
             flex-direction: column;
 
-            .top {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                width: inherit;
-
-                div {
-                    display: flex;
-                    align-items: center;
-                    flex-direction: column;
-
-                    span {
-                        margin-top: 4px;
-                        font-size: 14px;
-                        color: #fff;
-                    }
-
-                    span:last-child {
-                        font-size: 12px;
-                        color: #ccc;
-                    }
-                }
+            .top>span {
+                color: #fff;
+                font-size: 1rem;
+                line-height: 3rem;
             }
 
-            .bottom {
+            >div {
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
                 width: inherit;
+            }
+
+            .center>div>.btn {
+                color: #f5f5f5;
+                background: transparent;
+                border: 1px solid #dcdee0;
+            }
+
+            .center>.open>.btn {
+                color: #323233;
+                background: #fff;
+                border: 1px solid #dcdee0;
+            }
+
+            .center>div {
+
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+
+                span {
+                    margin-top: 4px;
+                    font-size: 14px;
+                    color: #fff;
+                }
+
+                span:last-child {
+                    font-size: 12px;
+                    color: #ccc;
+                }
 
             }
         }
