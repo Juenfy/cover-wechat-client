@@ -1,7 +1,7 @@
 <!--聊天设置页面-->
 <script setup>
 import ChatGroupAction from "@/components/chat/group/action.vue";
-import { onMounted, reactive, ref, watch } from "vue";
+import { onMounted, inject, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
@@ -37,7 +37,7 @@ watch(
   () => props.info,
   (info) => {
     chatInfo.value = info;
-    call.setUser(userStore.info, info?.users[0] ?? []);
+    call.init(inject("WebSocketClient"), userStore.info, info?.users[0] ?? []);
   }
 );
 
