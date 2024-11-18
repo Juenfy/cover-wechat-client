@@ -1,3 +1,4 @@
+import { setWs } from "@/utils/call";
 export class WebSocketClient {
   constructor(url, emitter) {
     this.url = url;
@@ -55,6 +56,7 @@ export const startWebSocket = async (WebSocketClient, uid) => {
       data: { uid: uid },
     };
     WebSocketClient.send(data);
+    setWs(WebSocketClient);
   });
 };
 

@@ -2,7 +2,7 @@ import { ref } from "vue";
 import * as messageApi from "@/api/message";
 import * as call from "@/enums/call";
 
-const WebSocketClient = ref(null);
+const ws = ref(null);
 const fromOffer = ref(null);
 export const showCommonCall = ref(false);
 export const commonCallType = ref(call.CallVideo);
@@ -38,7 +38,7 @@ export const startWaiting = async () => {
 
 // 关闭通话界面
 export const endCalling = async (action) => {
-    WebSocketClient.value.send({
+    ws.value.send({
         who: 'user',
         action: 'call',
         data: {
@@ -67,6 +67,7 @@ export const startIncalling = async (data) => {
 };
 
 export const startCall = async () => {
+    console.log(ws);
     // 创建RTCPeerConnection对象
     await getLocalStream();
     const peerConnection = new RTCPeerConnection();
@@ -78,7 +79,7 @@ export const startCall = async () => {
     await peerConnection.setLocalDescription(offer);
 
     // 发起通话请求
-    WebSocketClient.value.send({
+    ws.value.send({
         who: 'user',
         action: 'call',
         data: {
@@ -99,9 +100,13 @@ export const startCall = async () => {
     startWaiting();
 };
 
+export const setWs = (ws) => {
+    console.log(ws);
+    ws.value = ws;
+};
+
 // 初始化通话对象
-export const init = (ws, from, call) => {
-    WebSocketClient.value = ws;
+export const setUser = (from, call) => {
     fromUser.value = from;
     if (commonCallStatus.value === call.StatusInclosing) {
         callUser.value = call;
@@ -125,7 +130,7 @@ export const handleOffer = async () => {
     await peerConnection.setLocalDescription(answer);
 
     // 同意通话回答
-    WebSocketClient.value.send({
+    ws.value.send({
         who: 'user',
         action: 'call',
         data: {

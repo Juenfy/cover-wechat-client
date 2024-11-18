@@ -37,7 +37,7 @@ watch(
   () => props.info,
   (info) => {
     chatInfo.value = info;
-    call.init(inject("WebSocketClient"), userStore.info, info?.users[0] ?? []);
+    call.setUser(inject("WebSocketClient"), userStore.info, info?.users[0] ?? []);
   }
 );
 
