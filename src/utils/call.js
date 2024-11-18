@@ -1,8 +1,8 @@
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import * as messageApi from "@/api/message";
 import * as call from "@/enums/call";
 
-const WebSocketClient = ref(null);
+let WebSocketClient = null;
 const fromOffer = ref(null);
 export const showCommonCall = ref(false);
 export const commonCallType = ref(call.CallVideo);
@@ -78,7 +78,7 @@ export const startCall = async () => {
     await peerConnection.setLocalDescription(offer);
 
     // 发起通话请求
-    WebSocketClient.value.send({
+    WebSocketClient.send({
         who: 'user',
         action: 'call',
         data: {
@@ -100,8 +100,8 @@ export const startCall = async () => {
 };
 
 export const setWs = (ws) => {
-    WebSocketClient.value = ws;
-    console.log(WebSocketClient.value);
+    WebSocketClient = ws;
+    console.log(WebSocketClient);
 };
 
 // 初始化通话对象
@@ -129,7 +129,7 @@ export const handleOffer = async () => {
     await peerConnection.setLocalDescription(answer);
 
     // 同意通话回答
-    WebSocketClient.value.send({
+    WebSocketClient.send({
         who: 'user',
         action: 'call',
         data: {
