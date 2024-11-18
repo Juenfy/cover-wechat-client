@@ -12,7 +12,7 @@ import {
 import "emoji-picker-element";
 import * as messageApi from "@/api/message";
 import { useAppStore } from "@/stores/app";
-import { chatInfo, getChatInfo, messageList, getMessageList, imagePreviewList } from "@/utils/websocket";
+import { chatInfo, getChatInfo, messageList, getMessageList, imagePreviewList } from "@/utils/chat";
 import { UnreadChat } from "@/enums/app";
 import ChatInfo from "@/components/chat/info.vue";
 import ChatGroupUsers from "@/components/chat/group/users.vue";

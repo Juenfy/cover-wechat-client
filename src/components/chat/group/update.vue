@@ -1,6 +1,6 @@
 <script setup>
 import { watch, ref } from "vue";
-import { chatInfo, getChatInfo, getMessageList } from "@/utils/websocket";
+import { chatInfo, getChatInfo, getMessageList } from "@/utils/chat";
 import * as chatApi from "@/api/chat";
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide"]);

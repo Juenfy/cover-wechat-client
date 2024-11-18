@@ -1,66 +1,62 @@
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from "vue";
-import { CallAudio, CallVideo, StatusIncalling, StatusInwaiting, StatusIncoming } from "@/enums/call";
-const props = defineProps({
-    show: Boolean,
-    type: String,
-    status: String,
-    to: Object
-});
+import { ref, watch } from "vue";
+import * as call from "@/utils/call";
+import * as callEnum from "@/enums/call";
+import { localVideoRef, remoteVideoRef } from "@/utils/call";
 
-const emit = defineEmits(["hide"]);
-const localVideoRef = ref(null);
-const remoteVideoRef = ref(null);
-const microphoneStatus = ref("");
-const cameraStatus = ref("");
-const speakerStatus = ref("");
 </script>
 
 <template>
-    <van-popup v-model:show="props.show" position="bottom" @opened="() => { }" @closed="() => { }"
+    <van-popup v-model:show="call.showCommonCall.value" position="bottom" @opened="() => { }" @closed="() => { }"
         style="width: 100%; height: 100%;background: transparent;">
         <div class="overly"></div>
-        <div :class="'common-call ' + 'common-call-' + props.type">
-            <div :class="'call ' + 'call-' + props.status">
+        <div :class="'common-call ' + 'common-call-' + call.commonCallType.value">
+            <div :class="'call ' + 'call-' + call.commonCallStatus.value">
                 <div class="user"
-                    v-if="(props.type != CallVideo) || (props.status != StatusIncalling && props.type == CallVideo)">
-                    <van-image :src="props.to.avatar" width="6rem" height="6rem" radius="1rem" />
-                    <div class="nickname">{{ props.to.nickname }}</div>
+                    v-if="(call.commonCallType.value != callEnum.CallVideo) || (call.commonCallStatus.value != callEnum.StatusIncalling && call.commonCallType.value == callEnum.CallVideo)">
+                    <van-image :src="call.callUser.value.avatar" width="6rem" height="6rem" radius="1rem" />
+                    <div class="nickname">{{ call.callUser.value.nickname }}</div>
                     <div class="status">
-                        <span v-if="props.status == StatusInwaiting">等待对方接听</span>
-                        <span v-else-if="props.status == StatusIncoming">邀请你通话</span>
-                        <span v-else-if="props.status == StatusIncalling">通话中</span>
+                        <span v-if="call.commonCallStatus.value == callEnum.StatusInwaiting">等待对方接听</span>
+                        <span v-else-if="call.commonCallStatus.value == callEnum.StatusIncoming">邀请你通话</span>
+                        <span v-else-if="call.commonCallStatus.value == callEnum.StatusIncalling">通话中</span>
                     </div>
                 </div>
 
-                <div class="operation incomming" v-if="props.status == StatusIncoming">
-                    <van-button type="danger" icon="close" round class="btn btn-large"></van-button>
-                    <van-button type="success" icon="phone" round class="btn btn-large"></van-button>
+                <div class="operation incomming" v-if="call.commonCallStatus.value == callEnum.StatusIncoming">
+                    <van-button type="danger" icon="close" round class="btn btn-large"
+                        @click="call.endCalling('refuse')"></van-button>
+                    <van-button type="success" icon="phone" round class="btn btn-large"
+                        @click="call.handleOffer"></van-button>
                 </div>
                 <div class="operation inwaiting-incalling" v-else>
                     <div class="top">
-                        <div :class="'microphone ' + microphoneStatus">
+                        <div :class="'microphone ' + call.microphoneStatus.value">
                             <van-button icon="close" round class="btn"></van-button>
                             <span>麦克风</span>
-                            <span>已{{ microphoneStatus ? '打开' : '关闭' }}</span>
+                            <span>已{{ call.microphoneStatus.value ? '打开' : '关闭' }}</span>
                         </div>
-                        <div :class="'speaker ' + speakerStatus">
+                        <div :class="'speaker ' + call.speakerStatus">
                             <van-button icon="close" round class="btn"></van-button>
                             <span>扬声器</span>
-                            <span>已{{ speakerStatus ? '打开' : '关闭' }}</span>
+                            <span>已{{ call.speakerStatus.value ? '打开' : '关闭' }}</span>
                         </div>
-                        <div :class="'camera ' + cameraStatus">
+                        <div :class="'camera ' + call.cameraStatus.value">
                             <van-button icon="close" round class="btn"></van-button>
                             <span>摄像头</span>
-                            <span>已{{ cameraStatus ? '打开' : '关闭' }}</span>
+                            <span>已{{ call.cameraStatus.value ? '打开' : '关闭' }}</span>
                         </div>
                     </div>
-                    <div class="bottom"></div>
+                    <div class="bottom">
+                        <van-button type="danger" icon="close" round class="btn btn-large"
+                            @click="call.endCalling('handup')"></van-button>
+                    </div>
                 </div>
             </div>
-            <div class="video" v-if="props.type == CallVideo && props.status == StatusIncalling">
+            <div class="video" v-if="call.commonCallType.value == callEnum.CallVideo">
                 <video id="local" autoplay muted ref="localVideoRef"></video>
-                <video id="remote" autoplay ref="remoteVideoRef"></video>
+                <video id="remote" autoplay ref="remoteVideoRef"
+                    v-if="call.commonCallStatus.value == callEnum.StatusIncalling"></video>
             </div>
         </div>
     </van-popup>
@@ -76,7 +72,7 @@ const speakerStatus = ref("");
 }
 
 .btn-large {
-    height: 4.5rem;
+    height: 4.5rem !important;
     width: 4.5rem;
 }
 

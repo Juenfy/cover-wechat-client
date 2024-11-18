@@ -13,18 +13,20 @@ import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
 import { ActionLike, ActionUnlike, ActionComment } from "@/enums/moment";
 import { showDialog } from "vant";
 import {
-  startWebSocket,
+  startWebSocket
+
+} from "@/utils/websocket";
+import {
   getChatList,
   messageList,
   imagePreviewList,
+} from "@/utils/chat";
+import {
   likeMoment,
   unlikeMoment,
-  commentMoment,
-  showCommonCall,
-  commonCallStatus,
-  commonCallType,
-  callUser
-} from "@/utils/websocket";
+  commentMoment
+} from "@/utils/moment";
+import * as call from "@/utils/call";
 import { TypeFile, TypeImage, Content } from "@/enums/file";
 import { Text } from "@/enums/message";
 
@@ -134,6 +136,18 @@ const onMessage = async (data) => {
       case ActionComment:
         appStore.unreadIncrBy(UnreadMoment, 1, data.data.from);
         commentMoment(data.data);
+        break;
+      case ActionCall:
+        if (data.data?.offer) {
+          call.startIncoming(data.data?.type, data.data?.offer);
+        }
+        if (data.data?.answer) {
+          call.handleAnswer(data.data?.answer);
+        }
+        if (data.data?.action) {
+          call.endCalling(data.data?.action);
+        }
+        break;
     }
   }
 
@@ -170,7 +184,6 @@ onUnmounted(() => {
       :action="appStore.commonSearchAction" :placeholder="appStore.commonSearchPlaceholder" @search="onSearch" />
     <message-popup :show="showMessagePopup" @hide="showMessagePopup = false" :message="message"
       :action="messageAction" />
-    <common-call :show="showCommonCall" :type="commonCallType" :status="commonCallStatus"
-      :to="userStore.info"></common-call>
+    <common-call></common-call>
   </van-config-provider>
 </template>

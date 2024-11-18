@@ -9,6 +9,8 @@ import ChatBackground from "@/components/common/background.vue";
 import * as chatApi from "@/api/chat";
 import { showDialog } from 'vant';
 import GroupUpdate from "@/components/chat/group/update.vue";
+import * as call from "@/utils/call";
+
 const router = useRouter();
 const showClearChat = ref(false);
 const showChatBackground = ref(false);
@@ -33,6 +35,7 @@ watch(
   () => props.info,
   (info) => {
     chatInfo.value = info;
+    call.setCallUser(info?.users[0] ?? []);
   }
 );
 

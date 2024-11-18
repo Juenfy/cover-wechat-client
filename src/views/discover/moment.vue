@@ -16,7 +16,7 @@ import {
   likeMoment,
   unlikeMoment,
   commentMoment
-} from "@/utils/websocket";
+} from "@/utils/moment";
 
 const appStore = useAppStore();
 const router = useRouter();

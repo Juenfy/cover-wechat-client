@@ -3,7 +3,7 @@
 import ChatList from "@/components/chat/list.vue";
 import { ref, onMounted } from "vue";
 import { useAppStore } from "@/stores/app";
-import { chatList, getChatList, sortChatList } from "@/utils/websocket";
+import { chatList, getChatList, sortChatList } from "@/utils/chat";
 const appStore = useAppStore();
 const loading = ref(false);
 const finished = ref(false);

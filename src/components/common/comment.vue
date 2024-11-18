@@ -3,11 +3,7 @@ import { onMounted, onUnmounted, onBeforeUnmount, ref, watch, nextTick } from 'v
 import { useAppStore } from "@/stores/app";
 import { showFailToast } from 'vant';
 import { TypeFile, TypeAudio } from "@/enums/file";
-import {
-    showCommonCall,
-    commonCallStatus,
-    commonCallType
-} from "@/utils/websocket";
+import * as call from "@/utils/call";
 
 const props = defineProps({
     modules: String,
@@ -316,7 +312,7 @@ onUnmounted(async () => {
                     </van-grid-item>
                     <van-grid-item>
                         <template #default>
-                            <div class="more-bottom-item" @click="showCommonCall = true">
+                            <div class="more-bottom-item" @click="call.startCall">
                                 <div class="more-bottom-icon">
                                     <van-icon name="video" size="30" />
                                 </div>
