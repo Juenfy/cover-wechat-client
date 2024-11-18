@@ -1,14 +1,13 @@
 import { ref, inject } from "vue";
 import * as messageApi from "@/api/message";
 import * as call from "@/enums/call";
-import { useUserStore } from "@/stores/user";
 
-const { userInfo } = useUserStore();
 const WebSocketClient = inject("WebSocketClient");
 const fromOffer = ref(null);
 export const showCommonCall = ref(false);
 export const commonCallType = ref(call.CallVideo);
 export const commonCallStatus = ref(call.StatusInclosing);
+export const fromUser = ref({});
 export const callUser = ref({});
 export const localVideoRef = ref(null);
 export const remoteVideoRef = ref(null);
@@ -44,7 +43,7 @@ export const endCalling = async (action) => {
         action: 'call',
         data: {
             type: commonCallType.value,
-            from: userInfo,
+            from: fromUser.value,
             to: callUser.value,
             action: action
         }
@@ -84,7 +83,7 @@ export const startCall = async () => {
         action: 'call',
         data: {
             type: commonCallType.value,
-            from: userInfo,
+            from: fromUser.value,
             to: callUser.value,
             offer: offer
         }
@@ -101,9 +100,12 @@ export const startCall = async () => {
 };
 
 // 初始化通话对象
-export const setCallUser = (user) => {
-    if (commonCallStatus.value === call.StatusInclosing)
-        callUser.value = user;
+export const setUser = (from, call) => {
+    fromUser.value = from;
+    if (commonCallStatus.value === call.StatusInclosing) {
+        callUser.value = call;
+    }
+
 };
 
 export const handleOffer = async () => {
@@ -127,7 +129,7 @@ export const handleOffer = async () => {
         action: 'call',
         data: {
             type: commonCallType.value,
-            from: userInfo,
+            from: fromUser.value,
             to: callUser.value,
             answer: answer
         }

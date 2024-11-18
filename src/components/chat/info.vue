@@ -4,6 +4,7 @@ import ChatGroupAction from "@/components/chat/group/action.vue";
 import { onMounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
+import { useUserStore } from "@/stores/user";
 import { SearchChatRecord } from "@/enums/app";
 import ChatBackground from "@/components/common/background.vue";
 import * as chatApi from "@/api/chat";
@@ -18,6 +19,7 @@ const showChatGroupInvite = ref(false);
 const showChatGroupUpdate = ref(false);
 const chatGroupUpdateField = ref("");
 const appStore = useAppStore();
+const userStore = useUserStore();
 const props = defineProps({ show: Boolean, info: Object });
 const chatInfo = ref({});
 //调用父组件关闭弹窗
@@ -35,7 +37,7 @@ watch(
   () => props.info,
   (info) => {
     chatInfo.value = info;
-    call.setCallUser(info?.users[0] ?? []);
+    call.setUser(userStore.info, info?.users[0] ?? []);
   }
 );
 
