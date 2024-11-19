@@ -97,7 +97,7 @@ const onMessage = async (data) => {
         // 当前聊天窗口，推进消息
         if (route.fullPath === currentPath) {
           messageList.value.push(data.data);
-          if (data.data.type === Image)
+          if (data.data.type === TypeImage)
             imagePreviewList.value.push(data.data.content);
           //立刻标记已读
           await messageApi.read({ to_user: toUser, is_group: isGroup });
