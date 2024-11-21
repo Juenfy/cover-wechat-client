@@ -51,9 +51,31 @@ export const timestampFormat = (timestamp) => {
     ) {
       return "昨天 " + zeroize(H) + ":" + zeroize(i);
     } else if (curDate.getFullYear() == Y) {
-      return zeroize(m) + "月" + zeroize(d) + "日";
+      return m + "月" + d + "日";
     } else {
-      return Y + "年" + zeroize(m) + "月" + zeroize(d) + "日";
+      return Y + "年" + m + "月" + d + "日";
     }
   }
+};
+
+export const timestampFormatMoment = (timestamp) => {
+  function zeroize(num) {
+    return (String(num).length == 1 ? "0" : "") + num;
+  }
+
+  let curTimestamp = parseInt(Date.now() / 1000); //当前时间戳
+  let timestampDiff = curTimestamp - timestamp; // 参数时间戳与当前时间戳相差秒数
+
+  let tmDate = new Date(timestamp * 1000); // 参数时间戳转换成的日期对象
+
+  let m = tmDate.getMonth() + 1,
+    d = tmDate.getDate();
+
+  if (timestampDiff < 86400)
+    return "<b class='day' style='font-size:20px'>今天</b>";
+  if (timestampDiff < 86400 * 2)
+    return "<b class='day' style='font-size:20px'>昨天</b>";
+  if (timestampDiff < 86400 * 3)
+    return "<b class='day' style='font-size:20px'>前天</b>";
+  return "<b class='day' style='font-size:20px'>" + zeroize(d) + "</b> " + m + "月";
 };

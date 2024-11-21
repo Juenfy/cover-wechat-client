@@ -15,8 +15,8 @@ export const getList = async (page, limit) => {
     return await request.get(`/api/moment/list?page=${page}&limit=${limit}`);
 };
 //获取点赞、评论消息列表
-export const getMessageList = async () => {
-    return await request.get('/api/moment/message');
+export const getMessageList = async (page, limit) => {
+    return await request.get(`/api/moment/message?page=${page}&limit=${limit}`);
 };
 //点赞朋友圈
 export const like = async (id) => {

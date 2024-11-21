@@ -5,6 +5,7 @@ import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
 import PostMoment from "@/components/discover/moment/post.vue";
 import CommonCamera from "@/components/common/camera.vue";
 import CommonComment from "@/components/common/comment.vue";
+import MomentMessage from "@/components/discover/moment/message.vue";
 import * as momentApi from "@/api/moment";
 import { timestampFormat } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
@@ -27,6 +28,7 @@ const showPostMoment = ref(false);
 const showCommonCamera = ref(false);
 const showMomentBackground = ref(false);
 const showCommonComment = ref(false);
+const showMomentMessage = ref(false);
 const content = ref("");
 const bgHeader = ref(null);
 const postType = ref("text");
@@ -55,11 +57,13 @@ const onClickDiscoverMoment = () => {
   }, 300);
 };
 const onClickBgHeader = () => {
-  bgHeader.value.classList.add("bg-header-go");
-  setTimeout(() => {
-    showDom.value = false;
-    bgHeader.value.classList.remove("bg-header-back");
-  }, 300);
+  if (bgHeader.value?.classList) {
+    bgHeader.value.classList.add("bg-header-go");
+    setTimeout(() => {
+      showDom.value = false;
+      bgHeader.value.classList.remove("bg-header-back");
+    }, 300);
+  }
 };
 
 const handlePostMomentMenu = (type) => {
@@ -245,29 +249,30 @@ onMounted(() => {
       </van-nav-bar>
     </header>
     <section>
-      <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-list"
+      <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-container"
         @scroll.passive="onScroll" style="background: var(--black20-white-color);">
-        <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMomentList">
-          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.info.moment_bg_file_path == ''
-            ? ''
-            : 'background-image: url(' + userStore.info.moment_bg_file_path + ');'
-            ">
-            <div class="user" v-if="showDom">
-              <span @click="gotoFriendInfo(userStore.info.wechat)">{{ userStore.info.nickname }}</span>
-              <van-image radius="8px" width="4rem" height="4rem" :src="userStore.info.avatar"
-                @click="gotoFriendInfo(userStore.info.wechat)" />
-            </div>
-            <div class="change-bg" v-else>
-              <van-grid :column-num="1" :border="false">
-                <van-grid-item icon="photo" text="换封面" icon-color="var(--theme-white)"
-                  @click="showMomentBackground = true" />
-              </van-grid>
-            </div>
+        <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.info.moment_bg_file_path == ''
+          ? ''
+          : 'background-image: url(' + userStore.info.moment_bg_file_path + ');'
+          ">
+          <div class="user" v-if="showDom">
+            <span @click="gotoFriendInfo(userStore.info.wechat)">{{ userStore.info.nickname }}</span>
+            <van-image radius="8px" width="4rem" height="4rem" :src="userStore.info.avatar"
+              @click="gotoFriendInfo(userStore.info.wechat)" />
           </div>
-          <div class="unread" v-if="appStore.unread.moment.num > 0">
-            <van-button :icon="appStore.unread.moment.from.avatar">&nbsp;{{
-              appStore.unread.moment.num }}条未读</van-button>
+          <div class="change-bg" v-else>
+            <van-grid :column-num="1" :border="false">
+              <van-grid-item icon="photo" text="换封面" icon-color="var(--theme-white)"
+                @click="showMomentBackground = true" />
+            </van-grid>
           </div>
+        </div>
+        <div class="unread" v-if="appStore.unread.moment.num > 0" @click="showMomentMessage = true">
+          <van-button :icon="appStore.unread.moment.from.avatar">&nbsp;{{
+            appStore.unread.moment.num }}条未读</van-button>
+        </div>
+        <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMomentList"
+          class="moment-list">
           <div class="moment-item" v-for="item in momentList" :key="item.id">
             <div class="moment-item-left">
               <van-image width="3rem" height="3rem" fit="contain" :src="item.user.avatar"
@@ -302,9 +307,9 @@ onMounted(() => {
                   <template #title>
                     <div>
                       <van-icon name="like-o" />
-                      <span style="margin-left: 4px;" v-for="(like, index) in item.likes" :key="like.id"
+                      <b style="margin-left: 4px;" v-for="(like, index) in item.likes" :key="like.id"
                         @click="gotoFriendInfo(like.from.wechat)">{{
-                          like.from.nickname + (index + 1 == item.likes.length ? '' : ',') }}</span>
+                          like.from.nickname + (index + 1 == item.likes.length ? '' : ',') }}</b>
                     </div>
                   </template>
                 </van-cell>
@@ -312,10 +317,10 @@ onMounted(() => {
                   <template #title>
                     <div v-for="(comment) in item.comments" :key="comment.id"
                       @click="replySomeOne(item.id, comment.from_user, ('回复' + comment.from.nickname))">
-                      <span @click="gotoFriendInfo(comment.from.wechat)">{{ comment.from.nickname }}</span><span
-                        v-if="comment.to_user > 0" @click="gotoFriendInfo(comment.to.wechat)"><b>回复</b>{{
-                          comment.to.nickname }}</span>
-                      <b>：{{ comment.content }}</b>
+                      <b @click="gotoFriendInfo(comment.from.wechat)">{{ comment.from.nickname }}</b><span
+                        v-if="comment.to_user > 0" @click="gotoFriendInfo(comment.to.wechat)">回复<b>{{
+                          comment.to.nickname }}</b></span>
+                      <span>：{{ comment.content }}</span>
                     </div>
                   </template>
                 </van-cell>
@@ -346,7 +351,8 @@ onMounted(() => {
   <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"
     title="更换相册封面" />
   <common-comment :show="showCommonComment" :content="content" :placeholder="placeholder" position="bottom"
-    @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="hideCommonComment"></common-comment>
+    @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="hideCommonComment" />
+  <moment-message :show="showMomentMessage" @hide="showMomentMessage = false" />
 </template>
 <style scoped lang="less">
 .discover-moment {
@@ -357,7 +363,7 @@ onMounted(() => {
   section {
 
 
-    .moment-list {
+    .moment-container {
       box-sizing: border-box;
       background: var(--common-search-background) !important;
 
@@ -437,73 +443,77 @@ onMounted(() => {
         }
       }
 
-      .moment-item:first-child {
+      .moment-list {
         margin-top: 1rem;
-      }
 
-      .moment-item {
-        padding: 1rem 2rem;
-        height: auto;
-        display: flex;
-        position: relative;
-        justify-content: flex-start;
+        .moment-item {
+          padding: 1rem 2rem;
+          height: auto;
+          display: flex;
+          position: relative;
+          justify-content: flex-start;
 
-        .moment-item-left {
-          width: 3rem;
-          margin-right: 0.5rem;
-        }
+          .moment-item-left {
+            width: 3rem;
+            margin-right: 0.5rem;
+          }
 
-        .moment-item-right {
-          flex-grow: 1;
+          .moment-item-right {
+            flex-grow: 1;
 
-          .like-comment-box {
-            background: var(--black20-whitef7-color);
-            margin-top: 8px;
-
-            .van-cell {
-              padding: 0px 6px;
+            .like-comment-box {
               background: var(--black20-whitef7-color);
-              font-weight: 600;
+              margin-top: 8px;
 
-              .van-cell__title>div {
-                color: var(--theme-blue-1970);
+              .van-cell {
+                padding: 0px 6px;
+                background: var(--black20-whitef7-color);
 
-                b {
+                .van-cell__title>div {
                   color: var(--black4c-whitebc-color);
+
+                  b {
+                    color: var(--theme-blue-1970);
+                  }
                 }
               }
             }
-          }
 
-          .nickname {
-            color: var(--theme-blue-1970);
-            font-size: 18px;
-            font-weight: 700;
-            margin-top: -5px;
-          }
+            .nickname {
+              color: var(--theme-blue-1970);
+              font-size: 18px;
+              font-weight: 700;
+              margin-top: -5px;
+            }
 
-          .content {
-            color: var(--black-white-color);
+            .content {
+              color: var(--black-white-color);
+            }
           }
+        }
+
+        .moment-item::after {
+          position: absolute;
+          box-sizing: border-box;
+          content: " ";
+          pointer-events: none;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          border-bottom: 1px solid var(--van-cell-border-color);
+          transform: scaleY(.5);
         }
       }
 
-      .moment-item::after {
-        position: absolute;
-        box-sizing: border-box;
-        content: " ";
-        pointer-events: none;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        border-bottom: 1px solid var(--van-cell-border-color);
-        transform: scaleY(.5);
-      }
     }
   }
 }
 </style>
 <style lang="css">
+.discover-moment .van-nav-bar .van-icon {
+  color: #fff;
+}
+
 .post-moment-menu .van-cell__title {
   text-align: center;
   line-height: 2rem;

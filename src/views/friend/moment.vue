@@ -3,14 +3,13 @@ import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
 import * as userApi from "@/api/user";
-import { timestampFormat } from "@/utils/helper";
+import { timestampFormatMoment } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
 import MomentMessage from "@/components/discover/moment/message.vue";
 
 const isOwner = ref(false);
 const momentList = ref([]);
-const appStore = useAppStore();
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
@@ -18,12 +17,6 @@ const showDom = ref(true);
 const showMomentMessageMenu = ref(false);
 const showMomentMessage = ref(false);
 const bgHeader = ref(null);
-const postType = ref("text");
-const fileList = ref([]);
-const momentId = ref(0);
-const toUser = ref(0);
-const placeholder = ref("评论");
-const list = ref([]);
 const loading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
@@ -40,11 +33,13 @@ const onClickDiscoverMoment = () => {
   }, 300);
 };
 const onClickBgHeader = () => {
-  bgHeader.value.classList.add("bg-header-go");
-  setTimeout(() => {
-    showDom.value = false;
-    bgHeader.value.classList.remove("bg-header-back");
-  }, 300);
+  if (bgHeader.value?.classList) {
+    bgHeader.value.classList.add("bg-header-go");
+    setTimeout(() => {
+      showDom.value = false;
+      bgHeader.value.classList.remove("bg-header-back");
+    }, 300);
+  }
 };
 
 const handleMomentMessageMenu = () => {
@@ -60,14 +55,14 @@ const onScroll = (e) => {
       navBar.value.classList.add('header-bg');
       document.getElementsByClassName('van-icon-arrow-left')[0].style.color =
         'var(--black-white-color)';
-      document.getElementsByClassName('van-icon-photo-o')[0].style.color =
+      document.getElementsByClassName('van-icon-ellipsis')[0].style.color =
         'var(--black-white-color)';
     } else {
       navTitle.value = '';
       navBar.value.classList.remove('header-bg');
       document.getElementsByClassName('van-icon-arrow-left')[0].style.color =
         '#fff';
-      document.getElementsByClassName('van-icon-photo-o')[0].style.color =
+      document.getElementsByClassName('van-icon-ellipsis')[0].style.color =
         '#fff';
     }
   }
@@ -105,57 +100,6 @@ const onRefreshMomentList = () => {
   onLoadMomentList();
 };
 
-//点赞、评论气泡弹出框
-const onOpenActionPopover = (id) => {
-  momentId.value = id;
-};
-
-//回复评论
-const replySomeOne = (id, to, ph) => {
-  momentId.value = id;
-  toUser.value = to;
-  placeholder.value = ph;
-  onSelectAction(ref('comment'));
-}
-
-//监听点赞、评论按钮
-const onSelectAction = (action) => {
-  console.log(action, momentId.value, toUser.value);
-  switch (action.value) {
-    //赞
-    case "like":
-      momentApi.like(momentId.value).then((res) => {
-        if (res.code == 200001) {
-          likeMoment(res.data);
-        }
-      });
-      break;
-    //取消赞
-    case "unlike":
-      momentApi.unlike(momentId.value).then((res) => {
-        if (res.code == 200001) {
-          unlikeMoment(res.data);
-        }
-      })
-      break;
-    case "comment":
-      showCommonComment.value = true;
-      break;
-  }
-}
-
-//发布朋友圈的回调
-const postSuccessCb = async (data) => {
-  showPostMoment.value = false;
-  refreshing.value = true;
-  onRefreshMomentList();
-};
-
-//评论朋友圈的回调
-const commentSuccessCb = async (data) => {
-  commentMoment(data);
-}
-
 
 //前往好友主页
 const gotoFriendInfo = (keywords) => {
@@ -168,14 +112,14 @@ const gotoFriendInfo = (keywords) => {
 }
 
 onMounted(() => {
-  isOwner.value = route.params.id == userStore.homeInfo.id;
+  isOwner.value = route.params.id == userStore.info.id;
   momentList.value = [];
 })
 </script>
 <template>
   <div class="overly" style="position: fixed;top: 0;left: 0;width: 100%;height: 100vh;z-index: 10;" v-show="!showDom"
     @click="onClickDiscoverMoment"></div>
-  <div class="discover-moment">
+  <div class="friend-moment">
     <header ref="navBar">
       <van-nav-bar left-arrow @click-left="router.go(-1)" @click-right="showMomentMessageMenu = true" :border="false"
         :title="navTitle" style="background: transparent;" v-if="showDom">
@@ -185,38 +129,49 @@ onMounted(() => {
       </van-nav-bar>
     </header>
     <section>
-      <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-list"
+      <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-container"
         @scroll.passive="onScroll" style="background: var(--black20-white-color);">
-        <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMomentList">
-          <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.homeInfo.moment_bg_file_path == ''
-            ? ''
-            : 'background-image: url(' + userStore.homeInfo.moment_bg_file_path + ');'
-            ">
-            <div class="user" v-if="showDom">
-              <div class="user-info">
-                <span @click="gotoFriendInfo(userStore.homeInfo.wechat)">{{ userStore.homeInfo.display_nickname
-                  ? userStore.homeInfo.display_nickname :
-                  userStore.homeInfo.nickname }}</span>
-                <van-image radius="8px" width="4rem" height="4rem" :src="userStore.homeInfo.avatar"
-                  @click="gotoFriendInfo(userStore.homeInfo.wechat)" />
-              </div>
-              <div class="user-info user-sign">
-                <span>{{ userStore.homeInfo.sign }}</span>
-              </div>
+        <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.homeInfo.moment_bg_file_path == ''
+          ? ''
+          : 'background-image: url(' + userStore.homeInfo.moment_bg_file_path + ');'
+          ">
+          <div class="user" v-if="showDom">
+            <div class="user-info">
+              <span @click="gotoFriendInfo(userStore.homeInfo.wechat)">{{ userStore.homeInfo.display_nickname
+                ? userStore.homeInfo.display_nickname :
+                userStore.homeInfo.nickname }}</span>
+              <van-image radius="8px" width="4rem" height="4rem" :src="userStore.homeInfo.avatar"
+                @click="gotoFriendInfo(userStore.homeInfo.wechat)" />
             </div>
-            <div class="change-bg" v-if="isOwner && !showDom">
-              <van-grid :column-num="1" :border="false">
-                <van-grid-item icon="photo" text="换封面" icon-color="var(--theme-white)"
-                  @click="showMomentBackground = true" />
-              </van-grid>
+            <div class="user-info user-sign">
+              <span>{{ userStore.homeInfo.sign }}</span>
             </div>
           </div>
-          <div class="moment-item" v-for="item in momentList" :key="item.id">
-            <div class="moment-item-left">
-
-            </div>
-            <div class="moment-item-right">
-
+          <div class="change-bg" v-if="isOwner && !showDom">
+            <van-grid :column-num="1" :border="false">
+              <van-grid-item icon="photo" text="换封面" icon-color="var(--theme-white)"
+                @click="showMomentBackground = true" />
+            </van-grid>
+          </div>
+        </div>
+        <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMomentList"
+          class="moment-list">
+          <div v-for="(item, index) in momentList" :key="index" class="moment-item">
+            <div class="year" v-if="item.year < item.current_year">{{ item.year }}</div>
+            <div class="moment-year" v-for="(moment, index) in item.moments" :key="index">
+              <div class="left">
+                <span v-html="timestampFormatMoment(moment.ts)"></span>
+              </div>
+              <div class="right">
+                <div class="item" v-for="(val, mk) in moment.list" :key="mk">
+                  <div class="img-grid" v-if="val.files.length > 0" :class="'img-grid-' + val.files.length">
+                    <div v-for="(file, fk) in val.files" :key="fk" class="img-item" :class="`item-${++fk}`"
+                      :style="{ backgroundImage: `url(${file.file.path})` }"></div>
+                  </div>
+                  <div class="content" :class="val.files.length <= 0 ? 'content-bg' : ''"><van-text-ellipsis
+                      :content="val.content" rows="3" /></div>
+                </div>
+              </div>
             </div>
           </div>
         </van-list>
@@ -231,9 +186,10 @@ onMounted(() => {
       <van-cell title="取消" clickable @click="showMomentMessageMenu = false" size="large" />
     </van-cell-group>
   </van-popup>
+  <moment-message :show="showMomentMessage" @hide="showMomentMessage = false" />
 </template>
 <style scoped lang="less">
-.discover-moment {
+.friend-moment {
   .header-bg {
     background: var(--van-nav-bar-background);
   }
@@ -241,7 +197,7 @@ onMounted(() => {
   section {
 
 
-    .moment-list {
+    .moment-container {
       box-sizing: border-box;
       background: var(--common-search-background) !important;
 
@@ -324,94 +280,172 @@ onMounted(() => {
         }
       }
 
-      .unread {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin-top: 1rem;
+      .moment-list {
+        padding-top: 4rem;
 
-        button {
-          border: none;
-          color: var(--theme-blue-1970);
-          background: var(--black20-whitef7-color);
-          font-size: 16px;
-        }
-      }
+        .moment-item {
+          padding: 0 1rem;
+          box-sizing: border-box;
+          width: 100%;
 
-      .moment-item:first-child {
-        margin-top: 1rem;
-      }
+          .year {
+            font-size: 20px;
+            font-weight: 700;
+            padding: 1rem 0;
+            color: var(--black-white-color);
+          }
 
-      .moment-item {
-        padding: 2rem 2rem;
-        height: auto;
-        display: flex;
-        position: relative;
-        justify-content: flex-start;
+          .moment-year {
+            display: flex;
 
-        .moment-item-left {
-          width: 3rem;
-          margin-right: 0.5rem;
-        }
+            .left {
+              width: 5rem;
+              text-align: left;
+              color: var(--black-white-color);
+            }
 
-        .moment-item-right {
-          flex-grow: 1;
+            .right {
+              flex: 1;
 
-          .like-comment-box {
-            background: var(--black20-whitef7-color);
-            margin-top: 8px;
+              .item {
+                display: flex;
+                width: inherit;
+                justify-content: center;
+                align-content: center;
+                margin-bottom: 1rem;
 
-            .van-cell {
-              padding: 0px 6px;
-              background: var(--black20-whitef7-color);
-              font-weight: 600;
+                .img-grid {
+                  width: 6rem;
+                  height: 6rem;
+                  display: grid;
 
-              .van-cell__title>div {
-                color: var(--theme-blue-1970);
+                  .img-item {
+                    background-size: cover;
+                    background-position: center;
+                    width: 100%;
+                    height: 100%;
+                  }
 
-                b {
-                  color: var(--black4c-whitebc-color);
+                  .item-1 {
+                    grid-area: item-1;
+                  }
+
+                  .item-2 {
+                    grid-area: item-2;
+                  }
+
+                  .item-3 {
+                    grid-area: item-3;
+                  }
+
+                  .item-4 {
+                    grid-area: item-4;
+                  }
+
+                  .item-5 {
+                    grid-area: item-5;
+                  }
+
+                  .item-6 {
+                    grid-area: item-6;
+                  }
+
+                  .item-7 {
+                    grid-area: item-7;
+                  }
+
+                  .item-8 {
+                    grid-area: item-8;
+                  }
+
+                  .item-9 {
+                    grid-area: item-9;
+                  }
+                }
+
+                .img-grid-1 {
+                  grid-template-areas: "item-1";
+                  grid-template-columns: 1fr;
+                  grid-template-rows: 1fr;
+                }
+
+                .img-grid-2 {
+                  grid-template-areas: "item-1 item-2";
+                  grid-template-columns: 1fr 1fr;
+                  grid-template-rows: 1fr;
+                }
+
+                .img-grid-3 {
+                  grid-template-areas: "item-1 item-2" "item-1 item-3";
+                  grid-template-columns: 1fr 1fr;
+                  grid-template-rows: 1fr 1fr;
+                }
+
+                .img-grid-4 {
+                  grid-template-areas: "item-1 item-2" "item-3 item-4";
+                  grid-template-columns: 1fr 1fr;
+                  grid-template-rows: 1fr 1fr;
+                }
+
+                .img-grid-5 {
+                  grid-template-areas: "item-1 item-2" "item-1 item-3" "item-4 item-5";
+                  grid-template-columns: 1fr 1fr;
+                  grid-template-rows: 1fr 1fr 1fr;
+                }
+
+                .img-grid-6 {
+                  grid-template-areas: "item-1 item-2 item-3" "item-4 item-5 item-6";
+                  grid-template-columns: 1fr 1fr 1fr;
+                  grid-template-rows: 1fr 1fr;
+                }
+
+                .img-grid-7 {
+                  grid-template-areas: "item-1 item-2 item-3" "item-1 item-4 item-5" "item-1 item-6 item-7";
+                  grid-template-columns: 1fr 1fr 1fr;
+                  grid-template-rows: 1fr 1fr 1fr;
+                }
+
+                .img-grid-8 {
+                  grid-template-areas: "item-1 item-2 item-3" "item-1 item-4 item-5" "item-6 item-7 item-8";
+                  grid-template-columns: 1fr 1fr 1fr;
+                  grid-template-rows: 1fr 1fr 1fr;
+                }
+
+                .img-grid-9 {
+                  grid-template-areas: "item-1 item-2 item-3" "item-4 item-5 item-6" "item-7 item-8 item-9";
+                  grid-template-columns: 1fr 1fr 1fr;
+                  grid-template-rows: 1fr 1fr 1fr;
+                }
+
+                .content {
+                  flex: 1;
+                  padding: 0.5rem;
+                  color: var(--black-white-color);
+                  max-height: 6rem;
+                  overflow: hidden;
+                }
+
+                .content-bg {
+                  background: var(--black20-whitef7-color);
+                  border-radius: 0.2rem;
                 }
               }
             }
           }
-
-          .nickname {
-            color: var(--theme-blue-1970);
-            font-size: 18px;
-            font-weight: 700;
-            margin-top: -5px;
-          }
-
-          .content {
-            color: var(--black-white-color);
-          }
         }
-      }
-
-      .moment-item::after {
-        position: absolute;
-        box-sizing: border-box;
-        content: " ";
-        pointer-events: none;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        border-bottom: 1px solid var(--van-cell-border-color);
-        transform: scaleY(.5);
       }
     }
   }
 }
 </style>
 <style lang="css">
+.friend-moment .van-nav-bar .van-icon {
+  color: #fff;
+}
+
 .moment-message-menu .van-cell__title {
   text-align: center;
   line-height: 2rem;
-}
-
-.van-icon-like {
-  color: var(--theme-danger-color);
 }
 
 .van-text-ellipsis__action {
@@ -420,10 +454,5 @@ onMounted(() => {
 
 .change-bg .van-grid-item__text {
   color: var(--theme-white);
-}
-
-.unread .van-icon__image {
-  width: 2rem;
-  height: 2rem;
 }
 </style>

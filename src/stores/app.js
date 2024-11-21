@@ -23,8 +23,8 @@ export const useAppStore = defineStore(
       apply: 0,
       discover: 0,
       moment: {
-          num: 0,
-          from: {}
+        num: 0,
+        from: {}
       },
       friend: 0
     };
@@ -78,6 +78,12 @@ export const useAppStore = defineStore(
       }
     };
 
+    const clearMomentUnread = () => {
+      unread.value.moment.num = 0;
+      unread.value.moment.from = {};
+      unread.value.discover = 0;
+    };
+
     const setUnread = (data) => {
       unread.value = data;
     };
@@ -122,6 +128,7 @@ export const useAppStore = defineStore(
       initCommonSearch,
       unreadIncrBy,
       unreadDecrBy,
+      clearMomentUnread,
       setUnread,
       clear,
       setTheme,
