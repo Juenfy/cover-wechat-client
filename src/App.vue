@@ -127,7 +127,7 @@ const onMessage = async (data) => {
         showMessagePopup.value = true;
         break;
       case ActionLike:
-        appStore.unreadIncrBy(UnreadMoment, 1, data.data.user);
+        appStore.unreadIncrBy(UnreadMoment, 1, data.data.from);
         likeMoment(data.data);
         break;
       case ActionUnlike:
@@ -139,7 +139,6 @@ const onMessage = async (data) => {
         break;
       case ActionCall:
         if (data.data?.action == 'offer') {
-          console.log(1111111);
           call.startIncoming(data.data);
         }
         if (data.data?.action == 'answer') {
