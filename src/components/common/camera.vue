@@ -41,7 +41,10 @@ const startCamera = async () => {
     console.log("打开摄像头");
   } catch (err) {
     console.error("Error accessing camera:", err);
-    return showFailToast("找不到摄像头");
+    showFailToast(err.message);
+    setTimeout(() => {
+      emit('hide');
+    }, 1000);
   }
 };
 

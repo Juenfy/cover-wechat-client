@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { QrcodeStream } from "vue-qrcode-reader";
+import { showFailToast } from "vant";
 const wrapper = ref(null);
 const router = useRouter();
 const torchActive = ref(false);
@@ -39,6 +40,10 @@ const onClickRight = () => {
 
 const onError = (e) => {
   console.error(e);
+  showFailToast(e.message);
+  setTimeout(() => {
+    router.go(-1);
+  }, 1000);
 };
 
 const onCameraOn = (capabilities) => {
