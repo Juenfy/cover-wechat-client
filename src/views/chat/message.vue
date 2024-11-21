@@ -217,13 +217,13 @@ onMounted(async () => {
                     <div class="msg_inner msg_image" v-else-if="item.type == TypeImage">
                       <van-image fit="contain" :src="item.content" @click="previewImage(item.content)" />
                     </div>
-                    <div class="msg_innser msg_video" v-else-if="item.type == TypeVideo">
+                    <div class="msg_inner msg_video" v-else-if="item.type == TypeVideo">
                       <div class="van-image">
                         <video controls :src="item.content" loop playsinline class="van-image__img"
                           style="object-fit: contain"></video>
                       </div>
                     </div>
-                    <div class="msg_innser msg_audio" v-else-if="item.type == TypeAudio">
+                    <div class="msg_inner msg_audio" v-else-if="item.type == TypeAudio">
                       <div class="van-image">
                         <audio :src="item.content" controls type="audio/wav"></audio>
                       </div>

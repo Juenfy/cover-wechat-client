@@ -123,7 +123,7 @@ const onLoadMomentList = () => {
         element.showActionPopover = false;
         let t = '赞', v = 'like', i = 'like-o';
         element.likes.forEach(item => {
-          if (item.user_id == userStore.info.id) {
+          if (item.from_user == userStore.info.id) {
             t = '取消';
             v = 'unlike';
             i = 'like';
@@ -303,8 +303,8 @@ onMounted(() => {
                     <div>
                       <van-icon name="like-o" />
                       <span style="margin-left: 4px;" v-for="(like, index) in item.likes" :key="like.id"
-                        @click="gotoFriendInfo(like.user.wechat)">{{
-                          like.user.nickname + (index + 1 == item.likes.length ? '' : ',') }}</span>
+                        @click="gotoFriendInfo(like.from.wechat)">{{
+                          like.from.nickname + (index + 1 == item.likes.length ? '' : ',') }}</span>
                     </div>
                   </template>
                 </van-cell>
