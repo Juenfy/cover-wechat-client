@@ -1,6 +1,8 @@
 # <center>仿微信客户端</center>
 
 在线体验：https://124.71.219.151:5173
+测试账号：13006789001 ~ 13006789010 密码：123456
+或者自行注册
 
 服务端传送门：https://github.com/Juenfy/cover-wechat-api
 
