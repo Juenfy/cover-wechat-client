@@ -194,7 +194,7 @@ watch(() => props.show, (show) => {
                                     <div class="like-box">
                                         <van-image :src="like.from.avatar" v-for="like in moment.likes" :key="like.id"
                                             height="2rem" width="2rem" radius="4px"
-                                            @click="gotoFriendInfo(comment.from.wechat)" />
+                                            @click="gotoFriendInfo(like.from.wechat)" />
                                     </div>
                                 </template>
                             </van-cell>
