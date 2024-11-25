@@ -21,7 +21,7 @@ export const unlikeMoment = (data) => {
                 if (like.id == data.like_id) {
                     momentList.value[i].likes.splice(j, 1);
                     momentList.value[i].actions = [
-                        { text: '赞', value: 'like', icon: 'like-0' },
+                        { text: '赞', value: 'like', icon: 'like-o' },
                         { text: "评论", value: 'comment', icon: 'comment-o' },
                     ];
                 }

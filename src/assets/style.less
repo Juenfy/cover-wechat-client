@@ -44,6 +44,10 @@ section {
         width: inherit;
         display: inline-block;
     }
+    .moment-container{
+      box-sizing: border-box;
+      background: var(--common-search-background) !important;
+    }
     .footer{
         height: 64px;
     }
@@ -240,5 +244,21 @@ footer{
     .footer {
       height: auto;
     }
+  }
+}
+
+/*通用底部弹出菜单*/
+.popup-menu {
+  background: var(--van-nav-bar-background) !important;
+  .van-cell__title {
+    text-align: center;
+    line-height: 2rem;
+  }
+  .cancel {
+    margin-top: 0.5rem;
+    margin-bottom: 0!important;
+  }
+  .red .van-cell__title {
+    color: red;
   }
 }

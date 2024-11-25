@@ -7,7 +7,7 @@ import { timestampFormatMoment } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
 import MomentMessage from "@/components/discover/moment/message.vue";
-
+import MomentDetail from "@/components/discover/moment/detail.vue";
 const isOwner = ref(false);
 const momentList = ref([]);
 const router = useRouter();
@@ -16,6 +16,9 @@ const userStore = useUserStore();
 const showDom = ref(true);
 const showMomentMessageMenu = ref(false);
 const showMomentMessage = ref(false);
+const showMomentDetail = ref(false);
+const momentId = ref(0);
+const userId = ref(0);
 const bgHeader = ref(null);
 const loading = ref(false);
 const finished = ref(false);
@@ -87,7 +90,7 @@ const onLoadMomentList = () => {
         finished.value = true;
       }
     });
-  }, 500);
+  }, 100);
 };
 //下拉刷新朋友圈列表
 const onRefreshMomentList = () => {
@@ -109,6 +112,13 @@ const gotoFriendInfo = (keywords) => {
       keywords: keywords,
     },
   });
+}
+
+//查看朋友圈详情
+const gotoMomentDetail = (moment) => {
+  momentId.value = moment.id;
+  userId.value = moment.user_id;
+  showMomentDetail.value = true;
 }
 
 onMounted(() => {
@@ -163,7 +173,7 @@ onMounted(() => {
                 <span v-html="timestampFormatMoment(moment.ts)"></span>
               </div>
               <div class="right">
-                <div class="item" v-for="(val, mk) in moment.list" :key="mk">
+                <div class="item" v-for="(val, mk) in moment.list" :key="mk" @click="gotoMomentDetail(val)">
                   <div class="img-grid" v-if="val.files.length > 0" :class="'img-grid-' + val.files.length">
                     <div v-for="(file, fk) in val.files" :key="fk" class="img-item" :class="`item-${++fk}`"
                       :style="{ backgroundImage: `url(${file.file.path})` }"></div>
@@ -178,15 +188,16 @@ onMounted(() => {
       </van-pull-refresh>
     </section>
   </div>
-  <van-popup v-model:show="showMomentMessageMenu" round position="bottom" class="moment-message-menu">
+  <van-popup v-model:show="showMomentMessageMenu" round position="bottom" class="popup-menu">
     <van-cell-group>
       <van-cell title="消息列表" clickable size="large" @click="handleMomentMessageMenu" />
     </van-cell-group>
-    <van-cell-group>
+    <van-cell-group class="cancel">
       <van-cell title="取消" clickable @click="showMomentMessageMenu = false" size="large" />
     </van-cell-group>
   </van-popup>
   <moment-message :show="showMomentMessage" @hide="showMomentMessage = false" />
+  <moment-detail :show="showMomentDetail" @hide="showMomentDetail = false" :momentId="momentId" :userId="userId" />
 </template>
 <style scoped lang="less">
 .friend-moment {
@@ -198,9 +209,6 @@ onMounted(() => {
 
 
     .moment-container {
-      box-sizing: border-box;
-      background: var(--common-search-background) !important;
-
       .bg-header {
         background-image: url(../../assets/bg.png);
         position: relative;
@@ -441,11 +449,6 @@ onMounted(() => {
 <style lang="css">
 .friend-moment .van-nav-bar .van-icon {
   color: #fff;
-}
-
-.moment-message-menu .van-cell__title {
-  text-align: center;
-  line-height: 2rem;
 }
 
 .van-text-ellipsis__action {

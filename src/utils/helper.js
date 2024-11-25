@@ -12,7 +12,7 @@ export const handleResponse = (res, cb, router, showSucces = false) => {
   cb();
 };
 
-export const timestampFormat = (timestamp) => {
+export const timestampFormat = (timestamp, hi = false) => {
   function zeroize(num) {
     return (String(num).length == 1 ? "0" : "") + num;
   }
@@ -51,9 +51,9 @@ export const timestampFormat = (timestamp) => {
     ) {
       return "昨天 " + zeroize(H) + ":" + zeroize(i);
     } else if (curDate.getFullYear() == Y) {
-      return m + "月" + d + "日";
+      return m + "月" + d + "日" + (hi ? zeroize(H) + ":" + zeroize(i) : '');
     } else {
-      return Y + "年" + m + "月" + d + "日";
+      return Y + "年" + m + "月" + d + "日" + (hi ? zeroize(H) + ":" + zeroize(i) : '');
     }
   }
 };

@@ -14,6 +14,11 @@ export const publish = async (data, onUploadProgress) => {
 export const getList = async (page, limit) => {
     return await request.get(`/api/moment/list?page=${page}&limit=${limit}`);
 };
+//获取朋友圈详情
+export const getDetail = async (id) => {
+    return await request.get(`/api/moment/detail?id=${id}`);
+}
+
 //获取点赞、评论消息列表
 export const getMessageList = async (page, limit) => {
     return await request.get(`/api/moment/message?page=${page}&limit=${limit}`);

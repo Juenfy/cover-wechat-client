@@ -137,11 +137,11 @@ onMounted(() => { });
         <van-cell-group>
           <van-cell title="清除聊天记录" clickable size="large" @click="showClearChat = true" />
         </van-cell-group>
-        <van-popup v-model:show="showClearChat" round position="bottom" class="clear-chat-menu">
-          <van-cell-group>
+        <van-popup v-model:show="showClearChat" round position="bottom" class="popup-menu">
+          <van-cell-group class="red">
             <van-cell title="清空聊天记录" clickable size="large" />
           </van-cell-group>
-          <van-cell-group>
+          <van-cell-group class="cancel">
             <van-cell title="取消" clickable @click="showClearChat = false" size="large" />
           </van-cell-group>
         </van-popup>
@@ -159,28 +159,11 @@ onMounted(() => { });
 .van-icon__image {
   border-radius: 4px;
 }
-
-.clear-chat-menu .van-cell__title {
-  text-align: center;
-  line-height: 3rem;
-}
-
-.clear-chat-menu .van-cell-group:first-child .van-cell__title {
-  color: red;
-}
 </style>
 <style lang="less" scoped>
 .chat-info-container {
   .van-cell-group {
     margin-bottom: 0.5rem;
-  }
-
-  .clear-chat-menu {
-    background: var(--van-nav-bar-background);
-
-    .van-cell-group:last-child {
-      margin-bottom: 0;
-    }
   }
 }
 </style>

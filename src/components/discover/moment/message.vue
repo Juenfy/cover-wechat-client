@@ -37,7 +37,7 @@ const onLoadMessageList = async () => {
                 finished.value = true;
             }
         });
-    }, 500);
+    }, 100);
 };
 
 //下拉刷新朋友圈列表
@@ -69,7 +69,7 @@ const gotoFriendInfo = (keywords) => {
         </header>
         <section>
             <div class="header"></div>
-            <van-pull-refresh v-model="refreshing" @refresh="onRefreshMessageList" class="container message-container"
+            <van-pull-refresh v-model="refreshing" @refresh="onRefreshMessageList" class="container moment-container"
                 style="background: var(--black20-white-color);">
                 <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMessageList"
                     class="message-list">

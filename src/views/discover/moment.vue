@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
+import { ActionComment, ActionLike, ActionUnlike } from '@/enums/moment';
 import PostMoment from "@/components/discover/moment/post.vue";
 import CommonCamera from "@/components/common/camera.vue";
 import CommonComment from "@/components/common/comment.vue";
@@ -125,17 +126,17 @@ const onLoadMomentList = () => {
     momentApi.getList(page.value, limit.value).then((res) => {
       res.data.forEach(element => {
         element.showActionPopover = false;
-        let t = '赞', v = 'like', i = 'like-o';
+        let t = '赞', v = ActionLike, i = 'like-o';
         element.likes.forEach(item => {
           if (item.from_user == userStore.info.id) {
             t = '取消';
-            v = 'unlike';
+            v = ActionUnlike;
             i = 'like';
           }
         });
         element.actions = [
           { text: t, value: v, icon: i },
-          { text: "评论", value: 'comment', icon: 'comment-o' },
+          { text: "评论", value: ActionComment, icon: 'comment-o' },
         ];
         momentList.value.push(element);
       });
@@ -145,7 +146,7 @@ const onLoadMomentList = () => {
         finished.value = true;
       }
     });
-  }, 500);
+  }, 100);
 };
 //下拉刷新朋友圈列表
 const onRefreshMomentList = () => {
@@ -168,7 +169,7 @@ const replySomeOne = (id, to, ph) => {
   momentId.value = id;
   toUser.value = to;
   placeholder.value = ph;
-  onSelectAction(ref('comment'));
+  onSelectAction(ref(ActionComment));
 };
 
 //监听点赞、评论按钮
@@ -176,7 +177,7 @@ const onSelectAction = (action) => {
   console.log(action, momentId.value, toUser.value);
   switch (action.value) {
     //赞
-    case "like":
+    case ActionLike:
       momentApi.like(momentId.value).then((res) => {
         if (res.code == 200001) {
           likeMoment(res.data);
@@ -184,14 +185,14 @@ const onSelectAction = (action) => {
       });
       break;
     //取消赞
-    case "unlike":
+    case ActionUnlike:
       momentApi.unlike(momentId.value).then((res) => {
         if (res.code == 200001) {
           unlikeMoment(res.data);
         }
       })
       break;
-    case "comment":
+    case ActionComment:
       showCommonComment.value = true;
       break;
   }
@@ -301,7 +302,8 @@ onMounted(() => {
                   </template>
                 </van-cell>
               </van-cell-group>
-              <van-cell-group style="background: var(--black20-whitef7-color);margin-top: 8px;"
+              <van-cell-group
+                style="background: var(--black20-whitef7-color);margin-top: 8px;border-radius: 4px;overflow: hidden;"
                 v-if="item.likes.length > 0 || item.comments.length > 0" class="like-comment-box">
                 <van-cell style="padding: 0 6px;background: var(--black20-whitef7-color);" v-if="item.likes.length > 0">
                   <template #title>
@@ -331,7 +333,7 @@ onMounted(() => {
       </van-pull-refresh>
     </section>
   </div>
-  <van-popup v-model:show="showPostMomentMenu" round position="bottom" class="post-moment-menu">
+  <van-popup v-model:show="showPostMomentMenu" round position="bottom" class="popup-menu">
     <van-cell-group>
       <van-cell title="拍摄" clickable size="large" @click="showCommonCamera = true" />
       <van-cell title="从手机相册选择" clickable size="large">
@@ -341,7 +343,7 @@ onMounted(() => {
       </van-cell>
       <van-cell title="纯文案" clickable size="large" @click="handlePostMomentMenu(TypeText)" />
     </van-cell-group>
-    <van-cell-group>
+    <van-cell-group class="cancel">
       <van-cell title="取消" clickable @click="showPostMomentMenu = false" size="large" />
     </van-cell-group>
   </van-popup>
@@ -364,9 +366,6 @@ onMounted(() => {
 
 
     .moment-container {
-      box-sizing: border-box;
-      background: var(--common-search-background) !important;
-
       .bg-header {
         background-image: url(../../assets/bg.png);
         position: relative;
@@ -512,11 +511,6 @@ onMounted(() => {
 <style lang="css">
 .discover-moment .van-nav-bar .van-icon {
   color: #fff;
-}
-
-.post-moment-menu .van-cell__title {
-  text-align: center;
-  line-height: 2rem;
 }
 
 .van-icon-like {
