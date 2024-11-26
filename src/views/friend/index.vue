@@ -2,6 +2,7 @@
 import FriendNew from "@/components/friend/new.vue";
 import FriendRemark from "@/components/friend/remark.vue";
 import GroupList from "@/components/chat/group/list.vue";
+import OnlyChatFriendList from "@/components/chat/friend/list.vue";
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAppStore } from "@/stores/app";
@@ -14,6 +15,7 @@ const friendList = ref({});
 const showFriendNew = ref(false);
 const showFriendRemark = ref(false);
 const showGroupList = ref(false);
+const showOnlyChatFriendList = ref(false);
 const indexList = ref([]);
 const getFriendList = async () => {
   friendApi.getList().then((res) => {
@@ -22,11 +24,12 @@ const getFriendList = async () => {
   });
 };
 
-const handleHomeClick = (item) => {
+//前往好友主页
+const gotoFriendInfo = (keywords) => {
   router.push({
     name: "friend-info",
     query: {
-      keywords: item.keywords,
+      keywords: keywords,
     },
   });
 };
@@ -49,13 +52,14 @@ onMounted(async () => {
             class="van-badge--center" />
         </template>
       </van-cell>
-      <van-cell title="仅聊天的朋友" icon="/friend-only-chat.png" size="large" :center="true" @click="() => { }" />
+      <van-cell title="仅聊天的朋友" icon="/friend-only-chat.png" size="large" :center="true"
+        @click="showOnlyChatFriendList = true" />
       <van-cell title="群聊" icon="/group-chat.png" size="large" :center="true" @click="showGroupList = true" />
       <div v-for="val in indexList" :key="val">
         <van-index-anchor :index="val" />
         <van-swipe-cell v-for="item in friendList[val]" :key="item.friend">
           <van-cell :title="item.nickname" :icon="item.avatar" size="large" :center="true"
-            @click="handleHomeClick(item)" />
+            @click="gotoFriendInfo(item.keywords)" />
           <template #right>
             <van-button square type="primary" text="备注" style="height: inherit" @click="showFriendRemark = true" />
           </template>
@@ -66,18 +70,5 @@ onMounted(async () => {
   <friend-new :show="showFriendNew" @hide="showFriendNew = false" />
   <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
   <group-list :show="showGroupList" @hide="showGroupList = false" />
+  <only-chat-friend-list :show="showOnlyChatFriendList" @hide="showOnlyChatFriendList = false" />
 </template>
-
-<style lang="css">
-.friend-list .van-cell__left-icon {
-  height: 3rem;
-  font-size: 3rem;
-  line-height: 3rem;
-  margin-right: 1rem;
-  border-radius: 0.2rem;
-}
-
-.friend-list .van-cell__left-icon img {
-  border-radius: 0.2rem;
-}
-</style>

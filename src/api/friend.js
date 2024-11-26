@@ -1,7 +1,7 @@
 import request from "@/utils/request";
 //好友列表
-export const getList = async () => {
-  return await request.get("/api/friend/list");
+export const getList = async (type = 'all') => {
+  return await request.get(`/api/friend/list?type=${type}`);
 };
 
 //朋友申请列表

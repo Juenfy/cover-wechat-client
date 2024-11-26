@@ -8,6 +8,8 @@ export const SearchChatRecord = "search-chat-record";
 
 export const SearchGroup = "search-group";
 
+export const SearchOnlyChatFriend = "search-only-chat-friend";
+
 export const Home = "home";
 
 export const HomeActions = [
