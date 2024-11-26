@@ -107,7 +107,7 @@ onMounted(() => {
             <template #title>
               <span>朋友圈</span>
               <van-image :src="v" style="width: 3rem; height: 3rem; margin-left: 1rem" v-for="(v, i) in homeInfo.moment"
-                :key="i" />
+                :key="i" fit="cover" />
             </template>
           </van-cell>
         </van-cell-group>
