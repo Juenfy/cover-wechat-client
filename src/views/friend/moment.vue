@@ -1,13 +1,13 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
 import * as userApi from "@/api/user";
 import { timestampFormatMoment } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
-import { useAppStore } from "@/stores/app";
 import MomentMessage from "@/components/discover/moment/message.vue";
 import MomentDetail from "@/components/discover/moment/detail.vue";
+import MomentBackground from "@/components/common/background.vue";
+
 const isOwner = ref(false);
 const momentList = ref([]);
 const router = useRouter();
@@ -17,6 +17,7 @@ const showDom = ref(true);
 const showMomentMessageMenu = ref(false);
 const showMomentMessage = ref(false);
 const showMomentDetail = ref(false);
+const showMomentBackground = ref(false);
 const momentId = ref(0);
 const userId = ref(0);
 const bgHeader = ref(null);
@@ -141,9 +142,9 @@ onMounted(() => {
     <section>
       <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-container"
         @scroll.passive="onScroll" style="background: var(--black20-white-color);">
-        <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.homeInfo.moment_bg_file_path == ''
+        <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.info.moment_bg_file_path == ''
           ? ''
-          : 'background-image: url(' + userStore.homeInfo.moment_bg_file_path + ');'
+          : 'background-image: url(' + userStore.info.moment_bg_file_path + ');'
           ">
           <div class="user" v-if="showDom">
             <div class="user-info">
@@ -198,6 +199,8 @@ onMounted(() => {
   </van-popup>
   <moment-message :show="showMomentMessage" @hide="showMomentMessage = false" />
   <moment-detail :show="showMomentDetail" @hide="showMomentDetail = false" :momentId="momentId" :userId="userId" />
+  <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"
+    title="更换相册封面" />
 </template>
 <style scoped lang="less">
 .friend-moment {
