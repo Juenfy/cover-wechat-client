@@ -186,11 +186,10 @@ onMounted(() => {
       padding: 0rem 1.5rem 0rem 1.5rem;
 
       span {
-        display: block;
-        width: 100%;
         padding: 1rem;
-        border-radius: 0.2rem;
-        margin-bottom: 1.5rem;
+        width: 100%;
+        background: var(--black20-whitef7-color);
+        border-radius: 4px;
       }
     }
   }
