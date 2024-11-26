@@ -1,9 +1,10 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import * as momentApi from '@/api/moment';
 import { ActionComment } from '@/enums/moment';
 import { useRouter } from "vue-router";
 import { useAppStore } from '@/stores/app';
+import MomentDetail from '@/components/discover/moment/detail.vue';
 
 const props = defineProps({ show: Boolean });
 //调用父组件关闭弹窗
@@ -17,7 +18,9 @@ const finished = ref(false);
 const refreshing = ref(false);
 const page = ref(1);
 const limit = ref(10);
-
+const momentId = ref(0);
+const userId = ref(0);
+const showMomentDetail = ref(false);
 
 const onLoadMessageList = async () => {
     setTimeout(() => {
@@ -60,6 +63,13 @@ const gotoFriendInfo = (keywords) => {
         },
     });
 }
+
+//查看朋友圈详情
+const gotoMomentDetail = (moment) => {
+    momentId.value = moment.id;
+    userId.value = moment.user_id;
+    showMomentDetail.value = true;
+}
 </script>
 
 <template>
@@ -74,17 +84,17 @@ const gotoFriendInfo = (keywords) => {
                 <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoadMessageList"
                     class="message-list">
                     <van-cell-group :border="false">
-                        <van-cell v-for="item in messageList" :key="item.id" size="large">
+                        <van-cell v-for="item in messageList" :key="item.id" size="large"
+                            @click="gotoMomentDetail(item.moment)">
                             <template #title>
                                 <div class="title" style="margin-left: 0.5rem;">
-                                    <div class="nickname" @click="gotoFriendInfo(item.from.wechat)">
+                                    <div class="nickname">
                                         <b>{{ item.from.nickname }}</b>
                                     </div>
                                     <div class="content">
                                         <div class="comment" v-if="item.type == ActionComment">
-                                            <span v-if="item.to_user > 0"
-                                                @click="gotoFriendInfo(item.to.wechat)">回复了<b>{{
-                                                    item.to.nickname }}</b>：</span>
+                                            <span v-if="item.to_user > 0">回复了<b>{{
+                                                item.to.nickname }}</b>：</span>
                                             <span>{{ item.content }}</span>
                                         </div>
                                         <div class="like" v-else>
@@ -95,7 +105,8 @@ const gotoFriendInfo = (keywords) => {
                                 </div>
                             </template>
                             <template #icon>
-                                <van-image :src="item.from.avatar" height="3.5rem" width="3.5rem" radius="4" />
+                                <van-image :src="item.from.avatar" height="3.5rem" width="3.5rem" radius="4"
+                                    @click="gotoFriendInfo(item.from.wechat)" />
                             </template>
                             <template #right-icon>
                                 <div class="right-icon">
@@ -112,6 +123,7 @@ const gotoFriendInfo = (keywords) => {
             </van-pull-refresh>
         </section>
     </van-popup>
+    <moment-detail :show="showMomentDetail" @hide="showMomentDetail = false" :momentId="momentId" :userId="userId" />
 </template>
 
 <style scoped lang="less">
