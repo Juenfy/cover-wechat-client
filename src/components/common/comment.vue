@@ -35,8 +35,8 @@ const mediaStream = ref(null);
 const startY = ref(0);
 const waveOffset = ref(0);
 const animationFrame = ref(null);
-const popupMoreBottom = ref(false);
-const popupEmojiBottom = ref(false);
+const showEmojiPopup = ref(false);
+const showMorePopup = ref(false);
 const commentRef = ref(null);
 
 const handleKeyupEnter = () => {
@@ -47,8 +47,8 @@ const handleKeyupEnter = () => {
 };
 
 const handleRecordIconClick = () => {
-    popupEmojiBottom.value = false;
-    popupMoreBottom.value = false;
+    showEmojiPopup.value = false;
+    showMorePopup.value = false;
     isAudioRecord.value = !isAudioRecord.value;
     if (isAudioRecord.value) {
         recordIcon.value = appStore.icon.keyboard;
@@ -58,25 +58,33 @@ const handleRecordIconClick = () => {
 }
 
 const handleEmojiIconClick = () => {
-    popupMoreBottom.value = false;
-    setTimeout(() => {
-        popupEmojiBottom.value = !popupEmojiBottom.value;
-        if (popupEmojiBottom.value) {
-            isAudioRecord.value = false;
-            recordIcon.value = appStore.icon.audio;
-        }
-    }, 100);
+    if (showMorePopup.value) {
+        showMorePopup.value = false;
+        setTimeout(() => {
+            showEmojiPopup.value = !showEmojiPopup.value;
+            if (showEmojiPopup.value) {
+                isAudioRecord.value = false;
+                recordIcon.value = appStore.icon.audio;
+            }
+        }, 200);
+    } else {
+        showEmojiPopup.value = !showEmojiPopup.value;
+    }
 }
 
 const handleMoreIconClick = () => {
-    popupEmojiBottom.value = false;
-    setTimeout(() => {
-        popupMoreBottom.value = !popupMoreBottom.value;
-        if (popupMoreBottom.value) {
-            isAudioRecord.value = false;
-            recordIcon.value = appStore.icon.audio;
-        }
-    }, 200);
+    if (showEmojiPopup.value) {
+        showEmojiPopup.value = false;
+        setTimeout(() => {
+            showMorePopup.value = !showMorePopup.value;
+            if (showMorePopup.value) {
+                isAudioRecord.value = false;
+                recordIcon.value = appStore.icon.audio;
+            }
+        }, 200);
+    } else {
+        showMorePopup.value = !showMorePopup.value;
+    }
 }
 
 const onMoreBottomItemClick = (action) => {
@@ -174,8 +182,8 @@ const handleClickOutside = (e) => {
     // console.log('handleClickOutside', e);
     // console.log(commentRef.value);
     if (commentRef.value && !commentRef.value.contains(e.target)) {
-        popupEmojiBottom.value = false;
-        popupMoreBottom.value = false;
+        showEmojiPopup.value = false;
+        showMorePopup.value = false;
         if (props.show && !isFirstClick.value) {
             emit('hide');
         }
@@ -269,10 +277,9 @@ onUnmounted(async () => {
                         v-if="props.modules.indexOf('more') !== -1" />
                 </div>
             </div>
-
-            <div :class="popupMoreBottom ? 'more-bottom more-bottom-popup' : 'more-bottom'
-                " v-if="props.modules.indexOf('more') !== -1">
-                <van-grid :column-num="4" style="width: inherit" gutter="1rem" square center :border="false">
+            <van-popup v-model:show="showMorePopup" position="bottom" :style="{ width: '100%' }" duration="0.2"
+                class="more-bottom" v-if="props.modules.indexOf('more') !== -1" :overlay="false">
+                <van-grid :column-num="4" style="width: inherit" square center :border="false">
                     <van-grid-item>
                         <template #default>
                             <van-uploader :before-read="beforeRead" :after-read="afterRead" accept="image/*, video/*"
@@ -321,11 +328,12 @@ onUnmounted(async () => {
                         </template>
                     </van-grid-item>
                 </van-grid>
-            </div>
-            <emoji-picker :class="popupEmojiBottom
-                ? 'emoji-bottom emoji-bottom-popup'
-                : 'emoji-bottom'
-                " @emojiClick="onSelectEmoji" v-if="props.modules.indexOf('emoji') !== -1" />
+            </van-popup>
+            <van-popup v-model:show="showEmojiPopup" position="bottom" :style="{ width: '100%' }" duration="0.2"
+                class="emoji-bottom" v-if="props.modules.indexOf('emoji') !== -1" :overlay="false">
+                <emoji-picker @emojiClick="onSelectEmoji" />
+            </van-popup>
+
         </div>
         <div class="audio-recording" v-if="isAudioRecording">
             <div :class="isCancelAudioRecording ? 'bubble bubble-cancel' : 'bubble'">
@@ -351,15 +359,7 @@ onUnmounted(async () => {
 .common-comment {
     position: relative;
     width: 100%;
-
-    >div,
-    emoji-picker {
-        width: inherit;
-        padding: 1rem 0;
-        background-color: var(--messge-footer-background);
-        border-top: 1px solid var(--van-nav-bar-border-color);
-        opacity: 0.9;
-    }
+    background: var(--messge-footer-background);
 
     >.top {
         border-top: none;
@@ -407,14 +407,10 @@ onUnmounted(async () => {
         }
     }
 
-
-
-    >.more-bottom,
-    >.emoji-bottom {
-        padding: 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.2s ease-in-out;
+    .more-bottom {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 1rem 0;
 
         .more-bottom-item {
             display: flex;
@@ -444,19 +440,16 @@ onUnmounted(async () => {
         }
     }
 
-    >.more-bottom-popup,
-    >.emoji-bottom-popup {
-        max-height: 18rem;
-    }
-
-    >.more-bottom-popup {
-        padding: 1rem 0;
+    .van-popup {
+        position: relative;
     }
 
     emoji-picker {
         width: inherit;
-        height: 18rem;
         --background: var(--messge-footer-background);
+        border-top: 1px solid var(--van-nav-bar-border-color);
+        opacity: 0.9;
+        height: 18rem;
     }
 
 }
