@@ -111,7 +111,8 @@ const gotoMomentDetail = (moment) => {
                             <template #right-icon>
                                 <div class="right-icon">
                                     <van-image v-if="item.moment.files.length > 0"
-                                        :src="item.moment.files[0]?.file.path" height="4.5rem" width="4.5rem" />
+                                        :src="item.moment.files[0]?.file.path" height="4.5rem" width="4.5rem"
+                                        fit="cover" />
                                     <div class="content" v-else style="height: 4rem;width: 4rem;">
                                         <van-text-ellipsis :content="item.moment.content" rows="3" />
                                     </div>
