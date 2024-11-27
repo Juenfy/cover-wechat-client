@@ -14,7 +14,7 @@ import { localVideoRef, remoteVideoRef } from "@/utils/call";
             <div :class="'call ' + 'call-' + call.commonCallStatus.value">
                 <div class="user"
                     v-if="(call.commonCallType.value != callEnum.CallVideo) || (call.commonCallStatus.value != callEnum.StatusIncalling && call.commonCallType.value == callEnum.CallVideo)">
-                    <van-image :src="call.callUser.value.avatar" width="6rem" height="6rem" radius="1rem" />
+                    <van-image :src="call.callUser.value.avatar" width="6rem" height="6rem" radius="0.6rem" />
                     <div class="nickname">{{ call.callUser.value.nickname }}</div>
                     <div class="status">
                         <span v-if="call.commonCallStatus.value == callEnum.StatusInwaiting">等待对方接听</span>

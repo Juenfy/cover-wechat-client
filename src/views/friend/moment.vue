@@ -151,7 +151,7 @@ onMounted(() => {
               <span @click="gotoFriendInfo(userStore.homeInfo.wechat)">{{ userStore.homeInfo.display_nickname
                 ? userStore.homeInfo.display_nickname :
                 userStore.homeInfo.nickname }}</span>
-              <van-image radius="8px" width="4rem" height="4rem" :src="userStore.homeInfo.avatar"
+              <van-image radius="0.4rem" width="4rem" height="4rem" :src="userStore.homeInfo.avatar"
                 @click="gotoFriendInfo(userStore.homeInfo.wechat)" />
             </div>
             <div class="user-info user-sign">

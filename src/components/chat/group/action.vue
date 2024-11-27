@@ -143,7 +143,7 @@ watch(
                       friendList[val][index].checked = checked;
                     }
                       "></van-checkbox>
-                  <van-image width="3rem" height="3rem" :src="item.avatar" />
+                  <van-image width="3rem" height="3rem" :src="item.avatar" radius="0.3rem" />
                 </template>
               </van-cell>
             </div>
@@ -155,7 +155,7 @@ watch(
                 :key="item.friend">
                 <template #icon>
                   <van-checkbox v-model="searchFriendList[index].checked" v-if="choseText != '多选'"></van-checkbox>
-                  <van-image width="3rem" height="3rem" :src="item.avatar" />
+                  <van-image width="3rem" height="3rem" :src="item.avatar" radius="0.3rem" />
                 </template>
               </van-cell>
             </van-cell-group>

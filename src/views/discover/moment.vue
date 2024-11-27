@@ -258,7 +258,7 @@ onMounted(() => {
           ">
           <div class="user" v-if="showDom">
             <span @click="gotoFriendInfo(userStore.info.wechat)">{{ userStore.info.nickname }}</span>
-            <van-image radius="8px" width="4rem" height="4rem" :src="userStore.info.avatar"
+            <van-image radius="0.4rem" width="4rem" height="4rem" :src="userStore.info.avatar"
               @click="gotoFriendInfo(userStore.info.wechat)" />
           </div>
           <div class="change-bg" v-else>
@@ -277,7 +277,7 @@ onMounted(() => {
           <div class="moment-item" v-for="item in momentList" :key="item.id">
             <div class="moment-item-left">
               <van-image width="3rem" height="3rem" fit="contain" :src="item.user.avatar"
-                @click="gotoFriendInfo(item.user.wechat)" />
+                @click="gotoFriendInfo(item.user.wechat)" radius="0.3rem" />
             </div>
             <div class="moment-item-right">
               <van-text-ellipsis :content="item.user.nickname" class="nickname"

@@ -157,7 +157,7 @@ onMounted(() => { });
 </template>
 <style lang="css">
 .van-icon__image {
-  border-radius: 4px;
+  border-radius: 0.3rem;
 }
 </style>
 <style lang="less" scoped>

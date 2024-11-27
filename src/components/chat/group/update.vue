@@ -151,7 +151,7 @@ const onSubmit = () => {
     img {
       width: inherit;
       height: inherit;
-      border-radius: 0.1rem;
+      border-radius: 0.3rem;
     }
 
     .avatar-group {

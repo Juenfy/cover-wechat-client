@@ -39,37 +39,20 @@ const handleTop = (item, isTop) => {
 </script>
 <template>
   <van-cell-group :border="false">
-    <van-swipe-cell
-      v-for="item in props.list"
-      :key="item.id"
-      :class="item.top > 0 ? 'top-active' : ''"
-    >
-      <router-link
-        :to="{
-          name: 'chat-message',
-          params: {
-            to_user: item.to_user,
-            is_group: item.is_group,
-          },
-        }"
-        class="to-chat-message"
-      >
+    <van-swipe-cell v-for="item in props.list" :key="item.id" :class="item.top > 0 ? 'top-active' : ''">
+      <router-link :to="{
+        name: 'chat-message',
+        params: {
+          to_user: item.to_user,
+          is_group: item.is_group,
+        },
+      }" class="to-chat-message">
         <div class="chat-item-left">
-          <van-badge
-            :content="item.unread"
-            max="99"
-            :show-zero="false"
-            :dot="item.unread > 0 && item.muted"
-            position="top-right"
-          >
+          <van-badge :content="item.unread" max="99" :show-zero="false" :dot="item.unread > 0 && item.muted"
+            position="top-right">
             <div class="avatar-box">
-              <img
-                alt="avatar"
-                v-for="avatar in item.to.avatars"
-                :key="avatar"
-                :src="avatar"
-                :class="item.to.avatars.length > 1 ? 'avatar-group' : ''"
-              />
+              <img alt="avatar" v-for="avatar in item.to.avatars" :key="avatar" :src="avatar"
+                :class="item.to.avatars.length > 1 ? 'avatar-group' : ''" />
             </div>
           </van-badge>
         </div>
@@ -83,27 +66,10 @@ const handleTop = (item, isTop) => {
         </div>
       </router-link>
       <template #right>
-        <van-button
-          square
-          type="danger"
-          text="删除"
-          style="height: inherit"
-          @click="handleDelete(item)"
-        />
-        <van-button
-          square
-          type="warning"
-          text="不显示"
-          style="height: inherit"
-          @click="handleHide(item)"
-        />
-        <van-button
-          square
-          type="primary"
-          :text="item.top > 0 ? '取消置顶' : '置顶'"
-          style="height: inherit"
-          @click="handleTop(item, item.top > 0 ? 0 : 1)"
-        />
+        <van-button square type="danger" text="删除" style="height: inherit" @click="handleDelete(item)" />
+        <van-button square type="warning" text="不显示" style="height: inherit" @click="handleHide(item)" />
+        <van-button square type="primary" :text="item.top > 0 ? '取消置顶' : '置顶'" style="height: inherit"
+          @click="handleTop(item, item.top > 0 ? 0 : 1)" />
       </template>
     </van-swipe-cell>
   </van-cell-group>
@@ -126,45 +92,50 @@ const handleTop = (item, isTop) => {
 .chat-item-left {
   padding: 0.8rem 0 0.8rem 1.4rem;
 }
+
 .chat-item-center,
 .chat-item-right {
   height: inherit;
   box-sizing: border-box;
   border-bottom: 1px solid var(--van-cell-border-color);
 }
+
 .chat-item-center {
   flex-grow: 2;
 }
+
 .chat-item-left {
   position: relative;
 }
 
-.avatar-box > img {
+.avatar-box>img {
   width: 4rem;
   height: 4rem;
-  border-radius: 0.3rem;
+  border-radius: 0.4rem;
 }
 
 .avatar-box {
   width: 4rem;
   height: 4rem;
-  border-radius: 0.3rem;
+  border-radius: 0.4rem;
   background-color: var(--theme-white-de);
 }
 
-.avatar-box > .avatar-group {
+.avatar-box>.avatar-group {
   width: 1.625rem;
   height: 1.625rem;
   float: left;
   margin: 0.25rem 0 0 0.25rem;
   border-radius: 0.1rem;
 }
-.chat-item-center > .username,
-.chat-item-center > .text,
-.chat-item-right > .time {
+
+.chat-item-center>.username,
+.chat-item-center>.text,
+.chat-item-right>.time {
   display: block;
 }
-.chat-item-center > .text {
+
+.chat-item-center>.text {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -173,7 +144,7 @@ const handleTop = (item, isTop) => {
   font-size: 0.9rem;
 }
 
-.chat-item-center > .username {
+.chat-item-center>.username {
   font-size: 1.2rem;
   margin-top: 0.2rem;
   margin-bottom: 0.8rem;
@@ -184,12 +155,13 @@ const handleTop = (item, isTop) => {
   padding-right: 1.4rem;
   text-align: right;
 }
-.chat-item-right > .time {
+
+.chat-item-right>.time {
   margin-top: 0.2rem;
   margin-bottom: 2rem;
 }
 
-.chat-item-center > .text,
+.chat-item-center>.text,
 .chat-item-right {
   color: var(--theme-gray-70);
 }

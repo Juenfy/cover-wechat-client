@@ -105,7 +105,7 @@ const gotoMomentDetail = (moment) => {
                                 </div>
                             </template>
                             <template #icon>
-                                <van-image :src="item.from.avatar" height="3.5rem" width="3.5rem" radius="4"
+                                <van-image :src="item.from.avatar" height="3.5rem" width="3.5rem" radius="0.35rem"
                                     @click="gotoFriendInfo(item.from.wechat)" />
                             </template>
                             <template #right-icon>

@@ -72,7 +72,7 @@ const afterRead = (file) => {
         <van-cell-group>
           <van-cell title="头像" is-link clickable @click="showAvatar = true" :center="true" size="large">
             <template #value>
-              <van-image height="3.5rem" width="3.5rem" radius="0.1rem" :src="userStore.info.avatar" />
+              <van-image height="3.5rem" width="3.5rem" radius="0.35rem" :src="userStore.info.avatar" />
             </template>
           </van-cell>
           <van-cell title="名字" :value="userStore.info.nickname" is-link :center="true" size="large" />

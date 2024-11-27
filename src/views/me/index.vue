@@ -58,7 +58,7 @@ onMounted(() => {
         <template #title>
           <div class="card">
             <div class="info">
-              <van-image radius=".5rem" width="4rem" height="4rem" :src="userStore.info.avatar" />
+              <van-image radius="0.4rem" width="4rem" height="4rem" :src="userStore.info.avatar" />
               <div class="text">
                 <span class="nickname">{{ userStore.info.nickname
                   }}<van-icon name="user" color="#008cff" /></span>

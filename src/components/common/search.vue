@@ -53,53 +53,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <van-popup
-    v-model:show="show"
-    position="right"
-    :style="{
-      height: '100%',
-      width: '100%',
-      background: background,
-    }"
-    :autofocus="true"
-    duration="0.2"
-  >
-    <div
-      style="
+  <van-popup v-model:show="show" position="right" :style="{
+    height: '100%',
+    width: '100%',
+    background: background,
+  }" :autofocus="true" duration="0.2">
+    <div style="
         width: 100%;
         background: var(--van-nav-bar-background);
         padding-top: 2rem;
-      "
-    >
-      <van-search
-        v-model="keywords"
-        show-action
-        :placeholder="placeholder"
-        @search="handleSearch"
-        @cancel="handleCancel"
-      />
+      ">
+      <van-search v-model="keywords" show-action :placeholder="placeholder" @search="handleSearch"
+        @cancel="handleCancel" />
     </div>
     <div class="common common-search">
       <template v-if="action == SearchFriend">
-        <van-cell-group
-          title="联系人"
-          v-if="isSearch && searchResult.length > 0"
-        >
-          <van-cell
-            :center="true"
-            size="large"
-            v-for="(item, index) in searchResult"
-            :key="index"
-            @click="handleHomeClick(item)"
-          >
+        <van-cell-group title="联系人" v-if="isSearch && searchResult.length > 0">
+          <van-cell :center="true" size="large" v-for="(item, index) in searchResult" :key="index"
+            @click="handleHomeClick(item)">
             <template #title>
-              <van-image
-                height="3rem"
-                width="3rem"
-                radius="0.1rem"
-                :src="item.avatar"
-                style="margin-right: 0.5rem"
-              />
+              <van-image height="3rem" width="3rem" radius="0.3rem" :src="item.avatar" style="margin-right: 0.5rem" />
               <span>{{ item.nickname }}</span>
             </template>
           </van-cell>
@@ -110,18 +83,9 @@ onMounted(() => {
         <van-cell-group v-else-if="keywords.length > 0">
           <van-cell :center="true" size="large" @click="handleSearch">
             <template #title>
-              <van-image
-                height="3rem"
-                width="3rem"
-                radius="0.1rem"
-                src="/search.png"
-                style="margin-right: 0.5rem"
-              />
-              <span style="font-weight: bold">搜索：</span
-              ><span
-                style="color: var(--theme-primary-color); font-weight: bold"
-                >{{ keywords }}</span
-              >
+              <van-image height="3rem" width="3rem" radius="0.3rem" src="/search.png" style="margin-right: 0.5rem" />
+              <span style="font-weight: bold">搜索：</span><span
+                style="color: var(--theme-primary-color); font-weight: bold">{{ keywords }}</span>
             </template>
           </van-cell>
         </van-cell-group>
@@ -135,38 +99,24 @@ onMounted(() => {
           <p style="text-align: center; color: var(--theme-gray-70)">
             快速搜索聊天内容
           </p>
-          <van-row
-            justify="center"
-            style="color: var(--theme-blue-tint); margin-top: 1rem"
-          >
+          <van-row justify="center" style="color: var(--theme-blue-tint); margin-top: 1rem">
             <van-col span="4" style="text-align: center">日期</van-col>
-            <van-col
-              span="6"
-              style="
+            <van-col span="6" style="
                 text-align: center;
                 border-left: 0.1rem solid #e3e3e3;
                 border-right: 0.1rem solid #e3e3e3;
                 box-sizing: border-box;
-              "
-              >图片与视频</van-col
-            >
+              ">图片与视频</van-col>
             <van-col span="4" style="text-align: center">文件</van-col>
           </van-row>
-          <van-row
-            justify="center"
-            style="color: var(--theme-blue-tint); margin-top: 1rem"
-          >
+          <van-row justify="center" style="color: var(--theme-blue-tint); margin-top: 1rem">
             <van-col span="4" style="text-align: center">链接</van-col>
-            <van-col
-              span="6"
-              style="
+            <van-col span="6" style="
                 text-align: center;
                 border-left: 0.1rem solid #e3e3e3;
                 border-right: 0.1rem solid #e3e3e3;
                 box-sizing: border-box;
-              "
-              >音乐与音频</van-col
-            >
+              ">音乐与音频</van-col>
             <van-col span="4" style="text-align: center">交易</van-col>
           </van-row>
         </div>
@@ -187,6 +137,7 @@ onMounted(() => {
     background: var(--van-white);
     color: var(--theme-gray-70);
   }
+
   .van-cell-group__title {
     padding: 16px 1px !important;
   }

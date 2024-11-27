@@ -68,41 +68,21 @@ watch(
 </script>
 
 <template>
-  <van-popup
-    v-model:show="props.show"
-    position="right"
-    :style="{ height: '100%', width: '100%' }"
-    duration="0.2"
-  >
+  <van-popup v-model:show="props.show" position="right" :style="{ height: '100%', width: '100%' }" duration="0.2">
     <header>
-      <van-nav-bar
-        title="新的朋友"
-        left-arrow
-        :right-text="'添加朋友'"
-        @click-left="$emit('hide')"
-        @click-right="showFriendAdd = true"
-        :border="false"
-      />
+      <van-nav-bar title="新的朋友" left-arrow :right-text="'添加朋友'" @click-left="$emit('hide')"
+        @click-right="showFriendAdd = true" :border="false" />
     </header>
     <section>
       <div class="header"></div>
       <div class="container">
-        <van-search
-          placeholder="账号/手机号"
-          input-align="center"
-          @focus="onSearchFocus"
-        />
+        <van-search placeholder="账号/手机号" input-align="center" @focus="onSearchFocus" />
         <div class="common">
           <van-cell-group title="近三天" v-if="applyList.three_day.length > 0">
             <van-swipe-cell v-for="item in applyList.three_day" :key="item.id">
               <van-cell :center="true" @click="handleHomeClick(item)">
                 <template #title>
-                  <van-image
-                    height="2.5rem"
-                    width="2.5rem"
-                    radius="0.2rem"
-                    :src="item.friend.avatar"
-                  />
+                  <van-image height="3rem" width="3rem" radius="0.3rem" :src="item.friend.avatar" />
                   <div class="left-box" style="">
                     <span>{{ item.friend.nickname }}</span>
                     <span>{{ item.remark }}</span>
@@ -115,32 +95,15 @@ watch(
                 </template>
               </van-cell>
               <template #right>
-                <van-button
-                  square
-                  type="danger"
-                  text="删除"
-                  style="height: inherit"
-                  @click="deleteApply(item.id)"
-                />
+                <van-button square type="danger" text="删除" style="height: inherit" @click="deleteApply(item.id)" />
               </template>
             </van-swipe-cell>
           </van-cell-group>
-          <van-cell-group
-            title="三天前"
-            v-if="applyList.over_three_day.length > 0"
-          >
-            <van-swipe-cell
-              v-for="item in applyList.over_three_day"
-              :key="item.id"
-            >
+          <van-cell-group title="三天前" v-if="applyList.over_three_day.length > 0">
+            <van-swipe-cell v-for="item in applyList.over_three_day" :key="item.id">
               <van-cell :center="true" @click="handleHomeClick(item)">
                 <template #title>
-                  <van-image
-                    height="3rem"
-                    width="3rem"
-                    radius="0.2rem"
-                    :src="item.friend.avatar"
-                  />
+                  <van-image height="3rem" width="3rem" radius="0.3rem" :src="item.friend.avatar" />
                   <div class="left-box" style="">
                     <span>{{ item.friend.nickname }}</span>
                     <span>{{ item.remark }}</span>
@@ -153,13 +116,7 @@ watch(
                 </template>
               </van-cell>
               <template #right>
-                <van-button
-                  square
-                  type="danger"
-                  text="删除"
-                  style="height: inherit"
-                  @click="deleteApply(item.id)"
-                />
+                <van-button square type="danger" text="删除" style="height: inherit" @click="deleteApply(item.id)" />
               </template>
             </van-swipe-cell>
           </van-cell-group>

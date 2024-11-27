@@ -153,7 +153,7 @@ watch(() => props.show, (show) => {
                     <div class="content">
                         <div class="left">
                             <van-image width="3rem" height="3rem" fit="contain" :src="moment.user.avatar"
-                                @click="gotoFriendInfo(moment.user.wechat)" />
+                                @click="gotoFriendInfo(moment.user.wechat)" radius="0.3rem" />
                         </div>
                         <div class="right">
                             <van-text-ellipsis :content="moment.user.nickname" class="nickname"
@@ -193,7 +193,7 @@ watch(() => props.show, (show) => {
                                 <template #title>
                                     <div class="like-box">
                                         <van-image :src="like.from.avatar" v-for="like in moment.likes" :key="like.id"
-                                            height="2rem" width="2rem" radius="4px"
+                                            height="2rem" width="2rem" radius="0.2rem"
                                             @click="gotoFriendInfo(like.from.wechat)" />
                                     </div>
                                 </template>
@@ -209,7 +209,7 @@ watch(() => props.show, (show) => {
                                         <van-cell style="padding: 0;">
                                             <template #icon>
                                                 <van-image :src="comment.from.avatar" :key="comment.id" height="2rem"
-                                                    width="2rem" radius="4px"
+                                                    width="2rem" radius="0.2rem"
                                                     @click="gotoFriendInfo(comment.from.wechat)" />
                                             </template>
                                             <template #title>

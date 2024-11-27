@@ -80,7 +80,7 @@ onMounted(() => {
             <template #title>
               <div class="card">
                 <div class="info">
-                  <van-image radius=".5rem" width="4rem" height="4rem" :src="homeInfo.avatar"
+                  <van-image radius="0.4rem" width="4rem" height="4rem" :src="homeInfo.avatar"
                     @click="previewImage(homeInfo.avatar)" />
                   <div class="text">
                     <span class="display-nickname">{{ homeInfo.display_nickname
