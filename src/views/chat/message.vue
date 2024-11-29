@@ -23,7 +23,7 @@ import {
 } from "vant";
 import * as fileApi from "@/api/file";
 import { TypeFile, TypeImage, TypeVideo, TypeAudio } from "@/enums/file";
-import { Text } from "@/enums/message";
+import { TypeText } from "@/enums/message";
 import CommonComment from "@/components/common/comment.vue";
 
 const uploadPercent = ref(0);
@@ -51,8 +51,8 @@ const onCommentCb = (data) => {
   if (data.value.type == TypeFile) {
     uploadAndSendMessage(data.value.file.file, data.value.action == TypeAudio)
   }
-  if (data.value.type == Text) {
-    sendMessage(Text);
+  if (data.value.type == TypeText) {
+    sendMessage(TypeText);
   }
 };
 
@@ -211,7 +211,7 @@ onMounted(async () => {
                   </span>
                   <div class="msg">
                     <div class="tri" v-if="[TypeVideo, TypeAudio].includes(item.type) === false"></div>
-                    <div class="msg_inner" v-if="item.type == Text">
+                    <div class="msg_inner" v-if="item.type == TypeText">
                       {{ item.content }}
                     </div>
                     <div class="msg_inner msg_image" v-else-if="item.type == TypeImage">

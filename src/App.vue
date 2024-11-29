@@ -9,7 +9,7 @@ import CommonCall from "@/components/common/call.vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend, UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app";
-import { ActionApply, ActionSend, ActionLogout } from "@/enums/message";
+import { ActionApply, ActionSend, ActionLogout, TypeText } from "@/enums/message";
 import { ActionLike, ActionUnlike, ActionComment, ActionCall } from "@/enums/moment";
 import { showDialog } from "vant";
 import {
@@ -27,8 +27,7 @@ import {
   commentMoment
 } from "@/utils/moment";
 import * as call from "@/utils/call";
-import { TypeFile, TypeImage, Content } from "@/enums/file";
-import { Text } from "@/enums/message";
+import { TypeFile, TypeImage, TypeContent } from "@/enums/file";
 
 const WebSocketClient = inject("WebSocketClient");
 const route = useRoute();
@@ -75,7 +74,7 @@ const onMessage = async (data) => {
         let isGroup = data.data.is_group;
         let toUser = isGroup == 1 ? data.data.to_user : data.data.from.id;
         let currentPath = "/chat/message/" + toUser + "/" + isGroup;
-        console.log(route.fullPath, currentPath);
+        // console.log(route.fullPath, currentPath);
         //在消息列表页面就刷新列表
         if (route.fullPath === "/chat" || route.fullPath === "/chat?verify=1") {
           await getChatList();
@@ -87,9 +86,10 @@ const onMessage = async (data) => {
           route.fullPath !== "/chat?verify=1" &&
           route.fullPath !== currentPath
         ) {
-          if (data.data.type !== Text)
-            data.data.content = Content[data.data.type] ?? Content[TypeFile];
           message.value = data.data;
+          if (message.value.type !== TypeText) {
+            message.value.content = TypeContent[message.value.type];
+          }
           showMessagePopup.value = true;
           messageAction.value = ActionSend;
         }

@@ -4,4 +4,4 @@ export const ActionApply = "apply";
 
 export const ActionLogout = "logout";
 
-export const Text = "text";
+export const TypeText = "text";
