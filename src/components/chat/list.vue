@@ -58,7 +58,7 @@ const handleTop = (item, isTop) => {
         </div>
         <div class="chat-item-center">
           <span class="username">{{ item.nickname }}</span>
-          <span class="text">{{ item.content }}</span>
+          <span :class="'text' + (item.at ? ' text-at' : '')">{{ item.content }}</span>
         </div>
         <div class="chat-item-right">
           <span class="time">{{ timestampFormat(item.time) }}</span>
@@ -164,5 +164,9 @@ const handleTop = (item, isTop) => {
 .chat-item-center>.text,
 .chat-item-right {
   color: var(--theme-gray-70);
+}
+
+.chat-item-center>.text-at {
+  color: var(--van-warning-color);
 }
 </style>

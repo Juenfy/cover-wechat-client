@@ -12,6 +12,7 @@ import {
 import "emoji-picker-element";
 import * as messageApi from "@/api/message";
 import { useAppStore } from "@/stores/app";
+import { useUserStore } from "@/stores/user";
 import { chatInfo, getChatInfo, messageList, getMessageList, imagePreviewList } from "@/utils/chat";
 import { UnreadChat } from "@/enums/app";
 import ChatInfo from "@/components/chat/info.vue";
@@ -30,6 +31,7 @@ const uploadPercent = ref(0);
 const router = useRouter();
 const route = useRoute();
 const appStore = useAppStore();
+const userStore = useUserStore();
 const atUsers = ref([]);
 const content = ref("");
 const contentRef = ref(null);
@@ -40,6 +42,14 @@ const queryData = reactive({
 });
 const showChatInfo = ref(false);
 const showChatGroupUsers = ref(false);
+const messageItemRefs = ref([]);
+const atMessageIds = ref([]);
+
+// 设置消息的 ref
+const setMessageItemRefs = (el, id) => {
+  if (el) messageItemRefs.value[id] = el
+  // console.log(messageItemRefs.value);
+}
 
 const handleInput = (data) => {
   // console.log("handleInput", data.value);
@@ -109,6 +119,7 @@ const sendMessage = (type) => {
   if (content.value) {
     queryData.content = content.value;
     queryData.type = type;
+    console.log(atUsers.value);
     if (atUsers.value.length > 0) {
       const atUserIds = atUsers.value.map((item) => item.id);
       queryData.at_users = atUserIds.join(',');
@@ -116,12 +127,15 @@ const sendMessage = (type) => {
     messageApi.send(queryData).then((res) => {
       console.log("sendMessage", res);
       if (res.code == 200001) {
+        content.value = "";
+        atUsers.value = [];
+        queryData.at_users = "";
+        console.log(atUsers.value);
         messageList.value.push(res.data);
         if (res.data.type == TypeImage)
           imagePreviewList.value.push(res.data.content);
       }
     });
-    content.value = "";
   }
 };
 
@@ -166,6 +180,32 @@ const onContentRightClick = (e) => {
   console.log("onContentRightClick", e);
 };
 
+// 查看@我的消息
+const watchAtMessage = () => {
+  if (atMessageIds.value.length < 0) return false;
+  const atMessageId = atMessageIds.value.shift();
+  const atMessage = messageItemRefs.value[atMessageId];
+  const item = messageList.value.find(item => item.id == atMessageId);
+  console.log(atMessage);
+  if (atMessage) {
+    nextTick(() => {
+      atMessage.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+      // 标记已读
+      messageApi.read({
+        is_group: item.is_group,
+        to_user: item.to_user,
+        id: item.id,
+        type: 'at_users'
+      }).then(res => {
+        console.log(res);
+      });
+    })
+  }
+};
+
 onUpdated(() => {
   nextTick(() => {
     // 滚动到底部
@@ -180,6 +220,19 @@ onMounted(async () => {
     }
   });
   await getMessageList(queryData, (res) => { });
+});
+
+watch(() => messageList.value, (newMessageList) => {
+  // 被@的消息ID存起来
+  atMessageIds.value = [];
+  newMessageList.forEach(item => {
+    if (item.at_users.indexOf(userStore.info.id) != -1) {
+      atMessageIds.value.push(item.id);
+    }
+  });
+  console.log(atMessageIds.value);
+}, {
+  deep: true  // 启用深度监听
 });
 </script>
 <template>
@@ -199,44 +252,49 @@ onMounted(async () => {
       <div class="header"></div>
       <div class="container" ref="msgBoxRef" style="background: transparent">
         <ul class="message-list">
-          <li v-for="item in messageList" :key="item.id" :class="item.is_tips == 1 ? 'li-tips-message' : ''">
-            <div v-if="item.is_tips == 0" class="normal-message">
-              <article :class="item.right ? 'right' : ''">
-                <div class="avatar">
-                  <img alt="avatar" :src="item.from.avatar" @click="onClickAvatar(item)" />
-                </div>
-                <div class="content" ref="contentRef" @click.exact.prevent="onContentRightClick">
-                  <span :class="item.right ? 'nickname right' : 'nickname'" v-if="chatInfo.display_nickname">
-                    {{ item.from.nickname }}
-                  </span>
-                  <div class="msg">
-                    <div class="tri" v-if="[TypeVideo, TypeAudio].includes(item.type) === false"></div>
-                    <div class="msg_inner" v-if="item.type == TypeText">
-                      {{ item.content }}
+          <li v-for="item in messageList" :key="item.id"
+            :class="item.is_tips == 1 ? 'li-tips-message' : (item.right ? 'right' : '')"
+            :ref="el => setMessageItemRefs(el, item.id)">
+            <article v-if="item.is_tips == 0" class="normal-message">
+
+              <div class="avatar">
+                <img alt="avatar" :src="item.from.avatar" @click="onClickAvatar(item)" />
+              </div>
+              <div class="content" ref="contentRef" @click.exact.prevent="onContentRightClick">
+                <span :class="item.right ? 'nickname right' : 'nickname'" v-if="chatInfo.display_nickname">
+                  {{ item.from.nickname }}
+                </span>
+                <div class="msg">
+                  <div class="tri"></div>
+                  <div class="msg_inner" v-if="item.type == TypeText">
+                    {{ item.content }}
+                  </div>
+                  <div class="msg_inner msg_image" v-else-if="item.type == TypeImage">
+                    <van-image fit="contain" :src="item.content" @click="previewImage(item.content)" />
+                  </div>
+                  <div class="msg_inner msg_video" v-else-if="item.type == TypeVideo">
+                    <div class="van-image">
+                      <video controls :src="item.content" loop playsinline class="van-image__img"
+                        style="object-fit: contain"></video>
                     </div>
-                    <div class="msg_inner msg_image" v-else-if="item.type == TypeImage">
-                      <van-image fit="contain" :src="item.content" @click="previewImage(item.content)" />
-                    </div>
-                    <div class="msg_inner msg_video" v-else-if="item.type == TypeVideo">
-                      <div class="van-image">
-                        <video controls :src="item.content" loop playsinline class="van-image__img"
-                          style="object-fit: contain"></video>
-                      </div>
-                    </div>
-                    <div class="msg_inner msg_audio" v-else-if="item.type == TypeAudio">
-                      <div class="van-image">
-                        <audio :src="item.content" controls type="audio/wav"></audio>
-                      </div>
+                  </div>
+                  <div class="msg_inner msg_audio" v-else-if="item.type == TypeAudio">
+                    <div class="van-image">
+                      <audio :src="item.content" controls type="audio/wav"></audio>
                     </div>
                   </div>
                 </div>
-              </article>
-            </div>
+              </div>
+            </article>
             <div v-else class="tips-message">
               {{ item.content }}
             </div>
           </li>
         </ul>
+        <van-badge :content="atMessageIds.length" max="99" v-if="atMessageIds.length > 0"
+          class="message-tag message-tag-at">
+          <van-tag type="warning" closeable round size="large" @click="watchAtMessage">有人@你了 </van-tag>
+        </van-badge>
       </div>
       <div class="footer">
         <common-comment :show="true" :content="content" @input="handleInput" @callback="onCommentCb"
@@ -248,3 +306,18 @@ onMounted(async () => {
   <chat-group-users v-if="chatInfo.is_group == 1" :show="showChatGroupUsers" @hide="showChatGroupUsers = false"
     @select="selectAtUsers" :users="chatInfo.users" />
 </template>
+
+<style lang="css">
+.message-tag {
+  position: fixed !important;
+  right: 1rem;
+}
+
+.message-tag-at {
+  bottom: 6rem;
+}
+
+.message-tag-quote {
+  bottom: 7rem;
+}
+</style>
