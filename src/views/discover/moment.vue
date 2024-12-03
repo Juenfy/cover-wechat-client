@@ -356,7 +356,7 @@ onMounted(() => {
   </div>
   <van-action-sheet v-model:show="showPostMomentMenu" :actions="postMomentActions" @select="onSelectPostMomentAction"
     cancel-text="取消" close-on-click-action />
-  <van-uploader :after-read="afterRead" max-count="9" accept="image/*" multiple ref="uplaodRef"
+  <van-uploader :after-read="afterRead" max-count="9" accept="image/*" multiple ref="uploadRef"
     style="display: none;" />
   <post-moment :show="showPostMoment" :fileList="fileList" :postType="postType" @hide="hidePostMoment"
     @postSuccessCb="postSuccessCb" />
