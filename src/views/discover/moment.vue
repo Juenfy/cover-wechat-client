@@ -30,6 +30,12 @@ const showCommonCamera = ref(false);
 const showMomentBackground = ref(false);
 const showCommonComment = ref(false);
 const showMomentMessage = ref(false);
+const uploadRef = ref(null);
+const postMomentActions = [
+  { name: "拍摄", subname: "照片或视频", value: "camera" },
+  { name: "从手机相册选择", value: "album" },
+  { name: "纯文案", value: "text" }
+];
 const content = ref("");
 const bgHeader = ref(null);
 const postType = ref("text");
@@ -233,6 +239,21 @@ const gotoFriendInfo = (keywords) => {
   });
 }
 
+//发朋友圈菜单选中
+const onSelectPostMomentAction = (action) => {
+  switch (action.value) {
+    case "camera":
+      showCommonCamera.value = true;
+      break;
+    case "album":
+      uploadRef.value.chooseFile();
+      break;
+    default:
+      handlePostMomentMenu(TypeText);
+      break;
+  }
+}
+
 onMounted(() => {
   momentList.value = [];
 });
@@ -333,20 +354,10 @@ onMounted(() => {
       </van-pull-refresh>
     </section>
   </div>
-  <van-popup v-model:show="showPostMomentMenu" round position="bottom" class="popup-menu">
-    <van-cell-group>
-      <van-cell title="拍摄" clickable size="large" @click="showCommonCamera = true" />
-      <van-cell title="从手机相册选择" clickable size="large">
-        <template #title>
-          <van-uploader :after-read="afterRead" max-count="9" accept="image/*" multiple>从手机相册选择</van-uploader>
-        </template>
-      </van-cell>
-      <van-cell title="纯文案" clickable size="large" @click="handlePostMomentMenu(TypeText)" />
-    </van-cell-group>
-    <van-cell-group class="cancel">
-      <van-cell title="取消" clickable @click="showPostMomentMenu = false" size="large" />
-    </van-cell-group>
-  </van-popup>
+  <van-action-sheet v-model:show="showPostMomentMenu" :actions="postMomentActions" @select="onSelectPostMomentAction"
+    cancel-text="取消" close-on-click-action />
+  <van-uploader :after-read="afterRead" max-count="9" accept="image/*" multiple ref="uplaodRef"
+    style="display: none;" />
   <post-moment :show="showPostMoment" :fileList="fileList" :postType="postType" @hide="hidePostMoment"
     @postSuccessCb="postSuccessCb" />
   <common-camera :show="showCommonCamera" @hide="showCommonCamera = false" @takePhotoCb="takePhotoCb" />

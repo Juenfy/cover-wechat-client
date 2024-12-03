@@ -16,6 +16,9 @@ const showClearChat = ref(false);
 const showChatBackground = ref(false);
 const showChatGroupInvite = ref(false);
 const showChatGroupUpdate = ref(false);
+const clearChatActions = [
+  { name: "清空聊天记录", color: "red", value: "clear" }
+];
 const chatGroupUpdateField = ref("");
 const appStore = useAppStore();
 const props = defineProps({ show: Boolean, info: Object });
@@ -74,6 +77,12 @@ const updateChatInfo = (value, key) => {
     console.log(res);
   });
 };
+
+//清空聊天记录菜单选中
+const onSelectClearChatAction = (action) => {
+  console.log(action);
+};
+
 onMounted(() => { });
 </script>
 
@@ -137,14 +146,8 @@ onMounted(() => { });
         <van-cell-group>
           <van-cell title="清除聊天记录" clickable size="large" @click="showClearChat = true" />
         </van-cell-group>
-        <van-popup v-model:show="showClearChat" round position="bottom" class="popup-menu">
-          <van-cell-group class="red">
-            <van-cell title="清空聊天记录" clickable size="large" />
-          </van-cell-group>
-          <van-cell-group class="cancel">
-            <van-cell title="取消" clickable @click="showClearChat = false" size="large" />
-          </van-cell-group>
-        </van-popup>
+        <van-action-sheet v-model:show="showClearChat" :actions="clearChatActions" @select="onSelectClearChatAction"
+          cancel-text="取消" close-on-click-action />
       </div>
     </section>
   </van-popup>

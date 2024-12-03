@@ -20,6 +20,10 @@ const moment = ref({});
 const refreshing = ref(false);
 const showMomentDetailMenu = ref(false);
 const showCommonComment = ref(false);
+const momentDetailActions = [
+    { name: "置顶", subname: "被置顶的朋友圈，将在[我的朋友圈]顶部长期展示", value: "top" },
+    { name: "修改可见范围", value: "edit" }
+];
 
 const onLoadDetail = async () => {
     setTimeout(() => {
@@ -127,6 +131,10 @@ const gotoFriendInfo = (keywords) => {
     });
 }
 
+//朋友圈详情菜单选中
+const onSelectMomentDetailAction = (action) => {
+
+}
 watch(() => props.show, (show) => {
     if (show) {
         onLoadDetail();
@@ -238,15 +246,8 @@ watch(() => props.show, (show) => {
                 @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="showCommonComment = false" />
         </section>
     </van-popup>
-    <van-popup v-model:show="showMomentDetailMenu" round position="bottom" class="popup-menu">
-        <van-cell-group>
-            <van-cell title="置顶" clickable size="large" label="被置顶的朋友圈，将在[我的朋友圈]顶部长期展示" />
-            <van-cell title="修改可见范围" clickable size="large" />
-        </van-cell-group>
-        <van-cell-group class="cancel">
-            <van-cell title="取消" clickable @click="showMomentDetailMenu = false" size="large" />
-        </van-cell-group>
-    </van-popup>
+    <van-action-sheet v-model:show="showMomentDetailMenu" :actions="momentDetailActions"
+        @select="onSelectMomentDetailAction" cancel-text="取消" close-on-click-action />
 </template>
 <style lang="less">
 .moment-container {

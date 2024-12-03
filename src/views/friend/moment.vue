@@ -18,6 +18,10 @@ const showMomentMessageMenu = ref(false);
 const showMomentMessage = ref(false);
 const showMomentDetail = ref(false);
 const showMomentBackground = ref(false);
+const momentMessageActions = [
+  { name: "消息列表", value: 'list' }
+];
+
 const momentId = ref(0);
 const userId = ref(0);
 const bgHeader = ref(null);
@@ -44,11 +48,6 @@ const onClickBgHeader = () => {
       bgHeader.value.classList.remove("bg-header-back");
     }, 300);
   }
-};
-
-const handleMomentMessageMenu = () => {
-  showMomentMessage.value = true;
-  showMomentMessageMenu.value = false;
 };
 
 // 监听滚动
@@ -122,6 +121,11 @@ const gotoMomentDetail = (moment) => {
   showMomentDetail.value = true;
 }
 
+//菜单选中
+const onSelectMomentMessageAction = (action) => {
+  showMomentMessage.value = true;
+};
+
 onMounted(() => {
   isOwner.value = route.params.id == userStore.info.id;
   momentList.value = [];
@@ -189,14 +193,8 @@ onMounted(() => {
       </van-pull-refresh>
     </section>
   </div>
-  <van-popup v-model:show="showMomentMessageMenu" round position="bottom" class="popup-menu">
-    <van-cell-group>
-      <van-cell title="消息列表" clickable size="large" @click="handleMomentMessageMenu" />
-    </van-cell-group>
-    <van-cell-group class="cancel">
-      <van-cell title="取消" clickable @click="showMomentMessageMenu = false" size="large" />
-    </van-cell-group>
-  </van-popup>
+  <van-action-sheet v-model:show="showMomentMessageMenu" :actions="momentMessageActions"
+    @select="onSelectMomentMessageAction" cancel-text="取消" close-on-click-action />
   <moment-message :show="showMomentMessage" @hide="showMomentMessage = false" />
   <moment-detail :show="showMomentDetail" @hide="showMomentDetail = false" :momentId="momentId" :userId="userId" />
   <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"

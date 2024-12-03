@@ -17,23 +17,39 @@ const showMore = ref(false);
 const showAvatar = ref(false);
 const showUpdateAvatar = ref(false);
 const showCommonCamera = ref(false);
+const updateAvatarActions = [
+  { name: "拍照", value: "camera" },
+  { name: "从手机相册选择", value: "album" },
+  { name: "查看上一张头像", value: "prev-avatar" },
+  { name: "保存", value: "save" }
+];
 const gender = ref({
   male: "男",
   female: "女",
   unknown: "未知",
 });
-
-const openCamera = () => {
-  showUpdateAvatar.value = false;
-  showCommonCamera.value = true;
-};
+const uploadRef = ref(null);
 
 const takePhotoCb = (photo) => {
   showCommonCamera.value = false;
   alert(photo);
-  // console.log(photo);
   avatar.value = photo;
 };
+
+//更新头像菜单选中
+const onSelectUpdateAvatarAction = (action) => {
+  switch (action.value) {
+    case "camera":
+      showCommonCamera.value = true;
+      break;
+    case "album":
+      console.log(uploadRef.value.chooseFile());
+      break;
+    default:
+      break;
+  }
+};
+
 watch(
   () => userStore.info.avatar,
   (val) => {
@@ -51,7 +67,6 @@ const afterRead = (file) => {
       () => {
         userApi.putUpdate({ avatar: res.data.path }).then(() => {
           userStore.updateInfo("avatar", res.data.url);
-          showUpdateAvatar.value = false;
         });
       },
       router,
@@ -148,21 +163,9 @@ const afterRead = (file) => {
       </section>
     </van-popup>
     <!--更换头像菜单-->
-    <van-popup v-model:show="showUpdateAvatar" round position="bottom" class="popup-menu">
-      <van-cell-group>
-        <van-cell title="拍照" clickable @click="openCamera" size="large" />
-        <van-cell title="拍照" clickable size="large">
-          <template #title>
-            <van-uploader :after-read="afterRead" max-count="1" accept="image/*">从手机相册选择</van-uploader>
-          </template>
-        </van-cell>
-        <van-cell title="查看上一张头像" clickable size="large" />
-        <van-cell title="保存图片" clickable size="large" />
-      </van-cell-group>
-      <van-cell-group class="cancel">
-        <van-cell title="取消" clickable @click="showUpdateAvatar = false" size="large" />
-      </van-cell-group>
-    </van-popup>
+    <van-action-sheet v-model:show="showUpdateAvatar" :actions="updateAvatarActions"
+      @select="onSelectUpdateAvatarAction" cancel-text="取消" close-on-click-action />
+    <van-uploader :after-read="afterRead" max-count="1" accept="image/*" ref="uploadRef" style="display: none;" />
   </van-popup>
   <common-camera :show="showCommonCamera" @hide="showCommonCamera = false" @takePhotoCb="takePhotoCb" />
 </template>
