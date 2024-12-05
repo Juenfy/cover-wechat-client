@@ -4,6 +4,7 @@ import { useAppStore } from "@/stores/app";
 import { showFailToast } from 'vant';
 import { TypeFile, TypeAudio, TypeVideoCall, TypeAudioCall } from "@/enums/file";
 import { startCall } from "@/utils/call";
+import "emoji-picker-element";
 
 const props = defineProps({
     modules: String,

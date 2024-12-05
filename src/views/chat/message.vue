@@ -10,7 +10,6 @@ import {
   watch,
   inject
 } from "vue";
-import "emoji-picker-element";
 import * as messageApi from "@/api/message";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";

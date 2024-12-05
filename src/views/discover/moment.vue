@@ -11,7 +11,6 @@ import * as momentApi from "@/api/moment";
 import { timestampFormat } from "@/utils/helper";
 import { useUserStore } from "@/stores/user";
 import MomentBackground from "@/components/common/background.vue";
-import "emoji-picker-element";
 import { useAppStore } from "@/stores/app";
 import {
   momentList,
