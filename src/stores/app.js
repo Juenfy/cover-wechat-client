@@ -1,17 +1,12 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { Home } from "@/enums/app";
-import { UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app";
+import { UnreadChat, UnreadApply, UnreadMoment, ThemeIcon } from "@/enums/app";
 export const useAppStore = defineStore(
   "app",
   () => {
     const theme = ref("light");
-    const icon = ref({
-      emoji: "/emoji-white.png",
-      audio: "/audio-white.png",
-      more: "/more-white.png",
-      keyboard: "/keyboard-white.png",
-    });
+    const icon = ref(ThemeIcon.light);
     const showSearch = ref(true);
     const showNavbar = ref(true);
     const navTitle = ref("");
@@ -100,18 +95,7 @@ export const useAppStore = defineStore(
 
     const setTheme = (t) => {
       theme.value = t;
-      if (t === "dark") {
-        icon.value.emoji = "/emoji-white.png";
-        icon.value.audio = "/audio-white.png";
-        icon.value.more = "/more-white.png";
-        icon.value.keyboard = "/keyboard-white.png";
-      } else {
-        icon.value.emoji = "/emoji.png";
-        icon.value.audio = "/audio.png";
-        icon.value.more = "/more.png";
-        icon.value.keyboard = "/keyboard.png";
-      }
-      console.log(theme.value);
+      icon.value = ThemeIcon[t];
     };
     return {
       showNavbar,

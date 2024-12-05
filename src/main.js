@@ -17,6 +17,7 @@ import "@/assets/animation.css";
 import "@/assets/style.less";
 import "vant/lib/index.css";
 import "@/assets/theme.css";
+import { SystemAudio } from "@/enums/app";
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
@@ -32,8 +33,18 @@ const url = import.meta.env.VITE_APP_WEBSOCKET;
 console.log(url);
 const ws = new WebSocketClient(url, emitter);
 app.provide("WebSocketClient", ws);
-const noticeAudio = new Audio("/audio/notification/default.mp3");
-app.provide("NoticeAudio", noticeAudio);
+
+//加载系统音效
+const SysAudio = {};
+Object.keys(SystemAudio).forEach(pk => {
+  Object.keys(SystemAudio[pk]).forEach(sk => {
+    if (!SysAudio.hasOwnProperty(pk)) {
+      SysAudio[pk] = {};
+    }
+    SysAudio[pk][sk] = new Audio(SystemAudio[pk][sk]);
+  })
+});
+app.provide("SysAudio", SysAudio);
 
 app.use(pinia);
 app.use(router);

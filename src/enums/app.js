@@ -22,3 +22,33 @@ export const UnreadChat = "unread-chat";
 export const UnreadApply = "unread-apply";
 export const UnreadMoment = "unread-moment";
 export const Unread = [UnreadChat, UnreadApply, UnreadMoment];
+
+/* 主题图标 */
+export const ThemeIcon = {
+  light: {
+    emoji: "/emoji.png",
+    audio: "/audio.png",
+    more: "/more.png",
+    keyboard: "/keyboard.png",
+    call: "/call.png"
+  },
+  dark: {
+    emoji: "/emoji-white.png",
+    audio: "/audio-white.png",
+    more: "/more-white.png",
+    keyboard: "/keyboard-white.png",
+    call: "/call-white.png"
+  }
+}
+
+/* 系统音效 */
+export const SystemAudio = {
+  chat: {
+    audio: "/audio/notification/chat/audio.mp3",
+    msg: "/audio/notification/chat/msg.mp3"
+  },
+  call: {
+    start: "/audio/notification/call/start.mp3",
+    end: "/audio/notification/call/end.mp3"
+  }
+}

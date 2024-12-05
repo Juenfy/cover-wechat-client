@@ -10,7 +10,7 @@ import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend, UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app";
 import { ActionApply, ActionSend, ActionLogout, TypeText } from "@/enums/message";
-import { ActionLike, ActionUnlike, ActionComment, ActionCall } from "@/enums/moment";
+import { ActionLike, ActionUnlike, ActionComment } from "@/enums/moment";
 import { showDialog } from "vant";
 import {
   startWebSocket
@@ -26,7 +26,6 @@ import {
   unlikeMoment,
   commentMoment
 } from "@/utils/moment";
-import * as call from "@/utils/call";
 import { TypeFile, TypeImage, TypeContent } from "@/enums/file";
 
 const WebSocketClient = inject("WebSocketClient");
@@ -35,7 +34,7 @@ const router = useRouter();
 const emitter = inject("emitter");
 const appStore = useAppStore();
 const userStore = useUserStore();
-const noticeAudio = inject("NoticeAudio");
+const sysAudio = inject("SysAudio");
 const showMessagePopup = ref(false);
 
 const message = ref({});
@@ -105,7 +104,7 @@ const onMessage = async (data) => {
           //消息未读数加1
           appStore.unreadIncrBy(UnreadChat);
           //播放消息通知音
-          await noticeAudio.play();
+          await sysAudio.chat.msg.play();
         }
 
         break;
@@ -136,17 +135,6 @@ const onMessage = async (data) => {
       case ActionComment:
         appStore.unreadIncrBy(UnreadMoment, 1, data.data.from);
         commentMoment(data.data);
-        break;
-      case ActionCall:
-        if (data.data?.action == 'offer') {
-          call.startIncoming(data.data);
-        }
-        if (data.data?.action == 'answer') {
-          call.handleAnswer(data.data?.answer);
-        }
-        if (data.data?.action) {
-          call.endCalling(data.data?.action);
-        }
         break;
     }
   }
