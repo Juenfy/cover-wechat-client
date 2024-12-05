@@ -347,7 +347,7 @@ const onCallMessage = async (data) => {
             await handleEnd(action, '对方已拒绝');
             break;
         case "end":
-            await handleEnd(action, '已结束通话');
+            await handleEnd(action, '已挂断');
             break;
     }
 };
