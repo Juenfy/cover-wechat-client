@@ -8,7 +8,10 @@ import { isCall, caller, overCall, callType } from "@/utils/call";
 import { durationFormat } from "@/utils/helper";
 import { messageList, getChatList } from "@/utils/chat";
 import emitter from "@/utils/emitter";
+import { useAppStore } from "@/stores/app";
+import { UnreadChat } from "@/enums/app";
 
+const appStore = useAppStore();
 const route = useRoute();
 const sysAudio = inject("SysAudio");
 const msgId = ref(null);
@@ -178,6 +181,8 @@ const handleEnd = async (action, content) => {
                     to_user: caller.value.id,
                     is_group: 0
                 });
+            } else {
+                appStore.unreadIncrBy(UnreadChat);
             }
             refreshMessage(res);
         }
@@ -353,15 +358,15 @@ const onCallMessage = async (data) => {
 };
 
 const playAudio = async () => {
-    // sysAudio.call.start.loop = true;
-    // sysAudio.call.start.play();
+    sysAudio.call.start.loop = true;
+    sysAudio.call.start.play();
     callDuration.value = 0;
 };
 
 const pasueAudio = async (end = false) => {
-    // sysAudio.call.start.loop = false;
-    // sysAudio.call.start.pause();
-    // if (end) sysAudio.call.end.play();
+    sysAudio.call.start.loop = false;
+    sysAudio.call.start.pause();
+    if (end) sysAudio.call.end.play();
 };
 
 // 摄像头、扬声器、麦克风开关控制
