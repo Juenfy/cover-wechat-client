@@ -49,10 +49,6 @@ const getHomeInfo = () => {
   });
 };
 
-const updateCb = async () => {
-  getHomeInfo();
-};
-
 const previewImage = (url) => {
   showImagePreview({
     images: [url],
@@ -130,7 +126,7 @@ onMounted(() => {
     </div>
   </section>
 
-  <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" :info="homeInfo" @updateCb="updateCb" />
+  <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" :info="homeInfo" @updateCb="getHomeInfo" />
   <friend-perm :show="showFriendPerm" @hide="showFriendPerm = false" :info="homeInfo" />
   <friend-setting :show="showFriendSetting" @hide="showFriendSetting = false" @showFP="showFriendPerm = true"
     @showFR="showFriendRemark = true" :info="homeInfo" />

@@ -17,6 +17,7 @@ const showFriendRemark = ref(false);
 const showGroupList = ref(false);
 const showOnlyChatFriendList = ref(false);
 const indexList = ref([]);
+const friendInfo = ref({});
 const getFriendList = async () => {
   friendApi.getList().then((res) => {
     friendList.value = res.data;
@@ -32,6 +33,14 @@ const gotoFriendInfo = (keywords) => {
       keywords: keywords,
     },
   });
+};
+
+const gotoFriendRemark = (item) => {
+  friendInfo.value.id = item.friend;
+  friendInfo.value.display_nickname = item.nickname;
+  friendInfo.value.desc = item.desc;
+  console.log(friendInfo.value);
+  showFriendRemark.value = true;
 };
 
 onMounted(async () => {
@@ -61,14 +70,15 @@ onMounted(async () => {
           <van-cell :title="item.nickname" :icon="item.avatar" size="large" :center="true"
             @click="gotoFriendInfo(item.keywords)" />
           <template #right>
-            <van-button square type="primary" text="备注" style="height: inherit" @click="showFriendRemark = true" />
+            <van-button square type="primary" text="备注" style="height: inherit" @click="gotoFriendRemark(item)" />
           </template>
         </van-swipe-cell>
       </div>
     </van-index-bar>
   </div>
   <friend-new :show="showFriendNew" @hide="showFriendNew = false" />
-  <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" />
+  <friend-remark :show="showFriendRemark" @hide="showFriendRemark = false" :info="friendInfo"
+    @updateCb="getFriendList" />
   <group-list :show="showGroupList" @hide="showGroupList = false" />
   <only-chat-friend-list :show="showOnlyChatFriendList" @hide="showOnlyChatFriendList = false" />
 </template>
