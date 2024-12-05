@@ -353,15 +353,15 @@ const onCallMessage = async (data) => {
 };
 
 const playAudio = async () => {
-    sysAudio.call.start.loop = true;
-    sysAudio.call.start.play();
+    // sysAudio.call.start.loop = true;
+    // sysAudio.call.start.play();
     callDuration.value = 0;
 };
 
 const pasueAudio = async (end = false) => {
-    sysAudio.call.start.loop = false;
-    sysAudio.call.start.pause();
-    if (end) sysAudio.call.end.play();
+    // sysAudio.call.start.loop = false;
+    // sysAudio.call.start.pause();
+    // if (end) sysAudio.call.end.play();
 };
 
 // 摄像头、扬声器、麦克风开关控制
@@ -482,29 +482,6 @@ onUnmounted(() => {
         </div>
     </van-popup>
 </template>
-<style lang="css">
-.btn {
-    height: 3.5rem !important;
-    width: 3.5rem;
-    display: flex !important;
-    ;
-    justify-content: center;
-    align-items: center;
-}
-
-.btn-large {
-    height: 4.5rem !important;
-    width: 4.5rem;
-}
-
-.btn>.van-button__content>.van-button__icon {
-    font-size: 1.5rem;
-}
-
-.btn-large>.van-button__content>.van-button__icon {
-    font-size: 2rem;
-}
-</style>
 <style scoped lang="less">
 .overly {
     height: 100%;
