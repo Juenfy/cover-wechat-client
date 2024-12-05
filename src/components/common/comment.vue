@@ -2,15 +2,16 @@
 import { onMounted, onUnmounted, onBeforeUnmount, ref, watch, nextTick } from 'vue';
 import { useAppStore } from "@/stores/app";
 import { showFailToast } from 'vant';
-import { TypeFile, TypeAudio } from "@/enums/file";
-import * as call from "@/utils/call";
+import { TypeFile, TypeAudio, TypeVideoCall, TypeAudioCall } from "@/enums/file";
+import { startCall } from "@/utils/call";
 
 const props = defineProps({
     modules: String,
     content: String,
     position: String,
     show: Boolean,
-    placeholder: String
+    placeholder: String,
+    group: String,
 });
 
 const emit = defineEmits(['callback', 'input', 'hide']);
@@ -38,6 +39,22 @@ const animationFrame = ref(null);
 const showEmojiPopup = ref(false);
 const showMorePopup = ref(false);
 const commentRef = ref(null);
+const showCallMenu = ref(false);
+const callActions = [
+    { name: "视频通话", value: TypeVideoCall },
+    { name: "语音通话", value: TypeAudioCall }
+];
+
+const onSelectCallAction = (action) => {
+    switch (action.value) {
+        case TypeVideoCall:
+            startCall(TypeVideoCall);
+            break;
+        case TypeAudioCall:
+            startCall(TypeAudioCall);
+            break;
+    }
+};
 
 const handleKeyupEnter = () => {
     input.value.action = 'input';
@@ -240,7 +257,8 @@ onMounted(async () => {
                 }
             };
         } catch (error) {
-            console.error('获取音频权限失败:', error);
+            console.error('获取本地媒体流失败:', error);
+            return showFailToast('获取本地媒体流失败:' + error);
         }
     }
 });
@@ -317,11 +335,11 @@ onUnmounted(async () => {
                             </van-uploader>
                         </template>
                     </van-grid-item>
-                    <van-grid-item>
+                    <van-grid-item v-show="props.group == 0">
                         <template #default>
-                            <div class="more-bottom-item" @click="call.startCall">
+                            <div class="more-bottom-item" @click="showCallMenu = true">
                                 <div class="more-bottom-icon">
-                                    <van-icon name="video" size="30" />
+                                    <van-icon :name="appStore.icon.call" size="30" />
                                 </div>
                                 <span class="more-bottom-text">视频通话</span>
                             </div>
@@ -348,6 +366,8 @@ onUnmounted(async () => {
                 }}
             </div>
         </div>
+        <van-action-sheet v-model:show="showCallMenu" :actions="callActions" @select="onSelectCallAction"
+            cancel-text="取消" close-on-click-action />
     </div>
 </template>
 <style lang="css">
@@ -411,6 +431,7 @@ onUnmounted(async () => {
         box-sizing: border-box;
         width: 100%;
         padding: 1rem 0;
+        background: transparent;
 
         .more-bottom-item {
             display: flex;

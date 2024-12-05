@@ -1,5 +1,9 @@
 import { showFailToast, showSuccessToast } from "vant";
 
+function zeroize(num) {
+  return (String(num).length == 1 ? "0" : "") + num;
+}
+
 //封装响应
 export const handleResponse = (res, cb, router, showSucces = false) => {
   console.log(res);
@@ -13,9 +17,6 @@ export const handleResponse = (res, cb, router, showSucces = false) => {
 };
 
 export const timestampFormat = (timestamp, hi = false) => {
-  function zeroize(num) {
-    return (String(num).length == 1 ? "0" : "") + num;
-  }
 
   let curTimestamp = parseInt(Date.now() / 1000); //当前时间戳
   let timestampDiff = curTimestamp - timestamp; // 参数时间戳与当前时间戳相差秒数
@@ -59,9 +60,6 @@ export const timestampFormat = (timestamp, hi = false) => {
 };
 
 export const timestampFormatMoment = (timestamp) => {
-  function zeroize(num) {
-    return (String(num).length == 1 ? "0" : "") + num;
-  }
 
   let curTimestamp = parseInt(Date.now() / 1000); //当前时间戳
   let timestampDiff = curTimestamp - timestamp; // 参数时间戳与当前时间戳相差秒数
@@ -79,3 +77,10 @@ export const timestampFormatMoment = (timestamp) => {
     return "<b class='day' style='font-size:20px'>前天</b>";
   return "<b class='day' style='font-size:20px'>" + zeroize(d) + "</b> " + m + "月";
 };
+
+export const durationFormat = (duration) => {
+  let h = Math.floor(duration / 3600);
+  let m = Math.floor((duration - h * 3600) / 60);
+  let s = duration - h * 3600 - m * 60;
+  return zeroize(h) + ":" + zeroize(m) + ":" + zeroize(s);
+}

@@ -243,7 +243,8 @@ watch(() => props.show, (show) => {
                 </div>
             </van-pull-refresh>
             <common-comment :show="showCommonComment" :content="content" :placeholder="placeholder" position="bottom"
-                @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="showCommonComment = false" />
+                @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="showCommonComment = false"
+                group="0" />
         </section>
     </van-popup>
     <van-action-sheet v-model:show="showMomentDetailMenu" :actions="momentDetailActions"

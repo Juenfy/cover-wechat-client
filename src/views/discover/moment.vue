@@ -364,7 +364,7 @@ onMounted(() => {
   <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"
     title="更换相册封面" />
   <common-comment :show="showCommonComment" :content="content" :placeholder="placeholder" position="bottom"
-    @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="hideCommonComment" />
+    @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="hideCommonComment" group="0" />
   <moment-message :show="showMomentMessage" @hide="showMomentMessage = false" />
 </template>
 <style scoped lang="less">

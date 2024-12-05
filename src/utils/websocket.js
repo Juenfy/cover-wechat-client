@@ -1,3 +1,5 @@
+import { ActionCall } from "@/enums/message";
+
 export class WebSocketClient {
   constructor(url, emitter) {
     this.url = url;
@@ -20,8 +22,12 @@ export class WebSocketClient {
       this.websocket.onopen = cb;
       this.websocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
-        console.log("收到消息", data);
-        this.emitter.emit("onMessage", data);
+        // console.log("收到消息", data);
+        if (data.action === ActionCall) {
+          this.emitter.emit("onCallMessage", data);
+        } else {
+          this.emitter.emit("onMessage", data);
+        }
       };
 
       this.websocket.onclose = (e) => {

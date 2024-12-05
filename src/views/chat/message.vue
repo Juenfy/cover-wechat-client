@@ -8,6 +8,7 @@ import {
   onUpdated,
   nextTick,
   watch,
+  inject
 } from "vue";
 import "emoji-picker-element";
 import * as messageApi from "@/api/message";
@@ -23,10 +24,11 @@ import {
   showLoadingToast,
 } from "vant";
 import * as fileApi from "@/api/file";
-import { TypeFile, TypeImage, TypeVideo, TypeAudio } from "@/enums/file";
+import { TypeFile, TypeImage, TypeVideo, TypeAudio, TypeVideoCall, TypeAudioCall } from "@/enums/file";
 import { TypeText } from "@/enums/message";
 import CommonComment from "@/components/common/comment.vue";
 
+const sysAudio = inject("SysAudio");
 const uploadPercent = ref(0);
 const router = useRouter();
 const route = useRoute();
@@ -153,7 +155,7 @@ const uploadAndSendMessage = (file, isAudio = false) => {
       showLoadingToast(`上传中${uploadPercent.value}%`);
     })
     .then((res) => {
-      console.log(res);
+      if (isAudio) sysAudio.chat.audio.play();
       if (res.code == 200001) {
         queryData.file_id = res.data.id;
         content.value = res.data.path;
@@ -266,7 +268,7 @@ watch(() => messageList.value, (newMessageList) => {
                 </span>
                 <div class="msg">
                   <div class="tri"></div>
-                  <div class="msg_inner" v-if="item.type == TypeText">
+                  <div class="msg_inner" v-if="[TypeText, TypeAudioCall, TypeVideoCall].indexOf(item.type) !== -1">
                     {{ item.content }}
                   </div>
                   <div class="msg_inner msg_image" v-else-if="item.type == TypeImage">
@@ -298,7 +300,7 @@ watch(() => messageList.value, (newMessageList) => {
       </div>
       <div class="footer">
         <common-comment :show="true" :content="content" @input="handleInput" @callback="onCommentCb"
-          modules="emoji,more,record" placeholder="回车发送消息"></common-comment>
+          modules="emoji,more,record" placeholder="回车发送消息" :group="route.params.is_group" />
       </div>
     </section>
   </div>
