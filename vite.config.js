@@ -7,6 +7,9 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 export default defineConfig({
   // plugins: [vue(), basicSsl()],
   plugins: [vue()],
+  optimizeDeps: {
+    include: ["mitt"],
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
