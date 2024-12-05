@@ -1,15 +1,15 @@
 <script setup>
-import { onMounted, reactive, inject, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
 import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
 import { useRouter, useRoute } from "vue-router";
 import { Verify } from "@/components/Verifition";
+import ws from "@/utils/websocket";
 
 const router = useRouter();
 const route = useRoute();
-const WebSocketClient = inject("WebSocketClient");
 const userStore = useUserStore();
 const appStore = useAppStore();
 const formData = reactive({
@@ -53,7 +53,7 @@ const getCode = async () => {
 onMounted(() => {
   console.log(route.query);
   if (route.query.logout) {
-    WebSocketClient.stop();
+    ws.stop();
     userStore.handleLogout();
     appStore.clear();
     showFailToast("账户信息已失效，请重新登录");

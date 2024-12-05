@@ -1,14 +1,13 @@
 import { ActionCall } from "@/enums/message";
-
-export class WebSocketClient {
-  constructor(url, emitter) {
+import emitter from "@/utils/emitter";
+let ws = null;
+class WebSocketClient {
+  constructor(url) {
     this.url = url;
-    this.emitter = emitter;
     this.websocket = null;
   }
 
-  start(cb) {
-    console.log(this.emitter);
+  start(uid) {
     if ("WebSocket" in window) {
       console.log("当前浏览器支持 WebSocket");
       this.websocket = new WebSocket(this.url);
@@ -19,14 +18,23 @@ export class WebSocketClient {
       alert("当前浏览器不支持 WebSocket");
     }
     if (this.websocket) {
-      this.websocket.onopen = cb;
+      this.websocket.onopen = (e) => {
+        console.log("连接成功", e);
+        //登录成功 绑定uid
+        const data = {
+          who: "user",
+          action: "login",
+          data: { uid: uid },
+        };
+        this.send(data);
+      };
       this.websocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
         // console.log("收到消息", data);
         if (data.action === ActionCall) {
-          this.emitter.emit("onCallMessage", data);
+          emitter.emit("onCallMessage", data);
         } else {
-          this.emitter.emit("onMessage", data);
+          emitter.emit("onMessage", data);
         }
       };
 
@@ -50,17 +58,7 @@ export class WebSocketClient {
     }
   }
 }
-
-export const startWebSocket = async (WebSocketClient, uid) => {
-  WebSocketClient.start((e) => {
-    console.log("连接成功", e);
-    //登录成功 连接websocket
-    const data = {
-      who: "user",
-      action: "login",
-      data: { uid: uid },
-    };
-    WebSocketClient.send(data);
-  });
-};
+if (ws == null)
+  ws = new WebSocketClient(import.meta.env.VITE_APP_WEBSOCKET);
+export default ws;
 

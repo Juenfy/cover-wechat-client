@@ -1,13 +1,12 @@
 <!--创建群聊组件-->
 <script setup>
-import { ref, watch, inject } from "vue";
+import { ref, watch } from "vue";
 import * as friendApi from "@/api/friend";
 import * as groupApi from "@/api/group";
 import { showFailToast, showSuccessToast } from "vant";
 import { useRouter } from "vue-router";
-
+import ws from "@/utils/websocket";
 const router = useRouter();
-const WebSocketClient = inject("WebSocketClient");
 const checkedList = ref([]);
 const choseText = ref("多选");
 const friendList = ref({});
@@ -88,7 +87,7 @@ const onSubmit = () => {
       if (res.code == 200001) {
         showSuccessToast(res.msg);
         sendData.value.data = res.data;
-        WebSocketClient.send(sendData.value);
+        ws.send(sendData.value);
         setTimeout(() => {
           emit("hide");
           if (props.action == "create") {

@@ -2,15 +2,16 @@
 import MeInfo from "@/components/me/info.vue";
 import MeSetting from "@/components/me/setting.vue";
 import { showConfirmDialog } from "vant";
-import { onMounted, inject, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import * as userApi from "@/api/user";
+import ws from "@/utils/websocket";
+
 const router = useRouter();
 const appStore = useAppStore();
 const userStore = useUserStore();
-const WebSocketClient = inject("WebSocketClient");
 const showMeInfo = ref(false);
 const showMeSetting = ref(false);
 const darkMode = ref(false);
@@ -23,7 +24,7 @@ const onLogout = () => {
       // on confirm
       userApi.postLogout().then((res) => {
         if (res.code == 200001) {
-          WebSocketClient.stop();
+          ws.stop();
           userStore.handleLogout();
           appStore.clear();
           setTimeout(() => {

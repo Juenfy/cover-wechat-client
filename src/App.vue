@@ -1,7 +1,7 @@
 <script setup>
 import * as messageApi from "@/api/message";
 import * as friendApi from "@/api/friend";
-import { onMounted, watch, inject, onUnmounted, ref } from "vue";
+import { onMounted, watch, inject, ref, onBeforeUnmount } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CommonSearch from "@/components/common/search.vue";
 import MessagePopup from "@/components/message/popup.vue";
@@ -12,10 +12,7 @@ import { SearchFriend, UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app
 import { ActionApply, ActionSend, ActionLogout, TypeText } from "@/enums/message";
 import { ActionLike, ActionUnlike, ActionComment } from "@/enums/moment";
 import { showDialog } from "vant";
-import {
-  startWebSocket
-
-} from "@/utils/websocket";
+import ws from "@/utils/websocket";
 import {
   getChatList,
   messageList,
@@ -27,11 +24,10 @@ import {
   commentMoment
 } from "@/utils/moment";
 import { TypeFile, TypeImage, TypeContent } from "@/enums/file";
+import emitter from "@/utils/emitter";
 
-const WebSocketClient = inject("WebSocketClient");
 const route = useRoute();
 const router = useRouter();
-const emitter = inject("emitter");
 const appStore = useAppStore();
 const userStore = useUserStore();
 const sysAudio = inject("SysAudio");
@@ -54,7 +50,7 @@ watch(
   (val) => {
     if (val) {
       //登录成功 连接websocket
-      startWebSocket(WebSocketClient, userStore.info.id);
+      ws.start(userStore.info.id);
       messageApi.getUnread().then((res) => {
         if (res.code == 200001) {
           appStore.setUnread(res.data);
@@ -142,17 +138,15 @@ const onMessage = async (data) => {
 };
 
 onMounted(() => {
-  console.log(emitter, WebSocketClient);
+  console.log(emitter, ws);
   //页面刷新 重新连接websocket
   if (userStore.isLogin) {
-    startWebSocket(WebSocketClient, userStore.info.id);
+    ws.start(userStore.info.id);
   }
-  console.log("emitter on onMessage");
   emitter.on("onMessage", onMessage);
 });
 
-onUnmounted(() => {
-  console.log("emitter off onMessage");
+onBeforeUnmount(() => {
   emitter.off("onMessage", onMessage);
 });
 </script>

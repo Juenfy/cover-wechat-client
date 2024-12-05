@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref, inject, watch } from "vue";
+import { onMounted, ref, inject, watch, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import * as messageApi from "@/api/message";
 import { TypeAudio, TypeVideo, StatusIncalling, StatusInclosing, StatusInwaiting, StatusIncoming } from "@/enums/call";
@@ -7,9 +7,9 @@ import { showFailToast } from "vant";
 import { isCall, caller, overCall, callType } from "@/utils/call";
 import { durationFormat } from "@/utils/helper";
 import { messageList, getChatList } from "@/utils/chat";
+import emitter from "@/utils/emitter";
 
 const route = useRoute();
-const emitter = inject("emitter");
 const sysAudio = inject("SysAudio");
 const msgId = ref(null);
 const callDuration = ref(0);
@@ -418,7 +418,7 @@ onMounted(() => {
     emitter.on("onCallMessage", onCallMessage);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
     emitter.off("onCallMessage", onCallMessage);
 });
 </script>
