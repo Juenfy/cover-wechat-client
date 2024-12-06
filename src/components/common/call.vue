@@ -21,11 +21,13 @@ const callStatus = ref(StatusInwaiting);
 const showCall = ref(false);
 const remoteAudio = ref(null);
 const localVideo = ref(null);
+const localVideoOffset = ref({ x: 10, y: 10 });
 const remoteVideo = ref(null);
 const controllsBtn = ref({
     camera: false,
     microphone: true,
-    speaker: true
+    speaker: true,
+    blur: false
 });
 const stream = ref(null);  // 本地视频流
 const remoteStream = ref(null);  // 远程视频流
@@ -401,6 +403,9 @@ const controlls = (type) => {
                 audioTrack.enabled = controllsBtn.value.microphone; // 通过 enabled 属性开关麦克风
             }
             break;
+        default:
+            controllsBtn.value.blur = !controllsBtn.value.blur;
+            break;
     }
 }
 
@@ -429,8 +434,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <van-popup v-model:show="showCall" position="bottom" style="width: 100%; height: 100%;background: transparent;">
-        <div class="overly"></div>
+    <van-popup v-model:show="showCall" position="bottom" style="width: 100%; height: 100vh;background: transparent;">
+        <van-overlay :show="showCall" class="blur-10-9" />
         <div :class="'common-call ' + 'common-call-' + callType">
             <div :class="'call ' + 'call-' + callStatus">
                 <div class="user"
@@ -450,7 +455,8 @@ onBeforeUnmount(() => {
                     <van-button type="success" icon="phone" round class="btn btn-large"
                         @click="answerCall"></van-button>
                 </div>
-                <div class="operation inwaiting-incalling" v-else>
+                <div :class="'operation inwaiting-incalling ' + (callStatus == StatusIncalling && callType == TypeVideo ? 'blur-1-5' : '')"
+                    v-else>
                     <div class="top" v-if="callStatus == StatusIncalling">
                         <span>{{ durationFormat(callDuration) }}</span>
                         <span>已接通</span>
@@ -467,8 +473,15 @@ onBeforeUnmount(() => {
                             <span>扬声器</span>
                             <span>已{{ controllsBtn.speaker ? '打开' : '关闭' }}</span>
                         </div>
-                        <div :class="'camera ' + (controllsBtn.camera ? 'open' : '')" @click="controlls('camera')">
+                        <div :class="'blur ' + (controllsBtn.blur ? 'open' : '')" @click="controlls('blur')"
+                            v-if="callType == TypeVideo">
                             <van-button icon="photo-o" round class="btn"></van-button>
+                            <span>背景模糊</span>
+                            <span>已{{ controllsBtn.blur ? '打开' : '关闭' }}</span>
+                        </div>
+                        <div :class="'camera ' + (controllsBtn.camera ? 'open' : '')" @click="controlls('camera')"
+                            v-if="callType == TypeVideo">
+                            <van-button icon="video-o" round class="btn"></van-button>
                             <span>摄像头</span>
                             <span>已{{ controllsBtn.camera ? '打开' : '关闭' }}</span>
                         </div>
@@ -480,29 +493,34 @@ onBeforeUnmount(() => {
                 </div>
             </div>
             <div class="video" v-if="callType == TypeVideo">
-                <video id="local" autoplay muted ref="localVideo"></video>
-                <video id="remote" autoplay ref="remoteVideo" v-if="callStatus == StatusIncalling"></video>
+                <van-floating-bubble v-model:offset="localVideoOffset" axis="xy"
+                    style="width: 5.5rem;height: 10rem;z-index: 9999;background: transparent;border-radius: 0;"
+                    v-if="controllsBtn.camera">
+                    <template #default>
+                        <video class="local" autoplay muted ref="localVideo">
+                        </video>
+                    </template>
+                </van-floating-bubble>
+                <video class="remote" autoplay ref="remoteVideo" v-if="callStatus == StatusIncalling">
+                </video>
+                <div :class="'blur ' + (controllsBtn.blur ? 'blur-1-5' : '')"></div>
             </div>
             <audio autoplay ref="remoteAudio" v-if="callType == TypeAudio"></audio>
         </div>
+
     </van-popup>
 </template>
 <style scoped lang="less">
-.overly {
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    backdrop-filter: blur(10rem);
-    background: #000;
-    opacity: 0.9;
+.van-floating-bubble {
+    .local {
+        width: inherit;
+        height: inherit;
+    }
 }
 
 .common-call {
-    width: 100%;
-    height: 100%;
+    width: inherit;
+    height: inherit;
     background: transparent;
 
     .call {
@@ -511,7 +529,7 @@ onBeforeUnmount(() => {
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 9999;
+        z-index: 2;
         background: transparent;
 
         .operation,
@@ -612,18 +630,20 @@ onBeforeUnmount(() => {
     }
 
     .video {
-        background: transparent;
+        width: inherit;
+        height: inherit;
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 999;
+        z-index: 1;
 
-        .local {
-            width: 4.5rem;
-            height: 8rem;
+        .blur {
             position: fixed;
-            top: 6rem;
-            left: 3rem;
+            left: 0;
+            top: 0;
+            width: inherit;
+            height: inherit;
+            z-index: 3;
         }
 
         .remote {
@@ -632,7 +652,7 @@ onBeforeUnmount(() => {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 10001;
+            z-index: 2;
         }
     }
 }
