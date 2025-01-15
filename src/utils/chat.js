@@ -6,6 +6,7 @@ import { TypeImage } from "@/enums/message";
 export const chatInfo = ref({});
 export const chatList = ref([]);
 export const messageList = ref([]);
+export const atMessageIdList = ref([]);
 export const imagePreviewList = ref([]);
 //获取聊天记录
 export const getMessageList = async (params, cb) => {
@@ -13,9 +14,13 @@ export const getMessageList = async (params, cb) => {
         console.log("getMessageList", res);
         if (res.code == 200001) {
             imagePreviewList.value = [];
+            atMessageIdList.value = [];
             messageList.value = res.data;
             messageList.value.forEach((item) => {
                 if (item.type === TypeImage) imagePreviewList.value.push(item.content);
+                if (item.at_users.indexOf(params.from_user) != -1) {
+                    atMessageIdList.value.push(item.id);
+                }
             });
             cb(res);
         }

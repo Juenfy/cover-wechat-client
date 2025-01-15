@@ -9,13 +9,14 @@ import CommonCall from "@/components/common/call.vue";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
 import { SearchFriend, UnreadChat, UnreadApply, UnreadMoment } from "@/enums/app";
-import { ActionApply, ActionSend, ActionLogout, TypeText } from "@/enums/message";
+import { ActionAt, ActionApply, ActionSend, ActionLogout, TypeText } from "@/enums/message";
 import { ActionLike, ActionUnlike, ActionComment } from "@/enums/moment";
 import { showDialog } from "vant";
 import ws from "@/utils/websocket";
 import {
   getChatList,
   messageList,
+  atMessageIdList,
   imagePreviewList,
 } from "@/utils/chat";
 import {
@@ -63,13 +64,19 @@ watch(
 //全局消息监听
 const onMessage = async (data) => {
   console.log("App:onMessage", data);
+  let isGroup,toUser,currentPath;
+  if ([ActionAt,ActionSend].indexOf(data?.action) != -1) {
+    isGroup = data.data.is_group;
+    toUser = isGroup == 1 ? data.data.to_user : data.data.from.id;
+    currentPath = "/chat/message/" + toUser + "/" + isGroup;
+    console.log(route.fullPath, currentPath);
+  }
   if (data?.action) {
     switch (data.action) {
+      case ActionAt:
+        atMessageIdList.value.push(data.data.to_user);
+        break;
       case ActionSend:
-        let isGroup = data.data.is_group;
-        let toUser = isGroup == 1 ? data.data.to_user : data.data.from.id;
-        let currentPath = "/chat/message/" + toUser + "/" + isGroup;
-        // console.log(route.fullPath, currentPath);
         //在消息列表页面就刷新列表
         if (route.fullPath === "/chat" || route.fullPath === "/chat?verify=1") {
           await getChatList();

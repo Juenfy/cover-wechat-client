@@ -13,7 +13,7 @@ import {
 import * as messageApi from "@/api/message";
 import { useAppStore } from "@/stores/app";
 import { useUserStore } from "@/stores/user";
-import { chatInfo, getChatInfo, messageList, getMessageList, imagePreviewList } from "@/utils/chat";
+import { chatInfo, getChatInfo, messageList, atMessageIdList, getMessageList, imagePreviewList } from "@/utils/chat";
 import { UnreadChat } from "@/enums/app";
 import ChatInfo from "@/components/chat/info.vue";
 import ChatGroupUsers from "@/components/chat/group/users.vue";
@@ -41,13 +41,13 @@ const content = ref("");
 const contentRef = ref(null);
 const msgBoxRef = ref(null);
 const queryData = reactive({
+  from_user: userStore.info.id,
   to_user: route.params.to_user,
   is_group: route.params.is_group
 });
 const showChatInfo = ref(false);
 const showChatGroupUsers = ref(false);
 const messageItemRefs = ref([]);
-const atMessageIds = ref([]);
 const showRedPacketDetail = ref(false);
 const redPacket = ref({});
 
@@ -189,16 +189,14 @@ const previewImage = (url) => {
 
 // 查看@我的消息
 const watchAtMessage = () => {
-  if (atMessageIds.value.length < 0) return false;
-  const atMessageId = atMessageIds.value.shift();
+  if (atMessageIdList.value.length < 0) return false;
+  const atMessageId = atMessageIdList.value.shift();
   const atMessage = messageItemRefs.value[atMessageId];
   const item = messageList.value.find(item => item.id == atMessageId);
-  console.log(atMessage);
   if (atMessage) {
     nextTick(() => {
       atMessage.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
+        behavior: 'smooth'
       });
       // 标记已读
       messageApi.read({
@@ -209,7 +207,7 @@ const watchAtMessage = () => {
       }).then(res => {
         console.log(res);
       });
-    })
+    });
   }
 };
 
@@ -238,19 +236,6 @@ onMounted(async () => {
     }
   });
   await getMessageList(queryData, (res) => { });
-});
-
-watch(() => messageList.value, (newMessageList) => {
-  // 被@的消息ID存起来
-  atMessageIds.value = [];
-  newMessageList.forEach(item => {
-    if (item.at_users.indexOf(userStore.info.id) != -1) {
-      atMessageIds.value.push(item.id);
-    }
-  });
-  console.log(atMessageIds.value);
-}, {
-  deep: true  // 启用深度监听
 });
 </script>
 <template>
@@ -332,7 +317,7 @@ watch(() => messageList.value, (newMessageList) => {
             </div>
           </li>
         </ul>
-        <van-badge :content="atMessageIds.length" max="99" v-if="atMessageIds.length > 0"
+        <van-badge :content="atMessageIdList.length" max="99" v-if="atMessageIdList.length > 0"
           class="message-tag message-tag-at">
           <van-tag type="warning" closeable round size="large" @click="watchAtMessage">有人@你了 </van-tag>
         </van-badge>

@@ -4,7 +4,9 @@ export const ActionApply = "apply";
 
 export const ActionLogout = "logout";
 
-export const ActionCall = 'call';
+export const ActionCall = "call";
+
+export const ActionAt = "at";
 
 export const TypeText = "text";
 
