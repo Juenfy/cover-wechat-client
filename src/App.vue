@@ -23,7 +23,7 @@ import {
   unlikeMoment,
   commentMoment
 } from "@/utils/moment";
-import { TypeFile, TypeImage, TypeContent } from "@/enums/file";
+import { TypeFile, TypeImage, TypeContent } from "@/enums/message";
 import emitter from "@/utils/emitter";
 
 const route = useRoute();

@@ -1,6 +1,6 @@
 <script setup>
 import { watch, ref, onMounted } from "vue";
-import { TypeText, TypeImage } from "@/enums/moment";
+import { TypeText, TypeImage } from "@/enums/message";
 import { showFailToast, showSuccessToast, showLoadingToast, closeToast } from "vant";
 import * as momentApi from "@/api/moment";
 import "emoji-picker-element";
@@ -91,7 +91,7 @@ const autoResizeTextarea = (e) => {
         </section>
     </van-popup>
 </template>
-<style scoped lang="less">
+<style lang="less">
 .post-menu-container {
     box-sizing: border-box;
     padding: 0 2.5rem;

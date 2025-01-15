@@ -18,14 +18,17 @@ import { UnreadChat } from "@/enums/app";
 import ChatInfo from "@/components/chat/info.vue";
 import ChatGroupUsers from "@/components/chat/group/users.vue";
 import {
-  closeToast,
+  closeToast, showFailToast,
   showImagePreview,
   showLoadingToast,
 } from "vant";
 import * as fileApi from "@/api/file";
-import { TypeFile, TypeImage, TypeVideo, TypeAudio, TypeVideoCall, TypeAudioCall } from "@/enums/file";
+import {TypeFile, TypeImage, TypeVideo, TypeAudio, TypeVideoCall, TypeAudioCall, TypeRedPacket} from "@/enums/message";
 import { TypeText } from "@/enums/message";
 import CommonComment from "@/components/common/comment.vue";
+import ChatRedPacketDetail from "@/components/chat/redPacket/detail.vue";
+import { StatusName } from "@/enums/redPacket";
+
 
 const sysAudio = inject("SysAudio");
 const uploadPercent = ref(0);
@@ -39,12 +42,14 @@ const contentRef = ref(null);
 const msgBoxRef = ref(null);
 const queryData = reactive({
   to_user: route.params.to_user,
-  is_group: route.params.is_group,
+  is_group: route.params.is_group
 });
 const showChatInfo = ref(false);
 const showChatGroupUsers = ref(false);
 const messageItemRefs = ref([]);
 const atMessageIds = ref([]);
+const showRedPacketDetail = ref(false);
+const redPacket = ref({});
 
 // 设置消息的 ref
 const setMessageItemRefs = (el, id) => {
@@ -60,10 +65,13 @@ const handleInput = (data) => {
 const onCommentCb = (data) => {
   console.log("onCommentCb", data.value);
   if (data.value.type == TypeFile) {
-    uploadAndSendMessage(data.value.file.file, data.value.action == TypeAudio)
+    uploadAndSendMessage(data.value.file.file, data.value.file?.options)
   }
-  if (data.value.type == TypeText) {
-    sendMessage(TypeText);
+  if (data.value.type == TypeRedPacket) {
+    queryData.red_packet_id = data.value.red_packet_id;
+  }
+  if ([TypeText, TypeRedPacket].indexOf(data.value.type) !== -1) {
+    sendMessage(data.value.type);
   }
 };
 
@@ -117,33 +125,36 @@ watch(content, (newVal, oldVal) => {
 
 //发送信息
 const sendMessage = (type) => {
-  if (content.value) {
+  if (content.value || queryData?.file_id > 0 || queryData?.red_packet_id > 0) {
     queryData.content = content.value;
     queryData.type = type;
-    console.log(atUsers.value);
+    // console.log(atUsers.value);
     if (atUsers.value.length > 0) {
       const atUserIds = atUsers.value.map((item) => item.id);
       queryData.at_users = atUserIds.join(',');
     }
+
     messageApi.send(queryData).then((res) => {
       console.log("sendMessage", res);
       if (res.code == 200001) {
-        content.value = "";
-        atUsers.value = [];
-        queryData.at_users = "";
-        console.log(atUsers.value);
         messageList.value.push(res.data);
         if (res.data.type == TypeImage)
           imagePreviewList.value.push(res.data.content);
       }
+    }).finally(() => {
+      content.value = "";
+      atUsers.value = [];
+      queryData.at_users = "";
+      queryData.file_id = 0;
+      queryData.red_packet_id = 0;
     });
   }
 };
 
-const uploadAndSendMessage = (file, isAudio = false) => {
+const uploadAndSendMessage = (file, options) => {
   const data = new FormData();
-  if (isAudio) {
-    data.append("file", file, "audio.wav");
+  if (options) {
+    data.append("file", file, options);
   } else {
     data.append("file", file);
   }
@@ -154,10 +165,9 @@ const uploadAndSendMessage = (file, isAudio = false) => {
       showLoadingToast(`上传中${uploadPercent.value}%`);
     })
     .then((res) => {
-      if (isAudio) sysAudio.chat.audio.play();
+      if (options == "audio.wav") sysAudio.chat.audio.play();
       if (res.code == 200001) {
         queryData.file_id = res.data.id;
-        content.value = res.data.path;
         sendMessage(res.data.type);
       }
     })
@@ -175,10 +185,6 @@ const previewImage = (url) => {
     images: imagePreviewList.value,
     startPosition: index,
   });
-};
-
-const onContentRightClick = (e) => {
-  console.log("onContentRightClick", e);
 };
 
 // 查看@我的消息
@@ -205,6 +211,17 @@ const watchAtMessage = () => {
       });
     })
   }
+};
+
+const onClickRedPacket = (data) => {
+  if (data.length <= 0)
+    return showFailToast("红包不存在");
+  redPacket.value = data;
+  showRedPacketDetail.value = true;
+};
+
+const onRightClick = (e) => {
+  console.log(e);
 };
 
 onUpdated(() => {
@@ -261,28 +278,51 @@ watch(() => messageList.value, (newMessageList) => {
               <div class="avatar">
                 <img alt="avatar" :src="item.from.avatar" @click="onClickAvatar(item)" />
               </div>
-              <div class="content" ref="contentRef" @click.exact.prevent="onContentRightClick">
+              <div class="content" ref="contentRef" @contextmenu.prevent="onRightClick">
                 <span :class="item.right ? 'nickname right' : 'nickname'" v-if="chatInfo.display_nickname">
                   {{ item.from.nickname }}
                 </span>
-                <div class="msg">
+                <div :class="'msg'+(' msg_'+item.type)+(item.type == TypeRedPacket && item.red_packet?.status != 1 ? ' red_packet_disabled' : '')">
                   <div class="tri"></div>
-                  <div class="msg_inner" v-if="[TypeText, TypeAudioCall, TypeVideoCall].indexOf(item.type) !== -1">
+                  <div class="msg_inner" v-if="item.type == TypeText">
                     {{ item.content }}
                   </div>
-                  <div class="msg_inner msg_image" v-else-if="item.type == TypeImage">
+                  <div class="msg_inner" v-else-if="[TypeAudioCall, TypeVideoCall].indexOf(item.type) !== -1">
+                    <van-icon :name="item.type == TypeAudioCall ? 'phone-o' : 'video-o'" /> {{ item.content }}
+                  </div>
+                  <div class="msg_inner" v-else-if="item.type == TypeImage">
                     <van-image fit="contain" :src="item.content" @click="previewImage(item.content)" />
                   </div>
-                  <div class="msg_inner msg_video" v-else-if="item.type == TypeVideo">
+                  <div class="msg_inner" v-else-if="item.type == TypeVideo">
                     <div class="van-image">
                       <video controls :src="item.content" loop playsinline class="van-image__img"
                         style="object-fit: contain"></video>
                     </div>
                   </div>
-                  <div class="msg_inner msg_audio" v-else-if="item.type == TypeAudio">
-                    <div class="van-image">
+                  <div class="msg_inner" v-else-if="item.type == TypeAudio">
+                    <span v-if="item.right">6"&nbsp;</span><van-icon
+                      :name="item.right ? '/volume-right.png' : '/volume.png'" style="margin-bottom: -2px;" /><span
+                      v-if="!item.right">&nbsp;"6</span>
+                    <!-- <div class="van-image">
                       <audio :src="item.content" controls type="audio/wav"></audio>
+                    </div> -->
+                  </div>
+                  <div class="msg_inner" v-else-if="item.type == TypeFile">
+
+                  </div>
+                  <div class="msg_inner" v-else-if="item.type == TypeRedPacket" @click="onClickRedPacket(item.red_packet)">
+                    <div class="top">
+                      <van-icon name="/hb.png" size="35"/>
+                      <div class="remark">
+                        <h4>{{ item.content }}</h4>
+                        <span v-if="item.red_packet.status != 1">{{ StatusName[item.red_packet.status] }}</span>
+                        <span v-else>&nbsp;</span>
+                      </div>
                     </div>
+                    <div class="bottom">
+                      微信红包
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -299,16 +339,17 @@ watch(() => messageList.value, (newMessageList) => {
       </div>
       <div class="footer">
         <common-comment :show="true" :content="content" @input="handleInput" @callback="onCommentCb"
-          modules="emoji,more,record" placeholder="回车发送消息" :group="route.params.is_group" />
+          modules="emoji,more,record" placeholder="回车发送消息" :group="route.params.is_group" :info="chatInfo"/>
       </div>
     </section>
   </div>
   <chat-info :show="showChatInfo" @hide="showChatInfo = false" :info="chatInfo" />
   <chat-group-users v-if="chatInfo.is_group == 1" :show="showChatGroupUsers" @hide="showChatGroupUsers = false"
     @select="selectAtUsers" :users="chatInfo.users" />
+  <chat-red-packet-detail :show="showRedPacketDetail" :redPacket="redPacket" @hide="showRedPacketDetail = false"/>
 </template>
 
-<style lang="css">
+<style lang="less">
 .message-tag {
   position: fixed !important;
   right: 1rem;

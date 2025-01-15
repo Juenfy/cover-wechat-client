@@ -60,7 +60,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <header>
+  <header class="friend-info-header">
     <van-nav-bar left-arrow @click-left="router.go(-1)" @click-right="showFriendSetting = true" :border="false">
       <template #right v-if="homeInfo.relationship == RelationShip.Friend">
         <van-icon name="ellipsis" />
@@ -80,7 +80,7 @@ onMounted(() => {
                     @click="previewImage(homeInfo.avatar)" />
                   <div class="text">
                     <span class="display-nickname">{{ homeInfo.display_nickname
-                      }}<van-icon name="user" color="#008cff" /></span>
+                      }}&nbsp;<van-icon :name="`/${homeInfo.gender}.png`"/></span>
                     <span class="nickname" v-if="homeInfo.display_nickname != homeInfo.nickname">昵称：{{ homeInfo.nickname
                       }}</span>
                     <span class="vchat">微信号：{{ homeInfo.wechat }}</span>
@@ -131,18 +131,18 @@ onMounted(() => {
   <friend-setting :show="showFriendSetting" @hide="showFriendSetting = false" @showFP="showFriendPerm = true"
     @showFR="showFriendRemark = true" :info="homeInfo" />
 </template>
-<style scoped lang="less">
-.van-cell-group {
-  margin-bottom: 0.5rem;
-}
-
-.van-nav-bar {
-  background: var(--friend-info-van-nav-bar);
+<style lang="less">
+.friend-info-header {
+  .van-nav-bar {
+    background: var(--friend-info-van-nav-bar);
+  }
 }
 
 .friend-info {
+  .van-cell-group {
+    margin-bottom: 0.5rem;
+  }
   button {
-    margin-top: 0.5rem;
     border: none;
     font-weight: bold;
   }
@@ -168,6 +168,8 @@ onMounted(() => {
         .display-nickname {
           font-weight: bold;
           font-size: 20px;
+          display: flex;
+          align-items: center;
         }
 
         .nickname,
@@ -191,3 +193,4 @@ onMounted(() => {
   }
 }
 </style>
+

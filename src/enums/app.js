@@ -30,14 +30,16 @@ export const ThemeIcon = {
     audio: "/audio.png",
     more: "/more.png",
     keyboard: "/keyboard.png",
-    call: "/call.png"
+    call: "/call.png",
+    red_packet: "/red-packet.png"
   },
   dark: {
     emoji: "/emoji-white.png",
     audio: "/audio-white.png",
     more: "/more-white.png",
     keyboard: "/keyboard-white.png",
-    call: "/call-white.png"
+    call: "/call-white.png",
+    red_packet: "/red-packet-white.png"
   }
 }
 

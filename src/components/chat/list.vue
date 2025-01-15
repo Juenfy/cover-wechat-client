@@ -50,9 +50,8 @@ const handleTop = (item, isTop) => {
         <div class="chat-item-left">
           <van-badge :content="item.unread" max="99" :show-zero="false" :dot="item.unread > 0 && item.muted"
             position="top-right">
-            <div class="avatar-box">
-              <img alt="avatar" v-for="avatar in item.to.avatars" :key="avatar" :src="avatar"
-                :class="item.to.avatars.length > 1 ? 'avatar-group' : ''" />
+            <div :class="'avatar-box' + (item.is_group == 1 ? ' avatar-group' : '')">
+              <img alt="avatar" v-for="avatar in item.to.avatars" :key="avatar" :src="avatar" />
             </div>
           </van-badge>
         </div>
@@ -75,7 +74,7 @@ const handleTop = (item, isTop) => {
   </van-cell-group>
 </template>
 
-<style scope lang="less">
+<style lang="less">
 .top-active {
   background: var(--van-nav-bar-background);
 }
@@ -108,7 +107,7 @@ const handleTop = (item, isTop) => {
   position: relative;
 }
 
-.avatar-box>img {
+.avatar-box,.avatar-box>img {
   width: 4rem;
   height: 4rem;
   border-radius: 0.4rem;
@@ -118,10 +117,11 @@ const handleTop = (item, isTop) => {
   width: 4rem;
   height: 4rem;
   border-radius: 0.4rem;
+}
+.avatar-group{
   background-color: var(--theme-white-de);
 }
-
-.avatar-box>.avatar-group {
+.avatar-group>img {
   width: 1.625rem;
   height: 1.625rem;
   float: left;
@@ -168,5 +168,37 @@ const handleTop = (item, isTop) => {
 
 .chat-item-center>.text-at {
   color: var(--van-warning-color);
+}
+
+@media (max-device-width: 390px) {
+  .avatar-box,.avatar-box>img {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.35rem;
+  }
+
+  .avatar-group>img {
+    width: 1.45rem;
+    height: 1.45rem;
+    float: left;
+    margin: 0.2rem 0 0 0.2rem;
+    border-radius: 0.1rem;
+  }
+  .chat-item-right,
+  .chat-item-center,
+  .chat-item-left {
+    padding: 0.6rem 0 0.6rem 0.5rem;
+  }
+  .chat-item-center>.username {
+    font-size: 1rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .chat-item-right {
+    font-size: 0.8rem;
+    padding-right: 0.5rem;
+    text-align: right;
+  }
 }
 </style>

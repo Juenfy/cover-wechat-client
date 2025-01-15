@@ -127,7 +127,7 @@ const gotoMomentDetail = (moment) => {
     <moment-detail :show="showMomentDetail" @hide="showMomentDetail = false" :momentId="momentId" :userId="userId" />
 </template>
 
-<style scoped lang="less">
+<style lang="less">
 .message-list {
     .title {
         .nickname {

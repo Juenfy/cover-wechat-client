@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import * as chatApi from "@/api/chat";
 import * as messageApi from "@/api/message";
-import { TypeImage } from "@/enums/file";
+import { TypeImage } from "@/enums/message";
 
 export const chatInfo = ref({});
 export const chatList = ref([]);
@@ -21,6 +21,30 @@ export const getMessageList = async (params, cb) => {
         }
     });
 };
+
+export const updateRedPacketStatus = (msg, redPacketId) => {
+    let status = 0;
+    if (msg.indexOf("被领取") != -1) {
+        status = -1;
+    }
+    if (msg.indexOf("已领取") != -1) {
+        status = -2;
+    }
+    if (msg.indexOf("24小时") != -1) {
+        status = -3;
+    }
+    if (msg.indexOf("无法领取") != -1) {
+        status = -4;
+    }
+    if (msg.indexOf("手慢了") != -1) {
+        status = -5;
+    }
+    messageList.value.forEach((item,index) => {
+        if (item.red_packet_id == redPacketId) {
+            messageList.value[index].red_packet.status = status;
+        }
+    });
+}
 
 //获取聊天信息
 export const getChatInfo = async (params, cb) => {

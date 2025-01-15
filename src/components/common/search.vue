@@ -127,7 +127,7 @@ onMounted(() => {
     </div>
   </van-popup>
 </template>
-<style scoped lang="less">
+<style lang="less">
 .common-search {
   .no-result {
     width: 100%;

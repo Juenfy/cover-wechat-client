@@ -97,8 +97,7 @@ onMounted(() => {
         </van-tabbar>
       </footer>
 
-      <chat-group-action :show="showChatGroupCreate" @hide="showChatGroupCreate = false" action="create" :users="[]"
-        groupId="0" />
+      <chat-group-action :show="showChatGroupCreate" @hide="showChatGroupCreate = false" action="create" :users="[]"/>
       <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
     </div>
   </div>
@@ -110,7 +109,7 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped lang="less">
+<style lang="less">
 .index {
   height: 100vh;
   width: 100%;

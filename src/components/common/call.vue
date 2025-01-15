@@ -2,7 +2,8 @@
 import { onMounted, ref, inject, watch, onBeforeUnmount } from "vue";
 import { useRoute } from "vue-router";
 import * as messageApi from "@/api/message";
-import { TypeAudio, TypeVideo, StatusIncalling, StatusInclosing, StatusInwaiting, StatusIncoming } from "@/enums/call";
+import { StatusIncalling, StatusInclosing, StatusInwaiting, StatusIncoming } from "@/enums/call";
+import { TypeAudioCall, TypeVideoCall } from "@/enums/message";
 import { showFailToast } from "vant";
 import { isCall, caller, overCall, callType } from "@/utils/call";
 import { durationFormat } from "@/utils/helper";
@@ -45,20 +46,20 @@ const configuration = {
 
 // 启动通话（发起方）
 const inwatingCall = async () => {
-    controllsBtn.value.camera = callType.value === TypeVideo;
+    controllsBtn.value.camera = callType.value === TypeVideoCall;
     // 获取本地媒体流
     try {
         stream.value = await navigator.mediaDevices.getUserMedia({
-            video: callType.value === TypeVideo,
+            video: callType.value === TypeVideoCall,
             audio: true
         });
-        if (callType.value === TypeVideo) {
+        if (callType.value === TypeVideoCall) {
             localVideo.value.srcObject = stream.value;
         }
     } catch (error) {
         console.error('获取本地媒体流失败:', error);
-        showFailToast('获取本地媒体流失败:' + error);
-        location.reload();
+        closeThem();
+        return showFailToast('获取本地媒体流失败:' + error);
     }
 
     // 初始化 PeerConnection
@@ -72,7 +73,7 @@ const inwatingCall = async () => {
     // 捕获远端流
     peerConnection.value.ontrack = (event) => {
         remoteStream.value = event.streams[0];
-        if (callType.value === TypeVideo) {
+        if (callType.value === TypeVideoCall) {
             remoteVideo.value.srcObject = remoteStream.value;
         } else {
             remoteAudio.value.srcObject = remoteStream.value;
@@ -159,7 +160,6 @@ const endCall = async (action, content) => {
     }).then((res) => {
         if (res.code == 200001) {
             closeThem();
-            pasueAudio(true);
             refreshMessage(res);
         }
     });
@@ -177,7 +177,6 @@ const handleEnd = async (action, content) => {
     }).then((res) => {
         if (res.code == 200001) {
             closeThem();
-            pasueAudio(true);
             if (action !== 'timeout') {
                 messageApi.read({
                     to_user: caller.value.id,
@@ -221,6 +220,7 @@ const closeThem = () => {
     }
     callDuration.value = 0;
     iceCandidateQueue.value = [];
+    pauseAudio(true);
 };
 
 // 接收方同意接听
@@ -228,14 +228,15 @@ const answerCall = async () => {
     // 获取本地媒体流
     try {
         stream.value = await navigator.mediaDevices.getUserMedia({
-            video: callType.value === TypeVideo,
+            video: callType.value === TypeVideoCall,
             audio: true
         });
-        if (callType.value === TypeVideo) {
+        if (callType.value === TypeVideoCall) {
             localVideo.value.srcObject = stream.value;
         }
     } catch (error) {
         console.error('获取本地媒体流失败:', error);
+        await endCall("reject", "已拒绝接听");
         return showFailToast('获取本地媒体流失败:' + error);
     }
 
@@ -250,7 +251,7 @@ const answerCall = async () => {
     // 捕获远端流
     peerConnection.value.ontrack = (event) => {
         remoteStream.value = event.streams[0];
-        if (callType.value === TypeVideo) {
+        if (callType.value === TypeVideoCall) {
             remoteVideo.value.srcObject = remoteStream.value;
         } else {
             remoteAudio.value.srcObject = remoteStream.value;
@@ -296,7 +297,7 @@ const answerCall = async () => {
     }).then((res) => {
         if (res.code == 200001) {
             callStatus.value = StatusIncalling;
-            pasueAudio();
+            pauseAudio();
             interval.value = setInterval(() => {
                 ++callDuration.value;
             }, 1000);
@@ -318,7 +319,7 @@ const handleAnswer = async (answer) => {
     });
 
     iceCandidateQueue.value = [];
-    pasueAudio();
+    pauseAudio();
     interval.value = setInterval(() => {
         ++callDuration.value;
     }, 1000);
@@ -360,22 +361,22 @@ const onCallMessage = async (data) => {
 };
 
 const playAudio = async () => {
-    sysAudio.call.start.loop = true;
-    sysAudio.call.start.play();
+    // sysAudio.call.start.loop = true;
+    // sysAudio.call.start.play();
     callDuration.value = 0;
 };
 
-const pasueAudio = async (end = false) => {
-    sysAudio.call.start.loop = false;
-    sysAudio.call.start.pause();
-    if (end) sysAudio.call.end.play();
+const pauseAudio = async (end = false) => {
+    // sysAudio.call.start.loop = false;
+    // sysAudio.call.start.pause();
+    // if (end) sysAudio.call.end.play();
 };
 
 // 摄像头、扬声器、麦克风开关控制
 const controlls = (type) => {
     switch (type) {
         case "camera":
-            if (callType.value == TypeVideo) {
+            if (callType.value == TypeVideoCall) {
                 const videoTrack = stream.value.getVideoTracks()[0];
                 if (videoTrack) {
                     controllsBtn.value.camera = !controllsBtn.value.camera;
@@ -390,7 +391,7 @@ const controlls = (type) => {
             break;
         case "speaker":
             controllsBtn.value.speaker = !controllsBtn.value.speaker;
-            if (callType.value == TypeVideo) {
+            if (callType.value == TypeVideoCall) {
                 remoteVideo.value.muted = controllsBtn.value.speaker;
             } else {
                 remoteAudio.value.volume = controllsBtn.value.speaker ? 1 : 0;
@@ -439,7 +440,7 @@ onBeforeUnmount(() => {
         <div :class="'common-call ' + 'common-call-' + callType">
             <div :class="'call ' + 'call-' + callStatus">
                 <div class="user"
-                    v-if="(callType != TypeVideo) || (callStatus != StatusIncalling && callType == TypeVideo)">
+                    v-if="(callType != TypeVideoCall) || (callStatus != StatusIncalling && callType == TypeVideoCall)">
                     <van-image :src="caller.avatar" width="6rem" height="6rem" radius="0.6rem" />
                     <div class="nickname">{{ caller.nickname }}</div>
                     <div class="status">
@@ -450,12 +451,12 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="operation incomming" v-if="callStatus == StatusIncoming">
-                    <van-button type="danger" icon="close" round class="btn btn-large"
+                    <van-button type="danger" icon="close" round class="call-btn call-btn-large"
                         @click="endCall('reject', '已拒绝接听')"></van-button>
-                    <van-button type="success" icon="phone" round class="btn btn-large"
+                    <van-button type="success" icon="phone" round class="call-btn call-btn-large"
                         @click="answerCall"></van-button>
                 </div>
-                <div :class="'operation inwaiting-incalling ' + (callStatus == StatusIncalling && callType == TypeVideo ? 'blur-1-5' : '')"
+                <div :class="'operation inwaiting-incalling ' + (callStatus == StatusIncalling && callType == TypeVideoCall ? 'blur-1-5' : '')"
                     v-else>
                     <div class="top" v-if="callStatus == StatusIncalling">
                         <span>{{ durationFormat(callDuration) }}</span>
@@ -464,35 +465,35 @@ onBeforeUnmount(() => {
                     <div class="center" v-if="callStatus == StatusIncalling">
                         <div :class="'microphone ' + (controllsBtn.microphone ? 'open' : '')"
                             @click="controlls('microphone')">
-                            <van-button icon="service-o" round class="btn"></van-button>
+                            <van-button icon="service-o" round class="call-btn"></van-button>
                             <span>麦克风</span>
                             <span>已{{ controllsBtn.microphone ? '打开' : '关闭' }}</span>
                         </div>
                         <div :class="'speaker ' + (controllsBtn.speaker ? 'open' : '')" @click="controlls('speaker')">
-                            <van-button icon="volume-o" round class="btn"></van-button>
+                            <van-button icon="volume-o" round class="call-btn"></van-button>
                             <span>扬声器</span>
                             <span>已{{ controllsBtn.speaker ? '打开' : '关闭' }}</span>
                         </div>
                         <div :class="'blur ' + (controllsBtn.blur ? 'open' : '')" @click="controlls('blur')"
-                            v-if="callType == TypeVideo">
-                            <van-button icon="photo-o" round class="btn"></van-button>
+                            v-if="callType == TypeVideoCall">
+                            <van-button icon="photo-o" round class="call-btn"></van-button>
                             <span>背景模糊</span>
                             <span>已{{ controllsBtn.blur ? '打开' : '关闭' }}</span>
                         </div>
                         <div :class="'camera ' + (controllsBtn.camera ? 'open' : '')" @click="controlls('camera')"
-                            v-if="callType == TypeVideo">
-                            <van-button icon="video-o" round class="btn"></van-button>
+                            v-if="callType == TypeVideoCall">
+                            <van-button icon="video-o" round class="call-btn"></van-button>
                             <span>摄像头</span>
                             <span>已{{ controllsBtn.camera ? '打开' : '关闭' }}</span>
                         </div>
                     </div>
                     <div class="bottom">
-                        <van-button type="danger" icon="close" round class="btn btn-large"
+                        <van-button type="danger" icon="close" round class="call-btn call-btn-large"
                             @click="endCall('end', '已挂断')"></van-button>
                     </div>
                 </div>
             </div>
-            <div class="video" v-if="callType == TypeVideo">
+            <div class="video" v-if="callType == TypeVideoCall">
                 <van-floating-bubble v-model:offset="localVideoOffset" axis="xy"
                     style="width: 5.5rem;height: 10rem;z-index: 9999;background: transparent;border-radius: 0;"
                     v-if="controllsBtn.camera">
@@ -505,12 +506,12 @@ onBeforeUnmount(() => {
                 </video>
                 <div :class="'blur ' + (controllsBtn.blur ? 'blur-1-5' : '')"></div>
             </div>
-            <audio autoplay ref="remoteAudio" v-if="callType == TypeAudio"></audio>
+            <audio autoplay ref="remoteAudio" v-if="callType == TypeAudioCall"></audio>
         </div>
 
     </van-popup>
 </template>
-<style scoped lang="less">
+<style lang="less">
 .van-floating-bubble {
     .local {
         width: inherit;

@@ -68,4 +68,4 @@ const content = computed(() => {
     </van-popup>
   </div>
 </template>
-<style scoped lang="less"></style>
+<style lang="less"></style>

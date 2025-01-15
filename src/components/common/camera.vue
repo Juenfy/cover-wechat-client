@@ -147,7 +147,7 @@ onUnmounted(async () => {
     </div>
   </van-popup>
 </template>
-<style scoped lang="less">
+<style lang="less">
 .camera {
   display: flex;
   flex-direction: column;

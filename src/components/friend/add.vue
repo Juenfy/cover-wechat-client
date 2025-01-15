@@ -45,6 +45,7 @@ const onSearchFocus = () => {
               text-align: center;
               line-height: 1;
               color: var(--friend-add-qrcode-text);
+              margin-bottom: 0.5rem;
             "
           >
             我的微信号：phpdalao

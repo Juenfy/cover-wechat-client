@@ -108,7 +108,7 @@ onMounted(() => {
     </section>
   </van-popup>
 </template>
-<style lang="css">
+<style lang="less">
 .van-uploader,
 .van-uploader__wrapper,
 .van-uploader__input-wrapper {

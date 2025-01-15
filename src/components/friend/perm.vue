@@ -68,4 +68,4 @@ const onChangePerm = (e) => {
     </section>
   </van-popup>
 </template>
-<style scoped lang="less"></style>
+<style lang="less"></style>

@@ -14,6 +14,11 @@ export const postLogout = async () => {
   return await request.post("/api/user/logout");
 };
 
+//充值
+export const postCharge = async (money) => {
+  return await request.post("/api/user/charge", {money});
+};
+
 //用户主页
 export const getHomeInfo = async (keywords) => {
   return await request.get(`/api/user/${keywords}/home`);

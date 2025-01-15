@@ -58,14 +58,10 @@ const onScroll = (e) => {
       navBar.value.classList.add('header-bg');
       document.getElementsByClassName('van-icon-arrow-left')[0].style.color =
         'var(--black-white-color)';
-      document.getElementsByClassName('van-icon-ellipsis')[0].style.color =
-        'var(--black-white-color)';
     } else {
       navTitle.value = '';
       navBar.value.classList.remove('header-bg');
       document.getElementsByClassName('van-icon-arrow-left')[0].style.color =
-        '#fff';
-      document.getElementsByClassName('van-icon-ellipsis')[0].style.color =
         '#fff';
     }
   }
@@ -200,7 +196,7 @@ onMounted(() => {
   <moment-background :show="showMomentBackground" @hide="showMomentBackground = false" :info="{}" type="moment"
     title="更换相册封面" />
 </template>
-<style scoped lang="less">
+<style lang="less">
 .friend-moment {
   .header-bg {
     background: var(--van-nav-bar-background);

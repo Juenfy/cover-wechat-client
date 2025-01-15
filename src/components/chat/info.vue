@@ -94,10 +94,10 @@ onMounted(() => { });
     <section class="bg-nav">
       <div class="header"></div>
       <div class="container chat-info-container">
-        <van-cell-group :style="{ padding: '1rem 0' }">
+        <van-cell-group style="padding-top: 0.8rem">
           <van-grid :column-num="5" icon-size="3rem" :border="false" :square="true">
             <van-grid-item :icon="item.avatar" :to="'/friend/info?keywords=' + item.wechat"
-              v-for="item in chatInfo.users" :key="item.id" />
+              v-for="item in chatInfo.users" :key="item.id" :text="item.nickname"/>
             <van-grid-item icon="/add.png" clickable @click="showChatGroupInvite = true" />
           </van-grid>
         </van-cell-group>
@@ -158,15 +158,16 @@ onMounted(() => { });
   <group-update :show="showChatGroupUpdate" @hide="showChatGroupUpdate = false" :chatInfo="chatInfo"
     :updateField="chatGroupUpdateField" />
 </template>
-<style lang="css">
-.van-icon__image {
-  border-radius: 0.3rem;
-}
-</style>
-<style lang="less" scoped>
+<style lang="less">
 .chat-info-container {
   .van-cell-group {
-    margin-bottom: 0.5rem;
+    .van-icon__image {
+      border-radius: 0.3rem;
+    }
+    .van-grid-item__text {
+      white-space: nowrap;
+      margin-top: 4px;
+    }
   }
 }
 </style>

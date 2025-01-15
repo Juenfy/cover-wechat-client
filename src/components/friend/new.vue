@@ -127,4 +127,6 @@ watch(
 
   <friend-add :show="showFriendAdd" @hide="showFriendAdd = false" />
 </template>
-<style scoped lang="less"></style>
+<style lang="less">
+
+</style>

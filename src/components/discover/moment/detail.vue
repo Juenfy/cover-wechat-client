@@ -58,7 +58,7 @@ const handleInput = (data) => {
 };
 
 //评论朋友圈的回调
-const onCommentCb = async (data) => {
+const onCommentCb = (data) => {
     if (content.value) {
         momentApi.comment({
             id: props.momentId,

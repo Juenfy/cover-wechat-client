@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import bg from "../assets/bg.png"
 export const useUserStore = defineStore(
   "user",
   () => {
@@ -8,6 +9,8 @@ export const useUserStore = defineStore(
     const homeInfo = ref({});
 
     const handleLogin = (user) => {
+      if(user.moment_bg_file_path.trim().length <= 0)
+          user.moment_bg_file_path = bg;
       info.value = user;
       localStorage.setItem("accessToken", user.token);
       isLogin.value = true;

@@ -4,6 +4,14 @@ import { ref, watch } from "vue";
 const props = defineProps({
   show: Boolean,
   users: Array,
+  title: {
+    type: String,
+    default: "选择提醒的人"
+  },
+  multiple: {
+    type: Boolean,
+    default: true
+  }
 });
 //调用父组件关闭弹窗
 const emit = defineEmits(["hide", "select"]);
@@ -21,11 +29,10 @@ const finishMultiChoose = () => {
   emit("select", checkedUsers);
 };
 const finishSingleChoose = (item) => {
-  console.log(item);
   if (multiChoose.value) {
     return;
   }
-  emit("select", [item]);
+  emit("select", props.multiple ? [item] : item);
 };
 
 watch(
@@ -46,8 +53,8 @@ watch(
   <van-popup v-model:show="props.show" round position="bottom" :style="{ height: '60%', width: '100%' }" duration="0.2">
     <section>
       <div class="header">
-        <van-nav-bar title="选择提醒的人" :border="false">
-          <template #right>
+        <van-nav-bar :title="props.title" :border="false">
+          <template #right v-if="props.multiple">
             <van-button v-if="multiChoose" type="primary" size="small" @click="finishMultiChoose">完成</van-button>
             <span v-else @click="handleMultiChoose" style="color: var(--friend-add-qrcode-text)">多选</span>
           </template>
@@ -71,7 +78,7 @@ watch(
     </section>
   </van-popup>
 </template>
-<style scoped lang="less">
+<style lang="less">
 .at-user-container {
 
   .van-checkbox,

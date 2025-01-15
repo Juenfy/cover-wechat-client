@@ -93,7 +93,7 @@ watch(
   </van-popup>
 </template>
 
-<style scoped lang="less">
+<style lang="less">
 .van-nav-bar {
   background: var(--friend-remark-nav-bar-background);
 }

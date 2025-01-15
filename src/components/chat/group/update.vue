@@ -115,18 +115,22 @@ const onSubmit = () => {
             </template>
           </van-cell>
         </van-cell-group>
-        <van-button type="primary" style="margin-top: 10rem;width: 10rem;"
+        <van-button type="primary" style="margin-top: 4rem;width: 10rem;"
           :disabled="updateValue.length <= 0 || updateValue === originValue" @click="onSubmit">确定</van-button>
       </div>
     </section>
   </van-popup>
 </template>
-<style scoped lang="less">
+<style lang="less">
 .group-update {
   text-align: center;
   padding: 0 2rem;
   box-sizing: border-box;
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
   h1,
   h4 {
     color: var(--black-white-color);

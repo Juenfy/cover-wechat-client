@@ -2,9 +2,12 @@
 import { onMounted, onUnmounted, onBeforeUnmount, ref, watch, nextTick } from 'vue';
 import { useAppStore } from "@/stores/app";
 import { showFailToast } from 'vant';
-import { TypeFile, TypeAudio, TypeVideoCall, TypeAudioCall } from "@/enums/file";
+import {TypeVideoCall, TypeAudioCall, TypeFile, TypeAudio, TypeRedPacket} from "@/enums/message";
 import { startCall } from "@/utils/call";
 import "emoji-picker-element";
+import {WechatCamera} from "vue-wechat-camera"
+import "vue-wechat-camera/dist/vue-wechat-camera.css"
+import ChatRedPacketForm from "@/components/chat/redPacket/form.vue"
 
 const props = defineProps({
     modules: String,
@@ -13,6 +16,7 @@ const props = defineProps({
     show: Boolean,
     placeholder: String,
     group: String,
+    info: Object
 });
 
 const emit = defineEmits(['callback', 'input', 'hide']);
@@ -20,6 +24,7 @@ const emit = defineEmits(['callback', 'input', 'hide']);
 const appStore = useAppStore();
 const input = ref({
     content: '',
+    red_packet_id: 0,
     file: null,
     type: 'text',
     action: ''
@@ -45,6 +50,8 @@ const callActions = [
     { name: "视频通话", value: TypeVideoCall },
     { name: "语音通话", value: TypeAudioCall }
 ];
+const openCamera = ref(false);
+const showRedPacketForm = ref(false);
 
 const onSelectCallAction = (action) => {
     switch (action.value) {
@@ -60,6 +67,7 @@ const onSelectCallAction = (action) => {
 const handleKeyupEnter = () => {
     input.value.action = 'input';
     input.value.file = null;
+    input.value.red_packet_id = 0;
     input.value.type = 'text';
     emit('callback', input);
 };
@@ -107,6 +115,10 @@ const handleMoreIconClick = () => {
 
 const onMoreBottomItemClick = (action) => {
     input.value.action = action;
+    if (action == 'camera') {
+      showMorePopup.value = false;
+      openCamera.value = true;
+    }
 }
 
 const handleInput = () => {
@@ -142,6 +154,27 @@ const afterRead = (file) => {
     input.value.type = TypeFile;
     emit('callback', input);
 };
+
+const cameraCb = (e) => {
+  console.log("cameraCb", e);
+  input.value.content = '';
+  if (e.type == "picture") {
+    input.value.file = {file: e.data.result.file};
+  } else {
+    input.value.file = {file: e.data.result.blob, options: "video.mp4"};
+  }
+  input.value.type = TypeFile;
+  emit('callback', input);
+};
+
+const redPacketCb = (id) => {
+  console.log("redPacketCb", id);
+  input.value.action = input.value.type = TypeRedPacket;
+  input.value.content = '';
+  input.value.red_packet_id = id;
+  input.value.file = null;
+  emit('callback', input);
+}
 
 //录音
 const animateWave = () => {
@@ -237,7 +270,14 @@ onMounted(async () => {
     if (props.modules.indexOf('record') !== -1) {
         try {
             mediaStream.value = await navigator.mediaDevices.getUserMedia({
-                audio: true,
+                audio: {
+                    sampleRate: 44100,
+                    sampleSize: 16,
+                    channelCount: 2,
+                    echoCancellation: true,      // 启用回声消除
+                    noiseSuppression: true,      // 启用噪声抑制
+                    autoGainControl: true        // 启用自动增益控制
+                },
             });
             mediaRecorder.value = new MediaRecorder(mediaStream.value);
 
@@ -251,7 +291,7 @@ onMounted(async () => {
                 if (!isCancelAudioRecording.value) {
                     // 这里可以上传录音文件或进行其他处理
                     console.log('录音文件:', audioBlob);
-                    input.value.file = { file: audioBlob };
+                    input.value.file = { file: audioBlob, options: "audio.wav" };
                     input.value.content = '';
                     input.value.type = TypeFile;
                     emit("callback", input);
@@ -315,7 +355,7 @@ onUnmounted(async () => {
                     </van-grid-item>
                     <van-grid-item>
                         <template #default>
-                            <div class="more-bottom-item">
+                            <div class="more-bottom-item" @click="onMoreBottomItemClick('camera')">
                                 <div class="more-bottom-icon">
                                     <van-icon name="photograph" size="30" />
                                 </div>
@@ -346,6 +386,16 @@ onUnmounted(async () => {
                             </div>
                         </template>
                     </van-grid-item>
+                    <van-grid-item>
+                      <template #default>
+                        <div class="more-bottom-item" @click="showRedPacketForm = true">
+                          <div class="more-bottom-icon">
+                            <van-icon :name="appStore.icon.red_packet" size="30" />
+                          </div>
+                          <span class="more-bottom-text">红包</span>
+                        </div>
+                      </template>
+                    </van-grid-item>
                 </van-grid>
             </van-popup>
             <van-popup v-model:show="showEmojiPopup" position="bottom" :style="{ width: '100%' }" duration="0.2"
@@ -354,29 +404,31 @@ onUnmounted(async () => {
             </van-popup>
 
         </div>
-        <div class="audio-recording" v-if="isAudioRecording">
-            <div :class="isCancelAudioRecording ? 'bubble bubble-cancel' : 'bubble'">
-                <svg class="waveform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30">
-                    <path v-for="n in 5" :key="n" :d="wavePath(n)" stroke="white" stroke-width="2" fill="none"
-                        :opacity="1 - n * 0.15" />
-                </svg>
-            </div>
-            <div class="recording-text">
-                {{
-                    isCancelAudioRecording ? "松开手指，取消发送" : "正在录音... 上划取消"
-                }}
-            </div>
+        <div v-if="props.modules.indexOf('more') !== -1">
+          <div class="audio-recording" v-if="isAudioRecording">
+              <div :class="isCancelAudioRecording ? 'bubble bubble-cancel' : 'bubble'">
+                  <svg class="waveform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30">
+                      <path v-for="n in 5" :key="n" :d="wavePath(n)" stroke="white" stroke-width="2" fill="none"
+                          :opacity="1 - n * 0.15" />
+                  </svg>
+              </div>
+              <div class="recording-text">
+                  {{
+                      isCancelAudioRecording ? "松开手指，取消发送" : "正在录音... 上划取消"
+                  }}
+              </div>
+          </div>
+          <van-action-sheet v-model:show="showCallMenu" :actions="callActions" @select="onSelectCallAction"
+              cancel-text="取消" close-on-click-action />
+          <wechat-camera :open="openCamera" @close="openCamera = false" @cameraCb="cameraCb"></wechat-camera>
+          <chat-red-packet-form :show="showRedPacketForm" @hide="showRedPacketForm = false" @sendCb="redPacketCb" :info="props.info"/>
         </div>
-        <van-action-sheet v-model:show="showCallMenu" :actions="callActions" @select="onSelectCallAction"
-            cancel-text="取消" close-on-click-action />
     </div>
 </template>
-<style lang="css">
+<style lang="less">
 :root:root {
-    --van-grid-item-content-background: transparent;
+  --van-grid-item-content-background: transparent;
 }
-</style>
-<style scoped lang="less">
 .common-comment {
     position: relative;
     width: 100%;

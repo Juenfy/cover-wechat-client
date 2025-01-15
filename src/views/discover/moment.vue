@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { TypeText, TypeImage, TypeVideo } from "@/enums/moment";
+import { TypeText, TypeImage, TypeVideo } from "@/enums/message";
 import { ActionComment, ActionLike, ActionUnlike } from '@/enums/moment';
 import PostMoment from "@/components/discover/moment/post.vue";
 import CommonCamera from "@/components/common/camera.vue";
@@ -211,7 +211,7 @@ const postSuccessCb = async (data) => {
 };
 
 //评论朋友圈的回调
-const onCommentCb = async (data) => {
+const onCommentCb = (data) => {
   if (content.value) {
     momentApi.comment({
       id: momentId.value,
@@ -272,10 +272,7 @@ onMounted(() => {
     <section>
       <van-pull-refresh v-model="refreshing" @refresh="onRefreshMomentList" class="container moment-container"
         @scroll.passive="onScroll" style="background: var(--black20-white-color);">
-        <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="userStore.info.moment_bg_file_path == ''
-          ? ''
-          : 'background-image: url(' + userStore.info.moment_bg_file_path + ');'
-          ">
+        <div class="bg-header" @click="onClickBgHeader" ref="bgHeader" :style="'background-image: url(' + userStore.info.moment_bg_file_path + ');'">
           <div class="user" v-if="showDom">
             <span @click="gotoFriendInfo(userStore.info.wechat)">{{ userStore.info.nickname }}</span>
             <van-image radius="0.4rem" width="4rem" height="4rem" :src="userStore.info.avatar"
@@ -366,7 +363,7 @@ onMounted(() => {
     @input="handleInput" @callback="onCommentCb" modules="emoji" @hide="hideCommonComment" group="0" />
   <moment-message :show="showMomentMessage" @hide="showMomentMessage = false" />
 </template>
-<style scoped lang="less">
+<style lang="less">
 .discover-moment {
   .header-bg {
     background: var(--van-nav-bar-background);

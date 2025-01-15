@@ -26,7 +26,7 @@ const deleteFriend = () => {};
     </header>
     <section class="bg-nav">
       <div class="header"></div>
-      <div class="container">
+      <div class="container friend-setting">
         <van-cell-group>
           <van-cell
             title="设置备注和标签"
@@ -73,7 +73,7 @@ const deleteFriend = () => {};
         <van-button
           size="large"
           :square="true"
-          style="margin-top: 0.5rem; border: none; color: var(--van-red)"
+          style="border: none; color: var(--van-red)"
           @click="deleteFriend"
           >删除联系人</van-button
         >
@@ -82,8 +82,10 @@ const deleteFriend = () => {};
   </van-popup>
 </template>
 
-<style lang="less" scoped>
-.van-cell-group {
-  margin-bottom: 0.5rem;
+<style lang="less">
+.friend-setting {
+  .van-cell-group {
+    margin-bottom: 0.5rem;
+  }
 }
 </style>
