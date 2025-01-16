@@ -74,7 +74,8 @@ const onMessage = async (data) => {
   if (data?.action) {
     switch (data.action) {
       case ActionAt:
-        atMessageIdList.value.push(data.data.to_user);
+        if (route.fullPath !== currentPath)
+          atMessageIdList.value.push(data.data.to_user);
         break;
       case ActionSend:
         //在消息列表页面就刷新列表
