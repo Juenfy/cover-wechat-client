@@ -65,7 +65,7 @@ const handleInput = (data) => {
 const onCommentCb = (data) => {
   console.log("onCommentCb", data.value);
   if (data.value.type == TypeFile) {
-    uploadAndSendMessage(data.value.file.file, data.value.file?.options)
+    uploadAndSendMessage(data.value.file, data.value.file?.options, )
   }
   if (data.value.type == TypeRedPacket) {
     queryData.red_packet_id = data.value.red_packet_id;
@@ -151,21 +151,22 @@ const sendMessage = (type) => {
   }
 };
 
-const uploadAndSendMessage = (file, options) => {
+const uploadAndSendMessage = (fileInfo) => {
   const data = new FormData();
-  if (options) {
-    data.append("file", file, options);
+  const file = fileInfo.file;
+  if (fileInfo?.options) {
+    data.append("file", file, fileInfo?.options);
   } else {
     data.append("file", file);
   }
-
+  if (fileInfo?.duration) data.append("duration", fileInfo?.duration);
   fileApi
     .upload(data, (progressEvent) => {
       uploadPercent.value = Math.floor(progressEvent.progress * 100);
       showLoadingToast(`上传中${uploadPercent.value}%`);
     })
     .then((res) => {
-      if (options == "audio.wav") sysAudio.chat.audio.play();
+      if (fileInfo?.options == "audio.wav") sysAudio.chat.audio.play();
       if (res.code == 200001) {
         queryData.file_id = res.data.id;
         sendMessage(res.data.type);
@@ -285,9 +286,9 @@ onMounted(async () => {
                     </div>
                   </div>
                   <div class="msg_inner" v-else-if="item.type == TypeAudio">
-                    <span v-if="item.right">6"&nbsp;</span><van-icon
+                    <span v-if="item.right">{{ item.file.duration }}"&nbsp;</span><van-icon
                       :name="item.right ? '/volume-right.png' : '/volume.png'" style="margin-bottom: -2px;" /><span
-                      v-if="!item.right">&nbsp;"6</span>
+                      v-if="!item.right">&nbsp;"{{ item.file.duration }}</span>
                     <!-- <div class="van-image">
                       <audio :src="item.content" controls type="audio/wav"></audio>
                     </div> -->

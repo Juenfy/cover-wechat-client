@@ -37,6 +37,8 @@ const isAudioRecord = ref(false);
 const isAudioRecording = ref(false);
 const isCancelAudioRecording = ref(false);
 const mediaRecorder = ref(null);
+const recorderInterval = ref(null);
+const audioDuration = ref(0);
 const audioChunks = ref([]);
 const mediaStream = ref(null);
 const startY = ref(0);
@@ -203,6 +205,10 @@ const startRecording = (e) => {
     audioChunks.value = [];
     if (mediaRecorder.value) {
         mediaRecorder.value.start();
+        audioDuration.value = 0;
+        recorderInterval.value = setInterval(() => {
+          audioDuration.value += 1;
+        }, 1000);
     }
     animationFrame.value = requestAnimationFrame(animateWave);
 };
@@ -210,6 +216,8 @@ const startRecording = (e) => {
 const stopRecording = (e) => {
     if (mediaRecorder.value && isAudioRecording.value) {
         mediaRecorder.value.stop();
+        clearInterval(recorderInterval.value);
+        recorderInterval.value = null;
         console.log(isCancelAudioRecording.value ? '取消录音' : '停止录音', e);
     }
     isAudioRecording.value = false;
@@ -291,7 +299,7 @@ onMounted(async () => {
                 if (!isCancelAudioRecording.value) {
                     // 这里可以上传录音文件或进行其他处理
                     console.log('录音文件:', audioBlob);
-                    input.value.file = { file: audioBlob, options: "audio.wav" };
+                    input.value.file = { file: audioBlob, options: "audio.wav", duration: audioDuration.value };
                     input.value.content = '';
                     input.value.type = TypeFile;
                     emit("callback", input);
