@@ -24,7 +24,7 @@ const remoteAudio = ref(null);
 const localVideo = ref(null);
 const localVideoOffset = ref({ x: 10, y: 10 });
 const remoteVideo = ref(null);
-const controllsBtn = ref({
+const controlsBtn = ref({
     camera: false,
     microphone: true,
     speaker: true,
@@ -46,7 +46,7 @@ const configuration = {
 
 // 启动通话（发起方）
 const inwatingCall = async () => {
-    controllsBtn.value.camera = callType.value === TypeVideoCall;
+    controlsBtn.value.camera = callType.value === TypeVideoCall;
     // 获取本地媒体流
     try {
         stream.value = await navigator.mediaDevices.getUserMedia({
@@ -195,9 +195,9 @@ const closeThem = () => {
     msgId.value = null;
     showCall.value = false;
     callStatus.value = StatusInclosing;
-    controllsBtn.value.camera = false;
-    controllsBtn.value.microphone = true;
-    controllsBtn.value.speaker = true;
+    controlsBtn.value.camera = false;
+    controlsBtn.value.microphone = true;
+    controlsBtn.value.speaker = true;
     console.log('关闭通话：', showCall.value, callStatus.value);
     overCall();
     if (peerConnection.value) {
@@ -361,27 +361,27 @@ const onCallMessage = async (data) => {
 };
 
 const playAudio = async () => {
-    // sysAudio.call.start.loop = true;
-    // sysAudio.call.start.play();
+    sysAudio.call.start.loop = true;
+    sysAudio.call.start.play();
     callDuration.value = 0;
 };
 
 const pauseAudio = async (end = false) => {
-    // sysAudio.call.start.loop = false;
-    // sysAudio.call.start.pause();
-    // if (end) sysAudio.call.end.play();
+    sysAudio.call.start.loop = false;
+    sysAudio.call.start.pause();
+    if (end) sysAudio.call.end.play();
 };
 
 // 摄像头、扬声器、麦克风开关控制
-const controlls = (type) => {
+const controls = (type) => {
     switch (type) {
         case "camera":
             if (callType.value == TypeVideoCall) {
                 const videoTrack = stream.value.getVideoTracks()[0];
                 if (videoTrack) {
-                    controllsBtn.value.camera = !controllsBtn.value.camera;
-                    videoTrack.enabled = controllsBtn.value.camera; // 通过 enabled 属性开关摄像头
-                    if (controllsBtn.value.camera) {
+                    controlsBtn.value.camera = !controlsBtn.value.camera;
+                    videoTrack.enabled = controlsBtn.value.camera; // 通过 enabled 属性开关摄像头
+                    if (controlsBtn.value.camera) {
                         videoTrack.start();// 开启视频流
                     } else {
                         videoTrack.stop();// 停止视频流并释放资源
@@ -390,22 +390,22 @@ const controlls = (type) => {
             }
             break;
         case "speaker":
-            controllsBtn.value.speaker = !controllsBtn.value.speaker;
+            controlsBtn.value.speaker = !controlsBtn.value.speaker;
             if (callType.value == TypeVideoCall) {
-                remoteVideo.value.muted = controllsBtn.value.speaker;
+                remoteVideo.value.muted = controlsBtn.value.speaker;
             } else {
-                remoteAudio.value.volume = controllsBtn.value.speaker ? 1 : 0;
+                remoteAudio.value.volume = controlsBtn.value.speaker ? 1 : 0;
             }
             break;
         case "microphone":
             const audioTrack = stream.value.getAudioTracks()[0];
             if (audioTrack) {
-                controllsBtn.value.microphone = !controllsBtn.value.microphone;
-                audioTrack.enabled = controllsBtn.value.microphone; // 通过 enabled 属性开关麦克风
+                controlsBtn.value.microphone = !controlsBtn.value.microphone;
+                audioTrack.enabled = controlsBtn.value.microphone; // 通过 enabled 属性开关麦克风
             }
             break;
         default:
-            controllsBtn.value.blur = !controllsBtn.value.blur;
+            controlsBtn.value.blur = !controlsBtn.value.blur;
             break;
     }
 }
@@ -463,28 +463,28 @@ onBeforeUnmount(() => {
                         <span>已接通</span>
                     </div>
                     <div class="center" v-if="callStatus == StatusIncalling">
-                        <div :class="'microphone ' + (controllsBtn.microphone ? 'open' : '')"
-                            @click="controlls('microphone')">
+                        <div :class="'microphone ' + (controlsBtn.microphone ? 'open' : '')"
+                            @click="controls('microphone')">
                             <van-button icon="service-o" round class="call-btn"></van-button>
                             <span>麦克风</span>
-                            <span>已{{ controllsBtn.microphone ? '打开' : '关闭' }}</span>
+                            <span>已{{ controlsBtn.microphone ? '打开' : '关闭' }}</span>
                         </div>
-                        <div :class="'speaker ' + (controllsBtn.speaker ? 'open' : '')" @click="controlls('speaker')">
+                        <div :class="'speaker ' + (controlsBtn.speaker ? 'open' : '')" @click="controls('speaker')">
                             <van-button icon="volume-o" round class="call-btn"></van-button>
                             <span>扬声器</span>
-                            <span>已{{ controllsBtn.speaker ? '打开' : '关闭' }}</span>
+                            <span>已{{ controlsBtn.speaker ? '打开' : '关闭' }}</span>
                         </div>
-                        <div :class="'blur ' + (controllsBtn.blur ? 'open' : '')" @click="controlls('blur')"
+                        <div :class="'blur ' + (controlsBtn.blur ? 'open' : '')" @click="controls('blur')"
                             v-if="callType == TypeVideoCall">
                             <van-button icon="photo-o" round class="call-btn"></van-button>
                             <span>背景模糊</span>
-                            <span>已{{ controllsBtn.blur ? '打开' : '关闭' }}</span>
+                            <span>已{{ controlsBtn.blur ? '打开' : '关闭' }}</span>
                         </div>
-                        <div :class="'camera ' + (controllsBtn.camera ? 'open' : '')" @click="controlls('camera')"
+                        <div :class="'camera ' + (controlsBtn.camera ? 'open' : '')" @click="controls('camera')"
                             v-if="callType == TypeVideoCall">
                             <van-button icon="video-o" round class="call-btn"></van-button>
                             <span>摄像头</span>
-                            <span>已{{ controllsBtn.camera ? '打开' : '关闭' }}</span>
+                            <span>已{{ controlsBtn.camera ? '打开' : '关闭' }}</span>
                         </div>
                     </div>
                     <div class="bottom">
@@ -496,7 +496,7 @@ onBeforeUnmount(() => {
             <div class="video" v-if="callType == TypeVideoCall">
                 <van-floating-bubble v-model:offset="localVideoOffset" axis="xy"
                     style="width: 5.5rem;height: 10rem;z-index: 9999;background: transparent;border-radius: 0;"
-                    v-if="controllsBtn.camera">
+                    v-if="controlsBtn.camera">
                     <template #default>
                         <video class="local" autoplay muted ref="localVideo">
                         </video>
@@ -504,7 +504,7 @@ onBeforeUnmount(() => {
                 </van-floating-bubble>
                 <video class="remote" autoplay ref="remoteVideo" v-if="callStatus == StatusIncalling">
                 </video>
-                <div :class="'blur ' + (controllsBtn.blur ? 'blur-1-5' : '')"></div>
+                <div :class="'blur ' + (controlsBtn.blur ? 'blur-1-5' : '')"></div>
             </div>
             <audio autoplay ref="remoteAudio" v-if="callType == TypeAudioCall"></audio>
         </div>
