@@ -5,14 +5,14 @@ function zeroize(num) {
 }
 
 //封装响应
-export const handleResponse = (res, cb, router, showSucces = false) => {
+export const handleResponse = (res, cb, router, showSuccess = false) => {
   console.log(res);
   if (res.code != 200001) {
     showFailToast(res.msg);
     router.go(-1);
     return false;
   }
-  if (showSucces) showSuccessToast(res.msg);
+  if (showSuccess) showSuccessToast(res.msg);
   cb();
 };
 
@@ -83,4 +83,8 @@ export const durationFormat = (duration) => {
   let m = Math.floor((duration - h * 3600) / 60);
   let s = duration - h * 3600 - m * 60;
   return zeroize(h) + ":" + zeroize(m) + ":" + zeroize(s);
+}
+
+export const isTauri = () => {
+  return typeof window !== 'undefined' && !!window.__TAURI__;
 }
