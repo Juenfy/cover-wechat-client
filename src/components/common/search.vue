@@ -77,7 +77,7 @@ onMounted(() => {
             </template>
           </van-cell>
         </van-cell-group>
-        <div class="no-result" v-else-if="isSearch && searchResult.length == 0">
+        <div class="no-result bg-white" v-else-if="isSearch && searchResult.length == 0">
           用户不存在
         </div>
         <van-cell-group v-else-if="keywords.length > 0">
@@ -134,7 +134,6 @@ onMounted(() => {
     text-align: center;
     line-height: 4rem;
     height: 4rem;
-    background: var(--van-white);
     color: var(--theme-gray-70);
   }
 
