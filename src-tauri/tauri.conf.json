@@ -59,10 +59,13 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 800,
+        "height": 844,
         "resizable": true,
-        "title": "仿微信",
-        "width": 450
+        "title": "微信",
+        "width": 390,
+        "minHeight": 667,
+        "minWidth": 375,
+        "decorations": false
       }
     ]
   }
