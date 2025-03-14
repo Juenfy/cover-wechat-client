@@ -21,3 +21,8 @@ export const read = async (data) => {
 export const getUnread = async () => {
   return await request.get("/api/message/unread");
 };
+
+//清空聊天记录
+export const clear = async (data) => {
+  return await request.put("/api/message/clear", data);
+}

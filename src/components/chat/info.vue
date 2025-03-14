@@ -7,9 +7,11 @@ import { useAppStore } from "@/stores/app";
 import { SearchChatRecord } from "@/enums/app";
 import ChatBackground from "@/components/common/background.vue";
 import * as chatApi from "@/api/chat";
+import * as messageApi from "@/api/message";
 import { showDialog } from 'vant';
 import GroupUpdate from "@/components/chat/group/update.vue";
 import { setCaller } from "@/utils/call";
+import {atMessageIdList, imagePreviewList, messageList} from "@/utils/chat";
 
 const router = useRouter();
 const showClearChat = ref(false);
@@ -81,6 +83,17 @@ const updateChatInfo = (value, key) => {
 //清空聊天记录菜单选中
 const onSelectClearChatAction = (action) => {
   console.log(action);
+  messageApi.clear({
+    is_group: chatInfo.value.is_group,
+    to_user: chatInfo.value.to_user,
+  }).then(res => {
+    if (res.code == 200001) {
+      messageList.value = [];
+      atMessageIdList.value = [];
+      imagePreviewList.value = [];
+      emit("hide");
+    }
+  });
 };
 
 onMounted(() => { });
