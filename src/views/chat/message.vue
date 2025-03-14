@@ -8,7 +8,7 @@ import {
   onUpdated,
   nextTick,
   watch,
-  inject
+  inject, onUnmounted
 } from "vue";
 import * as messageApi from "@/api/message";
 import { useAppStore } from "@/stores/app";
@@ -219,9 +219,10 @@ const onClickRedPacket = (data) => {
   showRedPacketDetail.value = true;
 };
 
-const onRightClick = (e) => {
-  console.log(e);
-};
+const playAudio = (src) => {
+  let audio = new Audio(src);
+  audio.play();
+}
 
 onUpdated(() => {
   nextTick(() => {
@@ -230,13 +231,20 @@ onUpdated(() => {
   });
 });
 
-onMounted(async () => {
-  await getChatInfo(queryData, (res) => {
+onMounted( () => {
+  getChatInfo(queryData, (res) => {
     if (res.data.unread > 0) {
       appStore.unreadDecrBy(UnreadChat, res.data.unread);
     }
   });
-  await getMessageList(queryData, (res) => { });
+  getMessageList(queryData, (res) => { });
+});
+
+onUnmounted(() => {
+  chatInfo.value = {};
+  messageList.value = [];
+  imagePreviewList.value = [];
+  atMessageIdList.value = [];
 });
 </script>
 <template>
@@ -264,7 +272,7 @@ onMounted(async () => {
               <div class="avatar">
                 <img alt="avatar" :src="item.from.avatar" @click="onClickAvatar(item)" />
               </div>
-              <div class="content" ref="contentRef" @contextmenu.prevent="onRightClick">
+              <div class="content" ref="contentRef">
                 <span :class="item.right ? 'nickname right' : 'nickname'" v-if="chatInfo.display_nickname">
                   {{ item.from.nickname }}
                 </span>
@@ -288,10 +296,7 @@ onMounted(async () => {
                   <div class="msg_inner" v-else-if="item.type == TypeAudio">
                     <span v-if="item.right">{{ item.file.duration }}"&nbsp;</span><van-icon
                       :name="item.right ? '/volume-right.png' : '/volume.png'" style="margin-bottom: -2px;" /><span
-                      v-if="!item.right">&nbsp;"{{ item.file.duration }}</span>
-                    <!-- <div class="van-image">
-                      <audio :src="item.content" controls type="audio/wav"></audio>
-                    </div> -->
+                      v-if="!item.right" @click="playAudio(item.content)">&nbsp;"{{ item.file.duration }}</span>
                   </div>
                   <div class="msg_inner" v-else-if="item.type == TypeFile">
 
