@@ -33,6 +33,7 @@ const isFirstClick = ref(true);
 const textareaRef = ref(null);
 const uploadMaxSize = ref(30 * 1024 * 1024);
 const recordIcon = ref(appStore.icon.audio);
+const audioCountDown = ref(60);
 const isAudioRecord = ref(false);
 const isAudioRecording = ref(false);
 const isCancelAudioRecording = ref(false);
@@ -202,12 +203,17 @@ const startRecording = (e) => {
     console.log(startY.value);
     isAudioRecording.value = true;
     isCancelAudioRecording.value = false;
+    audioCountDown.value = 60;
     audioChunks.value = [];
     if (mediaRecorder.value) {
         mediaRecorder.value.start();
         audioDuration.value = 0;
         recorderInterval.value = setInterval(() => {
           audioDuration.value += 1;
+          audioCountDown.value -= 1;
+          if (audioCountDown.value <= 0) {
+            stopRecording(e);
+          }
         }, 1000);
     }
     animationFrame.value = requestAnimationFrame(animateWave);
@@ -415,6 +421,7 @@ onUnmounted(async () => {
         <div v-if="props.modules.indexOf('more') !== -1">
           <div class="audio-recording" v-if="isAudioRecording">
               <div :class="isCancelAudioRecording ? 'bubble bubble-cancel' : 'bubble'">
+                {{ audioCountDown }}'
                   <svg class="waveform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30">
                       <path v-for="n in 5" :key="n" :d="wavePath(n)" stroke="white" stroke-width="2" fill="none"
                           :opacity="1 - n * 0.15" />
@@ -569,7 +576,7 @@ onUnmounted(async () => {
         display: flex;
         align-items: center;
         justify-content: center;
-
+        flex-direction:column;
         .waveform {
             width: 100px;
             height: 30px;
