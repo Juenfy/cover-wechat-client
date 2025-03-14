@@ -14,7 +14,7 @@ import { ActionLike, ActionUnlike, ActionComment } from "@/enums/moment";
 import { showDialog } from "vant";
 import ws from "@/utils/websocket";
 import {
-  getChatList,
+  updateChat,
   messageList,
   atMessageIdList,
   imagePreviewList,
@@ -33,9 +33,10 @@ const appStore = useAppStore();
 const userStore = useUserStore();
 const sysAudio = inject("SysAudio");
 const showMessagePopup = ref(false);
-
+const msgIdList = ref([]);
 const message = ref({});
 const messageAction = ref("");
+
 const onSearch = (action, keywords, cb) => {
   console.log("action", action);
   switch (action) {
@@ -46,6 +47,7 @@ const onSearch = (action, keywords, cb) => {
       break;
   }
 };
+
 watch(
   () => userStore.isLogin,
   (val) => {
@@ -62,7 +64,7 @@ watch(
 );
 
 //全局消息监听
-const onMessage = async (data) => {
+const onMessage = (data) => {
   console.log("App:onMessage", data);
   let isGroup,toUser,currentPath;
   if ([ActionAt,ActionSend].indexOf(data?.action) != -1) {
@@ -76,11 +78,21 @@ const onMessage = async (data) => {
       case ActionAt:
         if (route.fullPath !== currentPath)
           atMessageIdList.value.push(data.data.to_user);
-        break;
-      case ActionSend:
         //在消息列表页面就刷新列表
         if (route.fullPath === "/chat" || route.fullPath === "/chat?verify=1") {
-          await getChatList();
+          updateChat(data.data, data.action);
+        }
+        break;
+      case ActionSend:
+        //去重
+        if (msgIdList.value.indexOf(data.data.id) !== -1) {
+          return;
+        }
+        msgIdList.value.push(data.data.id);
+
+        //在消息列表页面就刷新列表
+        if (route.fullPath === "/chat" || route.fullPath === "/chat?verify=1") {
+          updateChat(data.data, data.action);
         }
 
         //不在聊天窗口或者消息列表页面就弹出消息气泡
@@ -103,12 +115,12 @@ const onMessage = async (data) => {
           if (data.data.type === TypeImage)
             imagePreviewList.value.push(data.data.content);
           //立刻标记已读
-          await messageApi.read({ to_user: toUser, is_group: isGroup });
+          messageApi.read({ to_user: toUser, is_group: isGroup });
         } else {
           //消息未读数加1
           appStore.unreadIncrBy(UnreadChat);
           //播放消息通知音
-          await sysAudio.chat.msg.play();
+          sysAudio.chat.msg.play();
         }
 
         break;
