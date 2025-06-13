@@ -19,6 +19,10 @@ const formData = reactive({
   captchaVerification: "",
 });
 const captchaEnable = ref(true);
+const captchaImgSize = reactive({
+  width: 0,
+  height: 0
+});
 const verify = ref();
 const captchaType = ref("blockPuzzle"); // blockPuzzle 滑块 clickWord 点击文字
 
@@ -50,9 +54,20 @@ const getCode = async () => {
   }
 };
 
+// 设置验证码图片的宽高
+const setCaptchaImgSize = () => {
+  if (window.innerWidth < 420) {
+    captchaImgSize.width = window.innerWidth - 20;
+    captchaImgSize.height = captchaImgSize.width / 2;
+  } else {
+    captchaImgSize.width = 400;
+    captchaImgSize.height = 200;
+  }
+}
+
 onMounted(() => {
   console.log(route.query);
-  if (route.query.logout) {
+  if (route.query?.logout == 1) {
     ws.stop();
     userStore.handleLogout();
     appStore.clear();
@@ -61,6 +76,16 @@ onMounted(() => {
       router.push("/login");
     }, 200);
   }
+  if (userStore.isLogin) {
+    router.push("/chat");
+  }
+  if (route.query?.password) {
+    formData.password = route.query?.password;
+  }
+  if (route.query?.mobile) {
+    formData.mobile = route.query?.mobile;
+  }
+  setCaptchaImgSize();
 });
 </script>
 
@@ -81,7 +106,8 @@ onMounted(() => {
         </van-button>
       </div>
     </van-form>
-    <Verify ref="verify" :captchaType="captchaType" :imgSize="{ width: '400px', height: '200px' }" mode="pop"
+    <Verify ref="verify" :captchaType="captchaType"
+      :imgSize="{ width: captchaImgSize.width + 'px', height: captchaImgSize.height + 'px' }" mode="pop"
       @success="onSubmit" />
   </section>
 </template>

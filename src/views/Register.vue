@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref } from "vue";
+import {onMounted, reactive, ref} from "vue";
 import * as userApi from "@/api/user";
 import { showSuccessToast, showFailToast } from "vant";
 import { Verify } from "@/components/Verifition";
@@ -63,6 +63,12 @@ const afterRead = (file) => {
     console.log(formData);
   });
 };
+
+onMounted(() => {
+  if (userStore.isLogin) {
+    router.push("/chat");
+  }
+});
 </script>
 
 <template>

@@ -47,6 +47,9 @@ const onSelect = (action) => {
 };
 
 onMounted(() => {
+  if (["light", "dark"].includes(route.query?.theme) && route.query.theme != appStore.theme) {
+    appStore.setTheme(route.query.theme);
+  }
   if (userStore.isLogin && route.fullPath == "/") {
     router.push("/chat");
   }
@@ -103,7 +106,7 @@ onMounted(() => {
   </div>
   <div class="index" v-else>
     <div class="passport">
-      <van-button type="primary" style="margin-left: 1rem" to="login">登录</van-button>
+      <van-button type="primary" style="margin-left: 1rem" to="login?mobile=13006789002&password=123456">登录</van-button>
       <van-button style="margin-right: 1rem" to="register">注册</van-button>
     </div>
   </div>
