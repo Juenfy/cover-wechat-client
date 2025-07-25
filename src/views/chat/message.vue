@@ -65,7 +65,7 @@ const handleInput = (data) => {
 const onCommentCb = (data) => {
   console.log("onCommentCb", data.value);
   if (data.value.type == TypeFile) {
-    uploadAndSendMessage(data.value.file, data.value.file?.options, )
+    uploadAndSendMessage(data.value.file)
   }
   if (data.value.type == TypeRedPacket) {
     queryData.red_packet_id = data.value.red_packet_id;
@@ -152,6 +152,7 @@ const sendMessage = (type) => {
 };
 
 const uploadAndSendMessage = (fileInfo) => {
+  console.log("上传的文件信息", fileInfo);
   const data = new FormData();
   const file = fileInfo.file;
   if (fileInfo?.options) {
