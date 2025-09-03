@@ -6,7 +6,6 @@ import { useUserStore } from "@/stores/user";
 import { useAppStore } from "@/stores/app";
 import { useRouter, useRoute } from "vue-router";
 import { Verify } from "@/components/Verifition";
-import ws from "@/utils/websocket";
 
 const router = useRouter();
 const route = useRoute();
@@ -66,16 +65,6 @@ const setCaptchaImgSize = () => {
 }
 
 onMounted(() => {
-  console.log(route.query);
-  if (route.query?.logout == 1) {
-    ws.stop();
-    userStore.handleLogout();
-    appStore.clear();
-    showFailToast("账户信息已失效，请重新登录");
-    setTimeout(() => {
-      router.push("/login");
-    }, 200);
-  }
   if (userStore.isLogin) {
     router.push("/chat");
   }
@@ -91,7 +80,7 @@ onMounted(() => {
 
 <template>
   <section class="login">
-    <h3 style="color: var(--black-white-color)">手机号登录</h3>
+    <h3 style="color: var(--black-white-color); margin: 1rem">手机号登录</h3>
     <van-form @submit="getCode">
       <van-cell-group inset>
         <van-field v-model="formData.mobile" name="手机号" label="手机号" placeholder="手机号" />

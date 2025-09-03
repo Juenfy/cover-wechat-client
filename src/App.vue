@@ -66,8 +66,8 @@ watch(
 //全局消息监听
 const onMessage = (data) => {
   console.log("App:onMessage", data);
-  let isGroup,toUser,currentPath;
-  if ([ActionAt,ActionSend].indexOf(data?.action) != -1) {
+  let isGroup, toUser, currentPath;
+  if ([ActionAt, ActionSend].indexOf(data?.action) != -1) {
     isGroup = data.data.is_group;
     toUser = isGroup == 1 ? data.data.to_user : data.data.from.id;
     currentPath = "/chat/message/" + toUser + "/" + isGroup;
@@ -132,7 +132,10 @@ const onMessage = (data) => {
             data.data.time +
             "在其他地方登录，您已被强制下线，请重新登录。如果不是本人操作，请重新修改密码。",
         }).then(() => {
-          router.push({ name: "login", query: { logout: 1 } });
+          ws.stop();
+          appStore.clear();
+          userStore.handleLogout();
+          router.push("/login");
         });
         break;
       case ActionApply:
